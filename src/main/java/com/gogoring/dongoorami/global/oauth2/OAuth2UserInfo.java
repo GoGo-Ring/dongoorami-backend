@@ -25,6 +25,8 @@ public class OAuth2UserInfo {
             return ofKakao(attributes);
         } else if ("google".equals(provider)) {
             return ofGoogle(attributes);
+        } else if ("naver".equals(provider)) {
+            return ofNaver((Map<String, Object>) attributes.get("response"));
         }
 
         throw new IllegalArgumentException("소셜 로그인 방식이 존재하지 않습니다.");
@@ -48,6 +50,15 @@ public class OAuth2UserInfo {
                 .provider("google")
                 .name((String) attributes.get("name"))
                 .profileImage((String) attributes.get("picture"))
+                .build();
+    }
+
+    private static OAuth2UserInfo ofNaver(Map<String, Object> attributes) {
+        return OAuth2UserInfo.builder()
+                .providerId((String) attributes.get("id"))
+                .provider("naver")
+                .name((String) attributes.get("name"))
+                .profileImage((String) attributes.get("profile_image"))
                 .build();
     }
 
