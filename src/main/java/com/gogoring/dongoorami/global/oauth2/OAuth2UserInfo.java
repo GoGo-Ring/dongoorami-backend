@@ -23,6 +23,8 @@ public class OAuth2UserInfo {
     public static OAuth2UserInfo of(String provider, Map<String, Object> attributes) {
         if ("kakao".equals(provider)) {
             return ofKakao(attributes);
+        } else if ("google".equals(provider)) {
+            return ofGoogle(attributes);
         }
 
         throw new IllegalArgumentException("소셜 로그인 방식이 존재하지 않습니다.");
@@ -37,6 +39,15 @@ public class OAuth2UserInfo {
                 .provider("kakao")
                 .name((String) kakaoProfile.get("nickname"))
                 .profileImage((String) kakaoProfile.get("profile_image_url"))
+                .build();
+    }
+
+    private static OAuth2UserInfo ofGoogle(Map<String, Object> attributes) {
+        return OAuth2UserInfo.builder()
+                .providerId((String) attributes.get("sub"))
+                .provider("google")
+                .name((String) attributes.get("name"))
+                .profileImage((String) attributes.get("picture"))
                 .build();
     }
 
