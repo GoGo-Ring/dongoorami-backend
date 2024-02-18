@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-REPOSITORY=/home/ubuntu/magazine
+REPOSITORY=/home/ubuntu/dongoorami
 cd $REPOSITORY
 
 APP_NAME=dongoorami
