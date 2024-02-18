@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  # develop 브랜치에서 일어난 push/pull request에 작동한다.
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+
+  workflow_dispatch:
+
+env:
+  PROJECT_NAME: dongoorami
+  BUCKET_NAME: dongoorami-bucket
+  CODE_DEPLOY_APP_NAME: dongoorami-codedeploy
+  DEPLOYMENT_GROUP_NAME: dongoorami
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: JDK 17 설치
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      # gitignore한 파일 생성해주기
+      - name: create applications.yml
+        shell: bash
+        run: |
+          mkdir ./src/main/resources
+          cd ./src/main/resources
+          touch ./application.yml
+
+          echo "${{ secrets.APPLICATION }}" >> ./application.yml
+
+      # gradlew 파일 실행권한 설정
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      # 빌드 시작
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      # 프로젝트 zip파일로 압축
+      - name: Make Zip File
+        run: zip -qq -r ./$GITHUB_SHA.zip .
+
+      # aws 접근 id, key
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      # s3에 압축한 zip파일 업로드
+      - name: upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.zip
+
+      # s3에 업로드한 파일 code Deploy에서 배포 요청
+      - name: deploy with AWS codeDeploy
+        run: aws deploy create-deployment
+          --application-name $CODE_DEPLOY_APP_NAME
+          --deployment-config-name CodeDeployDefault.AllAtOnce
+          --deployment-group-name $DEPLOYMENT_GROUP_NAME
+          --s3-location bucket=$BUCKET_NAME,bundleType=zip,key=$PROJECT_NAME/$GITHUB_SHA.zip
