@@ -4,7 +4,6 @@ import com.gogoring.dongoorami.member.domain.Member;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @RequiredArgsConstructor
@@ -14,10 +13,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return member.getRoles()
-                .stream()
-                .map(role -> new SimpleGrantedAuthority(role.name()))
-                .toList();
+        return member.getRoles();
     }
 
     @Override
