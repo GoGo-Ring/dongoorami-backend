@@ -9,3 +9,13 @@
 ifndef::snippets[]
 :snippets: build/generated-snippets
 endif::[]
+
+== 회원 API
+=== 토큰 재발급
+
+.Request
+include::{snippets}/MemberControllerTest/reissueToken/http-request.adoc[]
+
+.Response
+include::{snippets}/MemberControllerTest/reissueToken/http-response.adoc[]
+include::{snippets}/MemberControllerTest/reissueToken/response-fields.adoc[]
