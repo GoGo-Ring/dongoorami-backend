@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @AllArgsConstructor
 public class CustomOAuth2User implements OAuth2User {
+
     private String provider;
     private Map<String, Object> attributes;
     private List<GrantedAuthority> authorities;

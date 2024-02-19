@@ -17,17 +17,15 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+
     private final MemberRepository memberRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        OAuth2UserInfo oAuth2UserInfo = null;
         String provider = userRequest.getClientRegistration().getRegistrationId();
-        if (provider.equals("kakao")) {
-            oAuth2UserInfo = new KakaoUserInfo(oAuth2User.getAttributes());
-        }
+        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfo.of(provider, oAuth2User.getAttributes());
 
         Member member = saveOrUpdate(oAuth2UserInfo);
         List<GrantedAuthority> authorities = new ArrayList<>();
@@ -40,7 +38,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private Member saveOrUpdate(OAuth2UserInfo oAuth2UserInfo) {
-        Member member = memberRepository.findByProviderIdAndIsActivatedIsTrue(oAuth2UserInfo.getProviderId())
+        Member member = memberRepository.findByProviderIdAndIsActivatedIsTrue(
+                        oAuth2UserInfo.getProviderId())
                 .map(entity -> entity.updateName(oAuth2UserInfo.getName()))
                 .orElse(oAuth2UserInfo.toEntity());
 

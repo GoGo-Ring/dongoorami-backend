@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
+
     private final Member member;
 
     @Override

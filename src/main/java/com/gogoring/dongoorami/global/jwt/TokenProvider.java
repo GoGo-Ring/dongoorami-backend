@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class TokenProvider implements InitializingBean {
+
     private static final String TOKEN_PREFIX = "Bearer ";
 
     private final CustomUserDetailsService customUserDetailsService;
@@ -39,10 +40,10 @@ public class TokenProvider implements InitializingBean {
     private Key key;
 
     public TokenProvider(CustomUserDetailsService customUserDetailsService,
-                         TokenRepository tokenRepository,
-                         @Value("${jwt.secret}") String secret,
-                         @Value("${jwt.access-expiration-time}") Long accessExpirationTime,
-                         @Value("${jwt.refresh-expiration-time}") Long refreshExpirationTime) {
+            TokenRepository tokenRepository,
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.access-expiration-time}") Long accessExpirationTime,
+            @Value("${jwt.refresh-expiration-time}") Long refreshExpirationTime) {
         this.customUserDetailsService = customUserDetailsService;
         this.tokenRepository = tokenRepository;
         this.secret = secret;
@@ -101,7 +102,8 @@ public class TokenProvider implements InitializingBean {
         String providerId = parseClaims(token).getSubject();
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(providerId);
 
-        return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails, token,
+                userDetails.getAuthorities());
     }
 
     public boolean validateAccessToken(String accessToken) {
