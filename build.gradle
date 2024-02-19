@@ -49,3 +49,16 @@ tasks.named('asciidoctor') {
     inputs.dir snippetsDir
     dependsOn test
 }
+
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')
+}
+
+bootJar {
+    enabled = true
+    dependsOn asciidoctor
+    copy {
+        from file('build/docs/asciidoc')
+        into file("src/main/resources/static/docs")
+    }
+}
