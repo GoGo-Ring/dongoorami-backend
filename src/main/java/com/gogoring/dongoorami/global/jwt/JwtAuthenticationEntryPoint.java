@@ -12,8 +12,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void commence(HttpServletRequest request, HttpServletResponse response,
+            AuthenticationException authException) throws IOException, ServletException {
         log.error("Unauthorized Request : {}", request.getRequestURI());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
     }

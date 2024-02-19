@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+
     private final MemberRepository memberRepository;
 
     @Override
@@ -37,7 +38,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private Member saveOrUpdate(OAuth2UserInfo oAuth2UserInfo) {
-        Member member = memberRepository.findByProviderIdAndIsActivatedIsTrue(oAuth2UserInfo.getProviderId())
+        Member member = memberRepository.findByProviderIdAndIsActivatedIsTrue(
+                        oAuth2UserInfo.getProviderId())
                 .map(entity -> entity.updateName(oAuth2UserInfo.getName()))
                 .orElse(oAuth2UserInfo.toEntity());
 
