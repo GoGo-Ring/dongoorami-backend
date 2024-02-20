@@ -2,7 +2,7 @@ package com.gogoring.dongoorami.member.application;
 
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
-import com.gogoring.dongoorami.member.dto.request.MemberLogoutRequest;
+import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
 import com.gogoring.dongoorami.member.dto.response.TokenDto;
 import com.gogoring.dongoorami.member.exception.InvalidRefreshTokenException;
@@ -44,11 +44,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void logout(MemberLogoutRequest memberLogoutRequest) {
-        String providerId = tokenProvider.getProviderId(memberLogoutRequest.getRefreshToken());
+    public void logout(MemberLogoutAndQuitRequest memberLogoutAndQuitRequest) {
+        String providerId = tokenProvider.getProviderId(memberLogoutAndQuitRequest.getRefreshToken());
         tokenRepository.deleteByKey(providerId);
 
-        String accessToken = tokenProvider.getTokenWithNoPrefix(memberLogoutRequest.getAccessToken());
+        String accessToken = tokenProvider.getTokenWithNoPrefix(memberLogoutAndQuitRequest.getAccessToken());
         Duration expirationTime = tokenProvider.getRestExpirationTime(accessToken);
         tokenRepository.save(accessToken, LOGOUT_VALUE, expirationTime);
     }

@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
-import com.gogoring.dongoorami.member.dto.request.MemberLogoutRequest;
+import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -104,15 +104,15 @@ public class MemberControllerTest {
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
         String refreshToken = tokenProvider.createRefreshToken(member.getProviderId());
-        MemberLogoutRequest memberLogoutRequest = new MemberLogoutRequest();
-        ReflectionTestUtils.setField(memberLogoutRequest, "accessToken", accessToken);
-        ReflectionTestUtils.setField(memberLogoutRequest, "refreshToken", refreshToken);
+        MemberLogoutAndQuitRequest memberLogoutAndQuitRequest = new MemberLogoutAndQuitRequest();
+        ReflectionTestUtils.setField(memberLogoutAndQuitRequest, "accessToken", accessToken);
+        ReflectionTestUtils.setField(memberLogoutAndQuitRequest, "refreshToken", refreshToken);
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 patch("/api/v1/members/logout")
                         .header("Authorization", accessToken)
-                        .content(new ObjectMapper().writeValueAsString(memberLogoutRequest))
+                        .content(new ObjectMapper().writeValueAsString(memberLogoutAndQuitRequest))
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
