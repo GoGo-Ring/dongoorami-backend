@@ -62,6 +62,10 @@ asciidoctor {
     dependsOn test
 }
 
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')
+}
+
 task copyDocument(type: Copy) {
     dependsOn asciidoctor
     from file("${asciidoctor.outputDir}")
@@ -70,9 +74,8 @@ task copyDocument(type: Copy) {
 
 bootJar {
     dependsOn asciidoctor
-    copy {
-        from "${asciidoctor.outputDir}"
-        into 'BOOT-INF/classes/static/docs'
+    from("build/docs/asciidoc") {
+        into("BOOT-INF/classes/static/docs")
     }
 }
 
