@@ -1,6 +1,7 @@
 package com.gogoring.dongoorami.member.presentation;
 
 import com.gogoring.dongoorami.member.application.MemberService;
+import com.gogoring.dongoorami.member.dto.request.MemberLogoutRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
 import com.gogoring.dongoorami.member.dto.response.TokenDto;
 import jakarta.validation.Valid;
@@ -22,5 +23,11 @@ public class MemberController {
     public ResponseEntity<TokenDto> reissueToken(
             @Valid @RequestBody MemberReissueRequest memberReissueRequest) {
         return ResponseEntity.ok(memberService.reissueToken(memberReissueRequest));
+    }
+
+    @PatchMapping("/members/logout")
+    public ResponseEntity<Void> logout(@Valid @RequestBody MemberLogoutRequest memberLogoutRequest) {
+        memberService.logout(memberLogoutRequest);
+        return ResponseEntity.ok().build();
     }
 }
