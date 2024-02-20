@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
+import com.gogoring.dongoorami.member.dto.request.MemberLogoutRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -41,9 +42,19 @@ public class MemberControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private Member member;
+
     @BeforeEach
     void setUp() {
         memberRepository.deleteAll();
+
+        member = Member.builder()
+                .name("김뫄뫄")
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        memberRepository.save(member);
     }
 
     @AfterEach
@@ -55,22 +66,16 @@ public class MemberControllerTest {
     @DisplayName("토큰을 재발급할 수 있다.")
     void success_reissueToken() throws Exception {
         // given
-        Member member = Member.builder()
-                .name("김뫄뫄")
-                .profileImage("image.png")
-                .provider("kakao")
-                .providerId("alsjkghlaskdjgh")
-                .build();
-        memberRepository.save(member);
-
         String refreshToken = tokenProvider.createRefreshToken(member.getProviderId());
         MemberReissueRequest memberReissueRequest = new MemberReissueRequest();
         ReflectionTestUtils.setField(memberReissueRequest, "refreshToken", refreshToken);
 
         // when
-        ResultActions resultActions = mockMvc.perform(patch("/api/v1/members/reissue").content(
-                        new ObjectMapper().writeValueAsString(memberReissueRequest))
-                .contentType(MediaType.APPLICATION_JSON));
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/members/reissue")
+                        .content(new ObjectMapper().writeValueAsString(memberReissueRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
 
         // then
         resultActions.andExpect(status().isOk())
@@ -79,11 +84,47 @@ public class MemberControllerTest {
                 .andDo(document("{ClassName}/reissueToken",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("refreshToken").type(JsonFieldType.STRING)
+                                        .description("refreshToken")
+                        ),
                         responseFields(
                                 fieldWithPath("accessToken").type(JsonFieldType.STRING)
                                         .description("accessToken(만료기한 1시간)"),
                                 fieldWithPath("refreshToken").type(JsonFieldType.STRING)
                                         .description("refreshToken(만료기한 1주)")
+                        ))
+                );
+    }
+
+    @Test
+    @DisplayName("로그아웃을 할 수 있다.")
+    void success_logout() throws Exception {
+        // given
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        String refreshToken = tokenProvider.createRefreshToken(member.getProviderId());
+        MemberLogoutRequest memberLogoutRequest = new MemberLogoutRequest();
+        ReflectionTestUtils.setField(memberLogoutRequest, "accessToken", accessToken);
+        ReflectionTestUtils.setField(memberLogoutRequest, "refreshToken", refreshToken);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/members/logout")
+                        .header("Authorization", accessToken)
+                        .content(new ObjectMapper().writeValueAsString(memberLogoutRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/logout",
+                        preprocessRequest(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("accessToken").type(JsonFieldType.STRING)
+                                        .description("accessToken"),
+                                fieldWithPath("refreshToken").type(JsonFieldType.STRING)
+                                        .description("refreshToken")
                         ))
                 );
     }
