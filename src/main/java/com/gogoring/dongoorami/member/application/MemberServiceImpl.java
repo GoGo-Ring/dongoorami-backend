@@ -52,4 +52,14 @@ public class MemberServiceImpl implements MemberService {
         Duration expirationTime = tokenProvider.getRestExpirationTime(accessToken);
         tokenRepository.save(accessToken, LOGOUT_VALUE, expirationTime);
     }
+
+    @Transactional
+    @Override
+    public void quit(MemberLogoutAndQuitRequest memberLogoutAndQuitRequest, Long memberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+        member.updateIsActivatedFalse();
+
+        logout(memberLogoutAndQuitRequest);
+    }
 }

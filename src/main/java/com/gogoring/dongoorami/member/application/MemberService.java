@@ -9,4 +9,6 @@ public interface MemberService {
     TokenDto reissueToken(MemberReissueRequest memberReissueRequest);
 
     void logout(MemberLogoutAndQuitRequest memberLogoutAndQuitRequest);
+
+    void quit(MemberLogoutAndQuitRequest memberLogoutAndQuitRequest, Long memberId);
 }
