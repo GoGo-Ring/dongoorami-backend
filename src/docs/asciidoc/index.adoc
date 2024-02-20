@@ -15,7 +15,17 @@ endif::[]
 
 .Request
 include::{snippets}/MemberControllerTest/reissueToken/http-request.adoc[]
+include::{snippets}/MemberControllerTest/reissueToken/request-fields.adoc[]
 
 .Response
 include::{snippets}/MemberControllerTest/reissueToken/http-response.adoc[]
 include::{snippets}/MemberControllerTest/reissueToken/response-fields.adoc[]
+
+=== 로그아웃
+
+.Request
+include::{snippets}/MemberControllerTest/logout/http-request.adoc[]
+include::{snippets}/MemberControllerTest/logout/request-fields.adoc[]
+
+.Response
+include::{snippets}/MemberControllerTest/logout/http-response.adoc[]
