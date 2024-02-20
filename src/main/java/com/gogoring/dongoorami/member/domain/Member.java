@@ -14,6 +14,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -50,6 +52,15 @@ public class Member extends BaseEntity {
         this.roles = new ArrayList<>() {{
             add(Role.ROLE_MEMBER);
         }};
+    }
+
+    public List<GrantedAuthority> getRoles() {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (Role role : this.roles) {
+            authorities.add(new SimpleGrantedAuthority(role.name()));
+        }
+
+        return authorities;
     }
 
     public Member updateName(String name) {
