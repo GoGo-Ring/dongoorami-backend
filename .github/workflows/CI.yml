@@ -38,6 +38,15 @@ jobs:
           touch ./src/main/resources/application.yml
           echo "${{ secrets.APPLICATION }}" >> ./src/main/resources/application.yml
 
+      - name: create application.yml for test
+        shell: bash
+        run: |
+          if [ ! -d "./src/test/resources" ]; then
+            mkdir -p ./src/test/resources
+          fi
+          touch ./src/test/resources/application.yml
+          echo "${{ secrets.APPLICATION_TEST }}" >> ./src/test/resources/application.yml
+
       # gradlew 파일 실행권한 설정
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
