@@ -64,6 +64,7 @@ asciidoctor {
 
 asciidoctor.doFirst {
     delete file('src/main/resources/static/docs')
+    delete file('BOOT-INF/classes/static/docs')
 }
 
 task copyDocument(type: Copy) {
