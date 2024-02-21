@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
-                        requests -> requests.requestMatchers("/error", "/favicon.ico", "/docs/index.html").permitAll()
+                        requests -> requests.requestMatchers("/error", "/favicon.ico", "/docs/**").permitAll()
                                 .requestMatchers("/oauth2/authorization/**", "/login/oauth2/code/**", "/oauth/**").permitAll()
                                 .requestMatchers("/api/v1/members/reissue").permitAll()
                                 .anyRequest().authenticated()
