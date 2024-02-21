@@ -1,4 +1,4 @@
-package com.gogoring.dongoorami.config;
+package com.gogoring.dongoorami.global.config;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
