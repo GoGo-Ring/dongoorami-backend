@@ -64,7 +64,6 @@ asciidoctor {
 
 asciidoctor.doFirst {
     delete file('src/main/resources/static/docs')
-    delete file('BOOT-INF/classes/static/docs')
 }
 
 task copyDocument(type: Copy) {
@@ -75,8 +74,8 @@ task copyDocument(type: Copy) {
 
 bootJar {
     dependsOn asciidoctor
-    from("build/docs/asciidoc") {
-        into("BOOT-INF/classes/static/docs")
+    from ("${asciidoctor.outputDir}") {
+        into 'static/docs'
     }
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
