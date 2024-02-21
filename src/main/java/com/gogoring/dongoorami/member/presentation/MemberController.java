@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +35,7 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/members/quit")
+    @DeleteMapping("/members")
     public ResponseEntity<Void> quit(
             @Valid @RequestBody MemberLogoutAndQuitRequest memberLogoutAndQuitRequest,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {

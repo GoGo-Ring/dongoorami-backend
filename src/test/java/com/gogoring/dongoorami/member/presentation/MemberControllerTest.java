@@ -158,7 +158,7 @@ public class MemberControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/v1/members/quit")
+                delete("/api/v1/members")
                         .header("Authorization", accessToken)
                         .content(new ObjectMapper().writeValueAsString(memberLogoutAndQuitRequest))
                         .contentType(MediaType.APPLICATION_JSON)
