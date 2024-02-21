@@ -9,6 +9,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
@@ -24,6 +25,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -42,19 +44,9 @@ public class MemberControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private Member member;
-
     @BeforeEach
     void setUp() {
         memberRepository.deleteAll();
-
-        member = Member.builder()
-                .name("김뫄뫄")
-                .profileImage("image.png")
-                .provider("kakao")
-                .providerId("alsjkghlaskdjgh")
-                .build();
-        memberRepository.save(member);
     }
 
     @AfterEach
@@ -66,6 +58,14 @@ public class MemberControllerTest {
     @DisplayName("토큰을 재발급할 수 있다.")
     void success_reissueToken() throws Exception {
         // given
+        Member member = Member.builder()
+                .name("김뫄뫄")
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        memberRepository.save(member);
+
         String refreshToken = tokenProvider.createRefreshToken(member.getProviderId());
         MemberReissueRequest memberReissueRequest = new MemberReissueRequest();
         ReflectionTestUtils.setField(memberReissueRequest, "refreshToken", refreshToken);
@@ -101,6 +101,14 @@ public class MemberControllerTest {
     @DisplayName("로그아웃을 할 수 있다.")
     void success_logout() throws Exception {
         // given
+        Member member = Member.builder()
+                .name("김뫄뫄")
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        memberRepository.save(member);
+
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
         String refreshToken = tokenProvider.createRefreshToken(member.getProviderId());
@@ -120,6 +128,47 @@ public class MemberControllerTest {
         resultActions.andExpect(status().isOk())
                 .andDo(document("{ClassName}/logout",
                         preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("accessToken").type(JsonFieldType.STRING)
+                                        .description("accessToken"),
+                                fieldWithPath("refreshToken").type(JsonFieldType.STRING)
+                                        .description("refreshToken")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("회원 탈퇴를 할 수 있다.")
+    void success_quit() throws Exception {
+        // given
+        Member member = (Member) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        memberRepository.save(member);
+
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        String refreshToken = tokenProvider.createRefreshToken(member.getProviderId());
+        MemberLogoutAndQuitRequest memberLogoutAndQuitRequest = new MemberLogoutAndQuitRequest();
+        ReflectionTestUtils.setField(memberLogoutAndQuitRequest, "accessToken", accessToken);
+        ReflectionTestUtils.setField(memberLogoutAndQuitRequest, "refreshToken", refreshToken);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/members/quit")
+                        .header("Authorization", accessToken)
+                        .content(new ObjectMapper().writeValueAsString(memberLogoutAndQuitRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/quit",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("accessToken").type(JsonFieldType.STRING)
                                         .description("accessToken"),
