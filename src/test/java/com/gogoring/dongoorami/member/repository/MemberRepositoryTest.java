@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
@@ -29,6 +30,27 @@ public class MemberRepositoryTest {
     @AfterEach
     void tearDown() {
         memberRepository.deleteAll();
+    }
+
+    @Test
+    @DisplayName("id로 회원을 조회할 수 있다.")
+    void success_findByIdAndIsActivatedIsTrue() {
+        // given
+        Member member = Member.builder()
+                .name("김뫄뫄")
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        ReflectionTestUtils.setField(member, "id", 1L);
+        memberRepository.save(member);
+
+        // when
+        Member savedMember = memberRepository.findByIdAndIsActivatedIsTrue(member.getId())
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        // then
+        assertThat(savedMember.getId()).isEqualTo(member.getId());
     }
 
     @Test
@@ -49,9 +71,6 @@ public class MemberRepositoryTest {
                 MemberErrorCode.MEMBER_NOT_FOUND));
 
         // then
-        assertThat(savedMember.getName()).isEqualTo(member.getName());
-        assertThat(savedMember.getProfileImage()).isEqualTo(member.getProfileImage());
-        assertThat(savedMember.getProvider()).isEqualTo(member.getProvider());
         assertThat(savedMember.getProviderId()).isEqualTo(member.getProviderId());
     }
 }

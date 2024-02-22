@@ -8,5 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
+    Optional<Member> findByIdAndIsActivatedIsTrue(Long id);
+
     Optional<Member> findByProviderIdAndIsActivatedIsTrue(String providerId);
 }

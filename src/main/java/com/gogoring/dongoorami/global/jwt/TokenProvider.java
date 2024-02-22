@@ -109,9 +109,9 @@ public class TokenProvider implements InitializingBean {
     public boolean validateAccessToken(String accessToken) {
         try {
             Claims claims = parseClaims(accessToken);
-            String signOutToken = tokenRepository.findByKey(accessToken);
+            String logoutToken = tokenRepository.findByKey(accessToken);
 
-            return !claims.getExpiration().before(new Date()) && (signOutToken == null);
+            return !claims.getExpiration().before(new Date()) && (logoutToken == null);
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.warn("잘못된 JWT 서명입니다.", e);
         } catch (ExpiredJwtException e) {
