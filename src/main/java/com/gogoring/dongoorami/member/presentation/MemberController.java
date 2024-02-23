@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -41,5 +43,13 @@ public class MemberController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         memberService.quit(memberLogoutAndQuitRequest, customUserDetails.getId());
         return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/members/profile-image")
+    public ResponseEntity<String> updateProfileImage(
+            @RequestPart("image") MultipartFile multipartFile,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(memberService.updateProfileImage(multipartFile,
+                customUserDetails.getId()));
     }
 }
