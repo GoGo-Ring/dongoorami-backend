@@ -38,3 +38,13 @@ include::{snippets}/MemberControllerTest/quit/request-fields.adoc[]
 
 .Response
 include::{snippets}/MemberControllerTest/quit/http-response.adoc[]
+
+== 동행 API
+=== 동행 구인 게시글 작성
+
+.Request
+include::{snippets}/AccompanyControllerTest/createAccompanyPost/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyPost/request-fields.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/createAccompanyPost/http-response.adoc[]
