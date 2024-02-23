@@ -3,6 +3,8 @@ package com.gogoring.dongoorami.accompany.domain;
 import com.gogoring.dongoorami.global.common.BaseEntity;
 import com.gogoring.dongoorami.member.domain.Member;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -47,6 +49,11 @@ public class AccompanyPost extends BaseEntity {
 
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    private final RecruitmentStatus status = RecruitmentStatus.PROCEEDING;
+
+    private final Long viewCount = 0L;
+
     private String image;
 
     @Builder
@@ -65,6 +72,20 @@ public class AccompanyPost extends BaseEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.content = content;
+    }
+
+    public enum RecruitmentStatus {
+        PROCEEDING("모집 중"), COMPLETED("모집 완료");
+
+        String name;
+
+        RecruitmentStatus(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 
 }
