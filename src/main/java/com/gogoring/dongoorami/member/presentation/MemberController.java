@@ -4,6 +4,7 @@ import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import com.gogoring.dongoorami.member.application.MemberService;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
+import com.gogoring.dongoorami.member.dto.response.MemberUpdateProfileImageResponse;
 import com.gogoring.dongoorami.member.dto.response.TokenDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class MemberController {
     }
 
     @PatchMapping("/members/profile-image")
-    public ResponseEntity<String> updateProfileImage(
+    public ResponseEntity<MemberUpdateProfileImageResponse> updateProfileImage(
             @RequestPart("image") MultipartFile multipartFile,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(memberService.updateProfileImage(multipartFile,

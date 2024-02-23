@@ -10,6 +10,7 @@ import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
+import com.gogoring.dongoorami.member.dto.response.MemberUpdateProfileImageResponse;
 import com.gogoring.dongoorami.member.dto.response.TokenDto;
 import com.gogoring.dongoorami.global.exception.InvalidFileExtensionException;
 import com.gogoring.dongoorami.member.exception.InvalidRefreshTokenException;
@@ -86,7 +87,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     @Override
-    public String updateProfileImage(MultipartFile multipartFile, Long memberId) {
+    public MemberUpdateProfileImageResponse updateProfileImage(MultipartFile multipartFile, Long memberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
 
@@ -119,7 +120,7 @@ public class MemberServiceImpl implements MemberService {
         String newProfileImageUrl = amazonS3.getUrl(bucket, s3Filename).toString();
         member.updateProfileImage(newProfileImageUrl);
 
-        return newProfileImageUrl;
+        return MemberUpdateProfileImageResponse.of(newProfileImageUrl);
     }
 
     private void validateFileExtension(String originalFilename) {
