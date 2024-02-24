@@ -202,6 +202,74 @@ class AccompanyControllerTest {
                 ));
     }
 
+    @Test
+    @WithCustomMockUser
+    @DisplayName("동행 구인글 목록을 조회할 수 있다. - 이후 요청")
+    void success_getAccompanyPostsAfterFirst() throws Exception {
+        // given
+        Member member = (Member) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        String cursorId = "17", postCnt = "3";
+        accompanyPostRepository.saveAll(createAccompanyPosts(member, 5));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompany/posts")
+                        .header("Authorization", accessToken)
+                        .param("cursorId", cursorId)
+                        .param("size", postCnt)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getAccompanyPostsAfterFirst",
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("cursorId").description("마지막으로 받은 동행 구인글 id"),
+                                parameterWithName("size").description("요청할 동행 구인글 개수")),
+                        responseFields(
+                                fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN)
+                                        .description("다음 동행 구인글 존재 여부"),
+                                fieldWithPath("accompanyPostInfos").type(JsonFieldType.ARRAY)
+                                        .description("동행 구인글 정보 목록"),
+                                fieldWithPath("accompanyPostInfos[].id").type(JsonFieldType.NUMBER)
+                                        .description("동행 구인글 id"),
+                                fieldWithPath("accompanyPostInfos[].title").type(
+                                                JsonFieldType.STRING)
+                                        .description("제목"),
+                                fieldWithPath("accompanyPostInfos[].writer").type(
+                                                JsonFieldType.STRING)
+                                        .description("작성자"),
+                                fieldWithPath("accompanyPostInfos[].updatedAt").type(
+                                                JsonFieldType.STRING)
+                                        .description("작성 날짜"),
+                                fieldWithPath("accompanyPostInfos[].status").type(
+                                                JsonFieldType.STRING)
+                                        .description("구인 상태"),
+                                fieldWithPath("accompanyPostInfos[].concertName").type(
+                                                JsonFieldType.STRING)
+                                        .description("공연명"),
+                                fieldWithPath("accompanyPostInfos[].viewCount").type(
+                                                JsonFieldType.NUMBER)
+                                        .description("조회수"),
+                                fieldWithPath("accompanyPostInfos[].commentCount").type(
+                                                JsonFieldType.NUMBER)
+                                        .description("댓글수"),
+                                fieldWithPath("accompanyPostInfos[].gender").type(
+                                                JsonFieldType.STRING)
+                                        .description("성별"),
+                                fieldWithPath("accompanyPostInfos[].totalPeople").type(
+                                                JsonFieldType.NUMBER)
+                                        .description("모집 인원 수")
+                        )
+                ));
+    }
+
     private List<AccompanyPost> createAccompanyPosts(Member member, int size) {
         List<AccompanyPost> accompanyPosts = new ArrayList<>();
         for (int i = 0; i < size; i++) {
