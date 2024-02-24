@@ -10,14 +10,12 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,13 +57,11 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-        objectMapper.registerModule(new JavaTimeModule());
         AccompanyPostRequest accompanyPostRequest = AccompanyPostRequest.builder()
                 .concertName("2024 SG워너비 콘서트 : 우리의 노래")
                 .concertPlace("KSPO DOME")
-                .startDate(LocalDate.parse("2024.03.22", dateTimeFormatter))
-                .endDate(LocalDate.parse("2024.03.22", dateTimeFormatter))
+                .startDate(LocalDate.of(2024, 3, 22))
+                .endDate(LocalDate.of(2024, 3, 22))
                 .title("서울 같이 갈 울싼 사람 구합니다~~")
                 .gender("여")
                 .region("서울")

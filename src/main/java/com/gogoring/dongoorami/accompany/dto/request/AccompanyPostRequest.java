@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 @Builder
 @AllArgsConstructor
@@ -46,11 +45,9 @@ public class AccompanyPostRequest {
     private String gender;
 
     @NotNull(message = "startDate은 공백일 수 없습니다.")
-    @DateTimeFormat(pattern = "yyyy.MM.dd")
     private LocalDate startDate;
 
     @NotNull(message = "endDate은 공백일 수 없습니다.")
-    @DateTimeFormat(pattern = "yyyy.MM.dd")
     private LocalDate endDate;
 
     @NotBlank(message = "content은 공백일 수 없습니다.")
