@@ -7,7 +7,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
-public class WithCustomMockUserSecurityContextFactory implements WithSecurityContextFactory<WithCustomMockUser> {
+public class WithCustomMockUserSecurityContextFactory implements
+        WithSecurityContextFactory<WithCustomMockUser> {
+
     @Override
     public SecurityContext createSecurityContext(WithCustomMockUser annotation) {
         Long id = 1L;

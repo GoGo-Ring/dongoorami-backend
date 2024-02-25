@@ -20,40 +20,25 @@ import lombok.NoArgsConstructor;
 @Entity
 public class AccompanyPost extends BaseEntity {
 
+    @Enumerated(EnumType.STRING)
+    private final RecruitmentStatus status = RecruitmentStatus.PROCEEDING;
+    private final Long viewCount = 0L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne
     private Member member;
-
     private String title;
-
     private String concertName;
-
     private String concertPlace;
-
     private String region;
-
     private Long startAge;
-
     private Long endAge;
-
     private Long totalPeople;
-
     private String gender;
-
     private LocalDate startDate;
-
     private LocalDate endDate;
-
     private String content;
-
-    @Enumerated(EnumType.STRING)
-    private final RecruitmentStatus status = RecruitmentStatus.PROCEEDING;
-
-    private final Long viewCount = 0L;
-
     private String image;
 
     @Builder

@@ -45,10 +45,12 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void logout(MemberLogoutAndQuitRequest memberLogoutAndQuitRequest) {
-        String providerId = tokenProvider.getProviderId(memberLogoutAndQuitRequest.getRefreshToken());
+        String providerId = tokenProvider.getProviderId(
+                memberLogoutAndQuitRequest.getRefreshToken());
         tokenRepository.deleteByKey(providerId);
 
-        String accessToken = tokenProvider.getTokenWithNoPrefix(memberLogoutAndQuitRequest.getAccessToken());
+        String accessToken = tokenProvider.getTokenWithNoPrefix(
+                memberLogoutAndQuitRequest.getAccessToken());
         Duration expirationTime = tokenProvider.getRestExpirationTime(accessToken);
         tokenRepository.save(accessToken, LOGOUT_VALUE, expirationTime);
     }
