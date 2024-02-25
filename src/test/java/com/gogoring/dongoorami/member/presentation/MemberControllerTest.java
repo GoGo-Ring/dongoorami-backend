@@ -98,6 +98,7 @@ public class MemberControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     @DisplayName("로그아웃을 할 수 있다.")
     void success_logout() throws Exception {
         // given
