@@ -4,6 +4,8 @@ import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
+import com.gogoring.dongoorami.global.util.ImageType;
+import com.gogoring.dongoorami.global.util.S3ImageUtil;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.exception.MemberErrorCode;
 import com.gogoring.dongoorami.member.exception.MemberNotFoundException;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -19,12 +22,16 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     private final AccompanyPostRepository accompanyPostRepository;
     private final MemberRepository memberRepository;
+    private final S3ImageUtil s3ImageUtil;
 
     @Override
     public Long createAccompanyPost(AccompanyPostRequest accompanyPostRequest, Long memberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        return accompanyPostRepository.save(accompanyPostRequest.toEntity(member)).getId();
+        String imageUrl = saveImage(accompanyPostRequest.getImage(), ImageType.ACCOMPANY_POST);
+
+        return accompanyPostRepository.save(accompanyPostRequest.toEntity(member, imageUrl))
+                .getId();
     }
 
     @Override
@@ -55,5 +62,11 @@ public class AccompanyServiceImpl implements AccompanyService {
                                         .commentCount(0L) // 임시
                                         .build()
                         ).toList());
+    }
+
+    private String saveImage(MultipartFile multipartFile, ImageType imageType) {
+        String newFilename = s3ImageUtil.putObject(multipartFile, imageType);
+
+        return s3ImageUtil.getObjectUrl(newFilename, imageType);
     }
 }

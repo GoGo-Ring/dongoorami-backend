@@ -44,7 +44,7 @@ public class AccompanyPost extends BaseEntity {
     @Builder
     public AccompanyPost(Member member, String title, String concertName, String concertPlace,
             String region, Long startAge, Long endAge, Long totalPeople, String gender,
-            LocalDate startDate, LocalDate endDate, String content) {
+            LocalDate startDate, LocalDate endDate, String content, String image) {
         this.member = member;
         this.title = title;
         this.concertName = concertName;
@@ -57,6 +57,7 @@ public class AccompanyPost extends BaseEntity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.content = content;
+        this.image = image;
     }
 
     public enum RecruitmentStatus {
