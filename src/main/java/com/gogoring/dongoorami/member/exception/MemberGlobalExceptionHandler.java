@@ -19,7 +19,8 @@ public class MemberGlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidRefreshTokenException.class)
-    public ResponseEntity<ErrorResponse> catchInvalidRefreshTokenException(InvalidRefreshTokenException e) {
+    public ResponseEntity<ErrorResponse> catchInvalidRefreshTokenException(
+            InvalidRefreshTokenException e) {
         log.error(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
