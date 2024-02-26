@@ -11,6 +11,7 @@ import com.gogoring.dongoorami.member.exception.MemberErrorCode;
 import com.gogoring.dongoorami.member.exception.MemberNotFoundException;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -23,12 +24,17 @@ public class AccompanyServiceImpl implements AccompanyService {
     private final AccompanyPostRepository accompanyPostRepository;
     private final MemberRepository memberRepository;
     private final S3ImageUtil s3ImageUtil;
+    @Value("${cloud.aws.s3.default-image-url}")
+    private String defaultImageUrl;
 
     @Override
     public Long createAccompanyPost(AccompanyPostRequest accompanyPostRequest, Long memberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        String imageUrl = saveImage(accompanyPostRequest.getImage(), ImageType.ACCOMPANY_POST);
+        String imageUrl = defaultImageUrl;
+        if (!accompanyPostRequest.getImage().isEmpty()) {
+            imageUrl = saveImage(accompanyPostRequest.getImage(), ImageType.ACCOMPANY_POST);
+        }
 
         return accompanyPostRepository.save(accompanyPostRequest.toEntity(member, imageUrl))
                 .getId();
