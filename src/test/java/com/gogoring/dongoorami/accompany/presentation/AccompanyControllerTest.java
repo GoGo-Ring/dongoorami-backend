@@ -105,35 +105,35 @@ class AccompanyControllerTest {
         );
 
         // then
-        resultActions.andExpect(status().isOk())
+        resultActions.andExpect(status().isCreated())
                 .andDo(document("{ClassName}/createAccompanyPost",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        requestFields(
-                                fieldWithPath("title").type(JsonFieldType.STRING)
-                                        .description("제목"),
-                                fieldWithPath("concertName").type(JsonFieldType.STRING)
-                                        .description("공연명"),
-                                fieldWithPath("concertPlace").type(JsonFieldType.STRING)
-                                        .description("공연장소"),
-                                fieldWithPath("region").type(JsonFieldType.STRING)
-                                        .description("지역"),
-                                fieldWithPath("startAge").type(JsonFieldType.NUMBER)
-                                        .description("시작 연령"),
-                                fieldWithPath("endAge").type(JsonFieldType.NUMBER)
-                                        .description("종료 연령"),
-                                fieldWithPath("totalPeople").type(JsonFieldType.NUMBER)
-                                        .description("인원 수"),
-                                fieldWithPath("gender").type(JsonFieldType.STRING)
-                                        .description("성별"),
-                                fieldWithPath("startDate").type(JsonFieldType.STRING)
-                                        .description("시작 날짜")
-                                , fieldWithPath("endDate").type(JsonFieldType.STRING)
-                                        .description("종료 날짜")
-                                , fieldWithPath("content").type(JsonFieldType.STRING)
-                                        .description("내용")
-                        ))
-
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestFields(
+                                        fieldWithPath("title").type(JsonFieldType.STRING)
+                                                .description("제목"),
+                                        fieldWithPath("concertName").type(JsonFieldType.STRING)
+                                                .description("공연명"),
+                                        fieldWithPath("concertPlace").type(JsonFieldType.STRING)
+                                                .description("공연장소"),
+                                        fieldWithPath("region").type(JsonFieldType.STRING)
+                                                .description("지역"),
+                                        fieldWithPath("startAge").type(JsonFieldType.NUMBER)
+                                                .description("시작 연령"),
+                                        fieldWithPath("endAge").type(JsonFieldType.NUMBER)
+                                                .description("종료 연령"),
+                                        fieldWithPath("totalPeople").type(JsonFieldType.NUMBER)
+                                                .description("인원 수"),
+                                        fieldWithPath("gender").type(JsonFieldType.STRING)
+                                                .description("성별"),
+                                        fieldWithPath("startDate").type(JsonFieldType.STRING)
+                                                .description("시작 날짜")
+                                        , fieldWithPath("endDate").type(JsonFieldType.STRING)
+                                                .description("종료 날짜")
+                                        , fieldWithPath("content").type(JsonFieldType.STRING)
+                                                .description("내용")
+                                )
+                        )
                 );
     }
 

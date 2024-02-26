@@ -21,10 +21,10 @@ public class AccompanyServiceImpl implements AccompanyService {
     private final MemberRepository memberRepository;
 
     @Override
-    public void createAccompanyPost(AccompanyPostRequest accompanyPostRequest, Long memberId) {
+    public Long createAccompanyPost(AccompanyPostRequest accompanyPostRequest, Long memberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        accompanyPostRepository.save(accompanyPostRequest.toEntity(member));
+        return accompanyPostRepository.save(accompanyPostRequest.toEntity(member)).getId();
     }
 
     @Override

@@ -5,7 +5,7 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 
 public interface AccompanyService {
 
-    void createAccompanyPost(AccompanyPostRequest accompanyPostRequest, Long memberId);
+    Long createAccompanyPost(AccompanyPostRequest accompanyPostRequest, Long memberId);
 
     AccompanyPostsResponse getAccompanyPosts(Long cursorId, int size);
 

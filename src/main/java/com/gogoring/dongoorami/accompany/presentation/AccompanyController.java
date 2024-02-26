@@ -5,6 +5,7 @@ import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,8 +34,10 @@ public class AccompanyController {
     public ResponseEntity<Void> createAccompanyPost(
             @Valid @RequestBody AccompanyPostRequest accompanyPostRequest,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        accompanyService.createAccompanyPost(accompanyPostRequest, customUserDetails.getId());
-        return ResponseEntity.ok().build();
+        Long accompanyPostId = accompanyService.createAccompanyPost(accompanyPostRequest,
+                customUserDetails.getId());
+        return ResponseEntity.created(URI.create("/api/v1/accompany/posts/" + accompanyPostId))
+                .build();
     }
 
 }
