@@ -49,6 +49,16 @@ include::{snippets}/MemberControllerTest/updateProfileImage/http-request.adoc[]
 include::{snippets}/MemberControllerTest/updateProfileImage/http-response.adoc[]
 include::{snippets}/MemberControllerTest/updateProfileImage/response-fields.adoc[]
 
+=== 프로필 정보 수정
+
+.Request
+include::{snippets}/MemberControllerTest/updateMember/http-request.adoc[]
+include::{snippets}/MemberControllerTest/updateMember/request-fields.adoc[]
+
+.Response
+include::{snippets}/MemberControllerTest/updateMember/http-response.adoc[]
+include::{snippets}/MemberControllerTest/updateMember/response-fields.adoc[]
+
 == 동행 API
 === 동행 구인 게시글 작성
 
