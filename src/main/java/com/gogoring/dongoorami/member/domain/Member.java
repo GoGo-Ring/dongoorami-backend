@@ -71,4 +71,10 @@ public class Member extends BaseEntity {
     public void updateProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
+
+    public void updateInfo(String gender, LocalDate birthDate, String introduction) {
+        this.gender = gender;
+        this.birthDate = birthDate;
+        this.introduction = introduction;
+    }
 }

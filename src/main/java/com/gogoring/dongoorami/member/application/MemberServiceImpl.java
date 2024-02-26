@@ -10,6 +10,8 @@ import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
+import com.gogoring.dongoorami.member.dto.request.MemberUpdateRequest;
+import com.gogoring.dongoorami.member.dto.response.MemberInfoResponse;
 import com.gogoring.dongoorami.member.dto.response.MemberUpdateProfileImageResponse;
 import com.gogoring.dongoorami.member.dto.response.TokenDto;
 import com.gogoring.dongoorami.global.exception.InvalidFileExtensionException;
@@ -121,6 +123,17 @@ public class MemberServiceImpl implements MemberService {
         member.updateProfileImage(newProfileImageUrl);
 
         return MemberUpdateProfileImageResponse.of(newProfileImageUrl);
+    }
+
+    @Transactional
+    @Override
+    public MemberInfoResponse updateMember(MemberUpdateRequest memberUpdateRequest, Long memberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+        member.updateInfo(memberUpdateRequest.getGender(), memberUpdateRequest.getBirthDate(),
+                memberUpdateRequest.getIntroduction());
+
+        return MemberInfoResponse.of(member);
     }
 
     private void validateFileExtension(String originalFilename) {
