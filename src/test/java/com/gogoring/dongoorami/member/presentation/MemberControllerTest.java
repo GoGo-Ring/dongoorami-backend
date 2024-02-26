@@ -19,6 +19,7 @@ import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
+import java.io.FileInputStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +29,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -181,5 +183,42 @@ public class MemberControllerTest {
                                         .description("refreshToken")
                         ))
                 );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("프로필 이미지를 수정할 수 있다.")
+    void success_updateProfileImage() throws Exception {
+        // given
+        Member member = (Member) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("image", "김영한.JPG",
+                MediaType.MULTIPART_FORM_DATA_VALUE,
+                new FileInputStream("src/test/resources/김영한.JPG"));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                multipart("/api/v1/members/profile-image")
+                        .file(mockMultipartFile)
+                        .header("Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.profileImageUrl").isString())
+                .andDo(document("{ClassName}/updateProfileImage",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("profileImageUrl").type(JsonFieldType.STRING)
+                                        .description("프로필 이미지 주소")
+                        )
+                ));
     }
 }

@@ -39,6 +39,16 @@ include::{snippets}/MemberControllerTest/quit/request-fields.adoc[]
 .Response
 include::{snippets}/MemberControllerTest/quit/http-response.adoc[]
 
+=== 프로필 이미지 수정
+==== 이미지 예시가 들어가있어 request 부분이 복잡한데 이름을 image로 둔 multipart/form-data 넣으시면 됩니다
+
+.Request
+include::{snippets}/MemberControllerTest/updateProfileImage/http-request.adoc[]
+
+.Response
+include::{snippets}/MemberControllerTest/updateProfileImage/http-response.adoc[]
+include::{snippets}/MemberControllerTest/updateProfileImage/response-fields.adoc[]
+
 == 동행 API
 === 동행 구인 게시글 작성
 
