@@ -1,7 +1,6 @@
 package com.gogoring.dongoorami.member.dto.response;
 
 import com.gogoring.dongoorami.member.domain.Member;
-import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -33,7 +32,7 @@ public class MemberInfoResponse {
                 .name(member.getName())
                 .profileImage(member.getProfileImage())
                 .gender(member.getGender())
-                .age((LocalDate.now().getYear() - member.getBirthDate().getYear()) + 1)
+                .age(member.getAge())
                 .introduction(member.getIntroduction())
                 .build();
     }

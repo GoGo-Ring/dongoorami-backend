@@ -63,6 +63,11 @@ public class Member extends BaseEntity {
         return authorities;
     }
 
+    public Integer getAge() {
+        return this.birthDate == null ? null
+                : (LocalDate.now().getYear() - this.getBirthDate().getYear()) + 1;
+    }
+
     public Member updateName(String name) {
         this.name = name;
         return this;
