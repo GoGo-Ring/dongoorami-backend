@@ -19,4 +19,6 @@ public interface MemberService {
     MemberUpdateProfileImageResponse updateProfileImage(MultipartFile multipartFile, Long memberId);
 
     MemberInfoResponse updateMember(MemberUpdateRequest memberUpdateRequest, Long memberId);
+
+    MemberInfoResponse getMember(Long memberId);
 }

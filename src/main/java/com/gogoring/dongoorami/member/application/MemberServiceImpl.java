@@ -136,6 +136,14 @@ public class MemberServiceImpl implements MemberService {
         return MemberInfoResponse.of(member);
     }
 
+    @Override
+    public MemberInfoResponse getMember(Long memberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        return MemberInfoResponse.of(member);
+    }
+
     private void validateFileExtension(String originalFilename) {
         List<String> allowedExtensions = Arrays.asList("jpg", "png", "jpeg");
 
