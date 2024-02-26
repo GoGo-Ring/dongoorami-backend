@@ -51,10 +51,10 @@ include::{snippets}/MemberControllerTest/updateProfileImage/response-fields.adoc
 
 == 동행 API
 === 동행 구인 게시글 작성
-
 .Request
 include::{snippets}/AccompanyControllerTest/createAccompanyPost/http-request.adoc[]
-include::{snippets}/AccompanyControllerTest/createAccompanyPost/request-fields.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyPost/form-parameters.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyPost/request-parts.adoc[]
 
 .Response
 include::{snippets}/AccompanyControllerTest/createAccompanyPost/http-response.adoc[]
