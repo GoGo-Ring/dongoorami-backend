@@ -1,6 +1,5 @@
 package com.gogoring.dongoorami.global.customMockUser;
 
-import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import com.gogoring.dongoorami.member.domain.Member;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -27,10 +26,8 @@ public class WithCustomMockUserSecurityContextFactory implements
                 .build();
         ReflectionTestUtils.setField(member, "id", id);
 
-        CustomUserDetails customUserDetails = new CustomUserDetails(member);
-        UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(customUserDetails, "password",
-                        member.getRoles());
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(member,
+                "password", member.getRoles());
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(token);
 
