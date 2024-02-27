@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +32,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         String imageUrl = defaultImageUrl;
         if (!accompanyPostRequest.getImage().isEmpty()) {
-            imageUrl = saveImage(accompanyPostRequest.getImage(), ImageType.ACCOMPANY_POST);
+            s3ImageUtil.putObject(accompanyPostRequest.getImage(), ImageType.ACCOMPANY_POST);
         }
 
         return accompanyPostRepository.save(accompanyPostRequest.toEntity(member, imageUrl))
@@ -68,11 +67,5 @@ public class AccompanyServiceImpl implements AccompanyService {
                                         .commentCount(0L) // 임시
                                         .build()
                         ).toList());
-    }
-
-    private String saveImage(MultipartFile multipartFile, ImageType imageType) {
-        String newFilename = s3ImageUtil.putObject(multipartFile, imageType);
-
-        return s3ImageUtil.getObjectUrl(newFilename, imageType);
     }
 }

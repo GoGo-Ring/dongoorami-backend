@@ -48,15 +48,12 @@ public class S3ImageUtil {
             throw new FailFileUploadException(GlobalErrorCode.FAIL_FILE_UPLOAD);
         }
 
-        return s3Filename;
+        return amazonS3.getUrl(bucket + imageType.getName(), s3Filename).toString();
     }
 
-    public void deleteObject(String filename, ImageType imageType) {
+    public void deleteObject(String originImageUrl, ImageType imageType) {
+        String filename = originImageUrl.substring(originImageUrl.lastIndexOf(".com/") + 1);
         amazonS3.deleteObject(bucket + imageType.getName(), filename);
-    }
-
-    public String getObjectUrl(String filename, ImageType imageType) {
-        return amazonS3.getUrl(bucket + imageType.getName(), filename).toString();
     }
 
     private void validateFileExtension(String originalFilename) {

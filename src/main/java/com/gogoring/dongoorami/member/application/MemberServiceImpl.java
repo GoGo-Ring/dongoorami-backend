@@ -81,13 +81,10 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        String newFilename = s3ImageUtil.putObject(multipartFile, ImageType.MEMBER);
+        String newProfileImageUrl = s3ImageUtil.putObject(multipartFile, ImageType.MEMBER);
         if (member.getProfileImage() != null) {
-            String profileImageUrl = member.getProfileImage();
-            String filename = profileImageUrl.substring(profileImageUrl.lastIndexOf(".com/") + 1);
-            s3ImageUtil.deleteObject(filename, ImageType.MEMBER);
+            s3ImageUtil.deleteObject(member.getProfileImage(), ImageType.MEMBER);
         }
-        String newProfileImageUrl = s3ImageUtil.getObjectUrl(newFilename, ImageType.MEMBER);
         member.updateProfileImage(newProfileImageUrl);
 
         return MemberUpdateProfileImageResponse.of(newProfileImageUrl);
