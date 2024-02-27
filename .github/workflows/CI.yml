@@ -79,9 +79,23 @@ jobs:
           --deployment-group-name $DEPLOYMENT_GROUP_NAME
           --s3-location bucket=$BUCKET_NAME,bundleType=zip,key=$PROJECT_NAME/$GITHUB_SHA.zip
 
-      # 실패 시 상세 내용 가져오기
-      - name: show build fail log
+      # 실패 시 상세 내용 파일 압축하기
+      - name: compress all report files
         if: ${{ failure() }}
         run: |
-          echo "!!!Show Build Fail Log!!!"
-          cat /home/runner/work/dongoorami-backend/dongoorami-backend/build/reports/tests/test/index.html
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          mkdir report_files
+          REPORT_DIRS=$( find . -type d -path '*/build/reports/tests/test')
+          for dir in $REPORT_DIRS; do
+            module_path=$(echo $dir | awk -F'/build/' '{print $1}' | cut -c 3-)
+            cp -r $dir report_files/$module_path/$(basename $(dirname $dir))
+          done
+          tar czvf report_files_$TIMESTAMP.tar.gz report_files
+
+      # report files 가져오기
+      - name: upload error report files to artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: report_files
+          path: report_files_*.tar.gz
