@@ -79,10 +79,9 @@ jobs:
           --deployment-group-name $DEPLOYMENT_GROUP_NAME
           --s3-location bucket=$BUCKET_NAME,bundleType=zip,key=$PROJECT_NAME/$GITHUB_SHA.zip
 
-      # 실패 시 상세 내용 파일 가져오기
-      - name: upload error report files to artifacts
+      # 실패 시 상세 내용 가져오기
+      - name: show build fail log
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: report_files
-          path: report_files_*.tar.gz
+        run: |
+          echo "!!!Show Build Fail Log!!!"
+          cat /home/runner/work/dongoorami-backend/dongoorami-backend/build/reports/tests/test/index.html
