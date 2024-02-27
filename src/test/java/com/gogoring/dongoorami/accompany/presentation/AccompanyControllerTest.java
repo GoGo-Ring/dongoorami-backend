@@ -42,6 +42,7 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.multipart.MultipartFile;
 
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
@@ -87,9 +88,12 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("image", "김영한.JPG",
-                MediaType.MULTIPART_FORM_DATA_VALUE,
-                new FileInputStream("src/test/resources/김영한.JPG"));
+        List<MultipartFile> images = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            images.add(new MockMultipartFile("image", "김영한.JPG",
+                    MediaType.MULTIPART_FORM_DATA_VALUE,
+                    new FileInputStream("src/test/resources/김영한.JPG")));
+        }
         AccompanyPostRequest accompanyPostRequest = AccompanyPostRequest.builder()
                 .concertName("2024 SG워너비 콘서트 : 우리의 노래")
                 .concertPlace("KSPO DOME")
@@ -102,13 +106,14 @@ class AccompanyControllerTest {
                 .startAge(23L)
                 .endAge(37L)
                 .totalPeople(2L)
-                .image(mockMultipartFile)
+                .images(images)
                 .build();
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 multipart("/api/v1/accompany/posts")
-                        .file((MockMultipartFile) accompanyPostRequest.getImage())
+                        .file("images", accompanyPostRequest.getImages().get(0).getBytes())
+                        .file("images", accompanyPostRequest.getImages().get(1).getBytes())
                         .param("concertName", accompanyPostRequest.getConcertName())
                         .param("concertPlace", accompanyPostRequest.getConcertPlace())
                         .param("startDate", accompanyPostRequest.getStartDate().toString())
@@ -129,7 +134,7 @@ class AccompanyControllerTest {
                 .andDo(document("{ClassName}/createAccompanyPost",
                                 preprocessRequest(prettyPrint()),
                                 requestParts(
-                                        partWithName("image").description("이미지")
+                                        partWithName("images").description("이미지 0개 이상")
                                 ),
                                 formParameters(
                                         parameterWithName("concertName").description("공연명").optional(),

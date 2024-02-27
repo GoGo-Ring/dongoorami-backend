@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,9 +55,9 @@ public class AccompanyPostRequest {
     @NotBlank(message = "content은 공백일 수 없습니다.")
     private String content;
 
-    private MultipartFile image;
+    private List<MultipartFile> images;
 
-    public AccompanyPost toEntity(Member member, String image) {
+    public AccompanyPost toEntity(Member member, List<String> images) {
         return AccompanyPost.builder()
                 .concertName(concertName)
                 .gender(gender)
@@ -70,7 +71,7 @@ public class AccompanyPostRequest {
                 .totalPeople(totalPeople)
                 .startAge(startAge)
                 .member(member)
-                .image(image)
+                .images(images)
                 .build();
     }
 }
