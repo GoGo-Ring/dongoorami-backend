@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
@@ -55,6 +54,9 @@ public class MemberControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @BeforeEach
     void setUp() {
         memberRepository.deleteAll();
@@ -84,7 +86,7 @@ public class MemberControllerTest {
         // when
         ResultActions resultActions = mockMvc.perform(
                 patch("/api/v1/members/reissue")
-                        .content(new ObjectMapper().writeValueAsString(memberReissueRequest))
+                        .content(objectMapper.writeValueAsString(memberReissueRequest))
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -132,7 +134,7 @@ public class MemberControllerTest {
         ResultActions resultActions = mockMvc.perform(
                 patch("/api/v1/members/logout")
                         .header("Authorization", accessToken)
-                        .content(new ObjectMapper().writeValueAsString(memberLogoutAndQuitRequest))
+                        .content(objectMapper.writeValueAsString(memberLogoutAndQuitRequest))
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -172,7 +174,7 @@ public class MemberControllerTest {
         ResultActions resultActions = mockMvc.perform(
                 delete("/api/v1/members")
                         .header("Authorization", accessToken)
-                        .content(new ObjectMapper().writeValueAsString(memberLogoutAndQuitRequest))
+                        .content(objectMapper.writeValueAsString(memberLogoutAndQuitRequest))
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -249,8 +251,7 @@ public class MemberControllerTest {
         ResultActions resultActions = mockMvc.perform(
                 patch("/api/v1/members")
                         .header("Authorization", accessToken)
-                        .content(new ObjectMapper().registerModule(new JavaTimeModule())
-                                .writeValueAsString(memberUpdateRequest))
+                        .content(objectMapper.writeValueAsString(memberUpdateRequest))
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
