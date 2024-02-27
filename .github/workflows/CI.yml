@@ -82,7 +82,7 @@ jobs:
       # 실패 시 상세 내용 파일 가져오기
       - name: upload error report files to artifacts
         if: ${{ failure() }}
-        uses: actions/upload-artifacts@v2
+        uses: actions/upload-artifact@v2
         with:
           name: report_files
           path: report_files_*.tar.gz
