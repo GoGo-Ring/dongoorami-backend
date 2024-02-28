@@ -28,5 +28,20 @@ public class AccompanyPostsResponse {
         private Long commentCount;
         private String gender;
         private Long totalPeople;
+
+        public static AccompanyPostInfo of(AccompanyPost accompanyPost) {
+            return AccompanyPostInfo.builder()
+                    .id(accompanyPost.getId())
+                    .title(accompanyPost.getTitle())
+                    .gender(accompanyPost.getGender())
+                    .concertName(accompanyPost.getConcertName())
+                    .status(accompanyPost.getStatus().getName())
+                    .totalPeople(accompanyPost.getTotalPeople())
+                    .updatedAt(accompanyPost.getUpdatedAt())
+                    .writer(accompanyPost.getMember().getName())
+                    .viewCount(accompanyPost.getViewCount())
+                    .commentCount(0L) // 임시
+                    .build();
+        }
     }
 }

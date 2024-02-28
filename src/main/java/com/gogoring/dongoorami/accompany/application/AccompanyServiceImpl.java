@@ -58,19 +58,9 @@ public class AccompanyServiceImpl implements AccompanyService {
         return new AccompanyPostsResponse(
                 accompanyPosts.hasNext(),
                 accompanyPosts.getContent().stream()
-                        .map(accompanyPost ->
-                                AccompanyPostsResponse.AccompanyPostInfo.builder()
-                                        .id(accompanyPost.getId())
-                                        .title(accompanyPost.getTitle())
-                                        .gender(accompanyPost.getGender())
-                                        .concertName(accompanyPost.getConcertName())
-                                        .status(accompanyPost.getStatus().getName())
-                                        .totalPeople(accompanyPost.getTotalPeople())
-                                        .updatedAt(accompanyPost.getUpdatedAt())
-                                        .writer(accompanyPost.getMember().getName())
-                                        .viewCount(accompanyPost.getViewCount())
-                                        .commentCount(0L) // 임시
-                                        .build()
-                        ).toList());
+                        .map(AccompanyPostInfo::of)
+                        .toList());
+    }
+
     }
 }
