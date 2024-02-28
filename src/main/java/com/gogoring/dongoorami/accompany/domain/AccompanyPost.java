@@ -24,7 +24,7 @@ public class AccompanyPost extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private final RecruitmentStatus status = RecruitmentStatus.PROCEEDING;
-    private final Long viewCount = 0L;
+    private Long viewCount = 0L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,6 +41,7 @@ public class AccompanyPost extends BaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private String content;
+
     @ElementCollection
     private List<String> images;
 
@@ -61,6 +62,10 @@ public class AccompanyPost extends BaseEntity {
         this.endDate = endDate;
         this.content = content;
         this.images = images;
+    }
+
+    public void increaseViewCount(Long viewCount) {
+        this.viewCount += viewCount;
     }
 
     public enum RecruitmentStatus {
