@@ -2,7 +2,11 @@ package com.gogoring.dongoorami.accompany.application;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
+import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
+import com.gogoring.dongoorami.accompany.exception.AccompanyNotFoundException;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
 import com.gogoring.dongoorami.global.util.ImageType;
 import com.gogoring.dongoorami.global.util.S3ImageUtil;
@@ -17,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,11 +38,13 @@ public class AccompanyServiceImpl implements AccompanyService {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         List<String> imageUrls = new ArrayList<>();
-        if (accompanyPostRequest.getImages().isEmpty() || accompanyPostRequest.getImages().get(0).isEmpty()) {
+        if (accompanyPostRequest.getImages().isEmpty() || accompanyPostRequest.getImages().get(0)
+                .isEmpty()) {
             imageUrls.add(defaultImageUrl);
         } else {
             accompanyPostRequest.getImages().stream()
-                    .map(image -> imageUrls.add(s3ImageUtil.putObject(image, ImageType.ACCOMPANY_POST)));
+                    .map(image -> imageUrls.add(
+                            s3ImageUtil.putObject(image, ImageType.ACCOMPANY_POST)));
         }
 
         return accompanyPostRepository.save(accompanyPostRequest.toEntity(member, imageUrls))
@@ -62,5 +69,15 @@ public class AccompanyServiceImpl implements AccompanyService {
                         .toList());
     }
 
+    @Transactional
+    @Override
+    public AccompanyPostResponse getAccompanyPost(Long accompanyPostId) {
+        AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyPostId)
+                .orElseThrow(() -> new AccompanyNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_NOT_FOUND));
+        accompanyPost.increaseViewCount(1L);
+        return AccompanyPostResponse.of(accompanyPost,
+                AccompanyPostResponse.MemberInfo.of(accompanyPost.getMember()));
     }
 }
