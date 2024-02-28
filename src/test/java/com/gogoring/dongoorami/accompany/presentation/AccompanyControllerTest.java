@@ -1,5 +1,7 @@
 package com.gogoring.dongoorami.accompany.presentation;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
@@ -15,6 +17,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.formParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -38,6 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -68,6 +72,9 @@ class AccompanyControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Value("${cloud.aws.s3.default-image-url}")
+    private String defaultImageUrl;
 
     @BeforeEach
     void setUp() {
@@ -291,7 +298,73 @@ class AccompanyControllerTest {
                 ));
     }
 
-    private List<AccompanyPost> createAccompanyPosts(Member member, int size) {
+    @Test
+    @WithCustomMockUser
+    @DisplayName("동행 구인글을 단건 상세 조회할 수 있다.")
+    void success_getAccompanyPost() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        member.updateInfo("여자", LocalDate.of(2001, 1, 17), "안녕하세요~");
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 1)).get(0);
+        Long beforeViewCount = accompanyPost.getViewCount();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompany/posts/{accompanyPostId}", accompanyPost.getId())
+                        .header("Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getAccompanyPost",
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("accompanyPostId").description("조회할 동행 구인글 id")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(NUMBER).description("동행 구인글 id"),
+                                fieldWithPath("title").type(STRING).description("제목"),
+                                fieldWithPath("writer.id").type(NUMBER).description("작성자 id"),
+                                fieldWithPath("writer.name").type(STRING).description("작성자 이름"),
+                                fieldWithPath("writer.profileImage").type(STRING)
+                                        .description("작성자 프로필 이미지 url"),
+                                fieldWithPath("writer.gender").type(STRING).description("작성자 성별"),
+                                fieldWithPath("writer.age").type(NUMBER).description("작성자 나이"),
+                                fieldWithPath("writer.introduction").type(STRING)
+                                        .description("작성자 소개"),
+                                fieldWithPath("createdAt").type(STRING).description("생성 날짜"),
+                                fieldWithPath("updatedAt").type(STRING).description("수정 날짜"),
+                                fieldWithPath("viewCount").type(NUMBER).description("조회수"),
+                                fieldWithPath("commentCount").type(NUMBER).description("댓글수"),
+                                fieldWithPath("status").type(STRING).description("구인 상태"),
+                                fieldWithPath("concertName").type(STRING).description("공연명"),
+                                fieldWithPath("concertPlace").type(STRING).description("공연 장소"),
+                                fieldWithPath("region").type(STRING).description("공연 지역"),
+                                fieldWithPath("startAge").type(NUMBER).description("시작 연령"),
+                                fieldWithPath("endAge").type(NUMBER).description("종료 연령"),
+                                fieldWithPath("totalPeople").type(NUMBER).description("인원 수"),
+                                fieldWithPath("gender").type(STRING).description("성별"),
+                                fieldWithPath("startDate").type(STRING).description("시작 날짜"),
+                                fieldWithPath("endDate").type(STRING).description("종료 날짜"),
+                                fieldWithPath("waitingCount").type(NUMBER).description("대기 인원 수"),
+                                fieldWithPath("content").type(STRING).description("내용"),
+                                fieldWithPath("images").type(ARRAY).description("이미지 리스트"),
+                                fieldWithPath("isWish").type(BOOLEAN).description("찜 여부")
+                        )
+                ));
+        Long afterViewCount = accompanyPostRepository.findById(accompanyPost.getId()).get()
+                .getViewCount();
+        assertThat(afterViewCount, equalTo(beforeViewCount + 1));
+    }
+
+    private List<AccompanyPost> createAccompanyPosts(Member member, int size) throws Exception {
         List<AccompanyPost> accompanyPosts = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             accompanyPosts.add(AccompanyPost.builder()
@@ -306,7 +379,8 @@ class AccompanyControllerTest {
                     .content("같이 올라갈 사람 구해요~")
                     .startAge(23L)
                     .endAge(37L)
-                    .totalPeople(2L).build());
+                    .totalPeople(2L)
+                    .images(createImageUrls(2)).build());
         }
 
         return accompanyPosts;
@@ -323,4 +397,12 @@ class AccompanyControllerTest {
         return images;
     }
 
+    private List<String> createImageUrls(int size) {
+        List<String> imageUrls = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            imageUrls.add(defaultImageUrl);
+        }
+
+        return imageUrls;
+    }
 }
