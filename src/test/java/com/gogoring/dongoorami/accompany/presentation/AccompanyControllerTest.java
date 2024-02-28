@@ -6,6 +6,10 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.formParameters;
@@ -139,11 +143,11 @@ class AccompanyControllerTest {
                                 ),
                                 formParameters(
                                         parameterWithName("concertName").description("공연명").optional(),
-                                        parameterWithName("concertPlace").description("공연장소").optional(),
+                                        parameterWithName("concertPlace").description("공연 장소").optional(),
                                         parameterWithName("startDate").description("시작 날짜").optional(),
                                         parameterWithName("endDate").description("종료 날짜").optional(),
                                         parameterWithName("gender").description("성별").optional(),
-                                        parameterWithName("region").description("지역").optional(),
+                                        parameterWithName("region").description("공연 지역").optional(),
                                         parameterWithName("content").description("내용").optional(),
                                         parameterWithName("startAge").description("시작 연령").optional(),
                                         parameterWithName("endAge").description("종료 연령").optional(),
@@ -182,38 +186,41 @@ class AccompanyControllerTest {
                         preprocessResponse(prettyPrint()),
                         queryParameters(parameterWithName("size").description("요청할 동행 구인글 개수")),
                         responseFields(
-                                fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN)
+                                fieldWithPath("hasNext").type(BOOLEAN)
                                         .description("다음 동행 구인글 존재 여부"),
-                                fieldWithPath("accompanyPostInfos").type(JsonFieldType.ARRAY)
+                                fieldWithPath("accompanyPostInfos").type(ARRAY)
                                         .description("동행 구인글 정보 목록"),
-                                fieldWithPath("accompanyPostInfos[].id").type(JsonFieldType.NUMBER)
+                                fieldWithPath("accompanyPostInfos[].id").type(NUMBER)
                                         .description("동행 구인글 id"),
                                 fieldWithPath("accompanyPostInfos[].title").type(
-                                                JsonFieldType.STRING)
+                                                STRING)
                                         .description("제목"),
                                 fieldWithPath("accompanyPostInfos[].writer").type(
-                                                JsonFieldType.STRING)
+                                                STRING)
                                         .description("작성자"),
+                                fieldWithPath("accompanyPostInfos[].createdAt").type(
+                                                STRING)
+                                        .description("생성 날짜"),
                                 fieldWithPath("accompanyPostInfos[].updatedAt").type(
-                                                JsonFieldType.STRING)
-                                        .description("작성 날짜"),
+                                                STRING)
+                                        .description("수정 날짜"),
                                 fieldWithPath("accompanyPostInfos[].status").type(
-                                                JsonFieldType.STRING)
+                                                STRING)
                                         .description("구인 상태"),
                                 fieldWithPath("accompanyPostInfos[].concertName").type(
-                                                JsonFieldType.STRING)
+                                                STRING)
                                         .description("공연명"),
                                 fieldWithPath("accompanyPostInfos[].viewCount").type(
-                                                JsonFieldType.NUMBER)
+                                                NUMBER)
                                         .description("조회수"),
                                 fieldWithPath("accompanyPostInfos[].commentCount").type(
-                                                JsonFieldType.NUMBER)
+                                                NUMBER)
                                         .description("댓글수"),
                                 fieldWithPath("accompanyPostInfos[].gender").type(
-                                                JsonFieldType.STRING)
+                                                STRING)
                                         .description("성별"),
                                 fieldWithPath("accompanyPostInfos[].totalPeople").type(
-                                                JsonFieldType.NUMBER)
+                                                NUMBER)
                                         .description("모집 인원 수")
                         )
                 ));
@@ -252,36 +259,39 @@ class AccompanyControllerTest {
                         responseFields(
                                 fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN)
                                         .description("다음 동행 구인글 존재 여부"),
-                                fieldWithPath("accompanyPostInfos").type(JsonFieldType.ARRAY)
+                                fieldWithPath("accompanyPostInfos").type(ARRAY)
                                         .description("동행 구인글 정보 목록"),
-                                fieldWithPath("accompanyPostInfos[].id").type(JsonFieldType.NUMBER)
+                                fieldWithPath("accompanyPostInfos[].id").type(NUMBER)
                                         .description("동행 구인글 id"),
                                 fieldWithPath("accompanyPostInfos[].title").type(
-                                                JsonFieldType.STRING)
+                                                STRING)
                                         .description("제목"),
                                 fieldWithPath("accompanyPostInfos[].writer").type(
-                                                JsonFieldType.STRING)
+                                                STRING)
                                         .description("작성자"),
+                                fieldWithPath("accompanyPostInfos[].createdAt").type(
+                                                STRING)
+                                        .description("생성 날짜"),
                                 fieldWithPath("accompanyPostInfos[].updatedAt").type(
-                                                JsonFieldType.STRING)
-                                        .description("작성 날짜"),
+                                                STRING)
+                                        .description("수정 날짜"),
                                 fieldWithPath("accompanyPostInfos[].status").type(
-                                                JsonFieldType.STRING)
+                                                STRING)
                                         .description("구인 상태"),
                                 fieldWithPath("accompanyPostInfos[].concertName").type(
-                                                JsonFieldType.STRING)
+                                                STRING)
                                         .description("공연명"),
                                 fieldWithPath("accompanyPostInfos[].viewCount").type(
-                                                JsonFieldType.NUMBER)
+                                                NUMBER)
                                         .description("조회수"),
                                 fieldWithPath("accompanyPostInfos[].commentCount").type(
-                                                JsonFieldType.NUMBER)
+                                                NUMBER)
                                         .description("댓글수"),
                                 fieldWithPath("accompanyPostInfos[].gender").type(
-                                                JsonFieldType.STRING)
+                                                STRING)
                                         .description("성별"),
                                 fieldWithPath("accompanyPostInfos[].totalPeople").type(
-                                                JsonFieldType.NUMBER)
+                                                NUMBER)
                                         .description("모집 인원 수")
                         )
                 ));

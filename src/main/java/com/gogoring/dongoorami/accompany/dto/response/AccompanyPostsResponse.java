@@ -1,5 +1,6 @@
 package com.gogoring.dongoorami.accompany.dto.response;
 
+import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ public class AccompanyPostsResponse {
         private Long id;
         private String title;
         private String writer;
+        private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
         private String status;
         private String concertName;
@@ -37,6 +39,7 @@ public class AccompanyPostsResponse {
                     .concertName(accompanyPost.getConcertName())
                     .status(accompanyPost.getStatus().getName())
                     .totalPeople(accompanyPost.getTotalPeople())
+                    .createdAt(accompanyPost.getCreatedAt())
                     .updatedAt(accompanyPost.getUpdatedAt())
                     .writer(accompanyPost.getMember().getName())
                     .viewCount(accompanyPost.getViewCount())
