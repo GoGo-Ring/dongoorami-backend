@@ -93,12 +93,6 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
-        List<MultipartFile> images = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            images.add(new MockMultipartFile("image", "김영한.JPG",
-                    MediaType.MULTIPART_FORM_DATA_VALUE,
-                    new FileInputStream("src/test/resources/김영한.JPG")));
-        }
         AccompanyPostRequest accompanyPostRequest = AccompanyPostRequest.builder()
                 .concertName("2024 SG워너비 콘서트 : 우리의 노래")
                 .concertPlace("KSPO DOME")
@@ -111,7 +105,7 @@ class AccompanyControllerTest {
                 .startAge(23L)
                 .endAge(37L)
                 .totalPeople(2L)
-                .images(images)
+                .images(createMockMultipartFiles(2))
                 .build();
 
         // when
@@ -317,4 +311,16 @@ class AccompanyControllerTest {
 
         return accompanyPosts;
     }
+
+    private List<MultipartFile> createMockMultipartFiles(int size) throws Exception {
+        List<MultipartFile> images = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            images.add(new MockMultipartFile("image", "김영한.JPG",
+                    MediaType.MULTIPART_FORM_DATA_VALUE,
+                    new FileInputStream("src/test/resources/김영한.JPG")));
+        }
+
+        return images;
+    }
+
 }
