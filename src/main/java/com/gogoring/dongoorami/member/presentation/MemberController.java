@@ -4,6 +4,8 @@ import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import com.gogoring.dongoorami.member.application.MemberService;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
+import com.gogoring.dongoorami.member.dto.request.MemberUpdateRequest;
+import com.gogoring.dongoorami.member.dto.response.MemberInfoResponse;
 import com.gogoring.dongoorami.member.dto.response.MemberUpdateProfileImageResponse;
 import com.gogoring.dongoorami.member.dto.response.TokenDto;
 import jakarta.validation.Valid;
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,5 +56,19 @@ public class MemberController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(memberService.updateProfileImage(multipartFile,
                 customUserDetails.getId()));
+    }
+
+    @PatchMapping("/members")
+    public ResponseEntity<MemberInfoResponse> updateMember(
+            @Valid @RequestBody MemberUpdateRequest memberUpdateRequest,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(memberService.updateMember(memberUpdateRequest,
+                customUserDetails.getId()));
+    }
+
+    @GetMapping("/members")
+    public ResponseEntity<MemberInfoResponse> getMember(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(memberService.getMember(customUserDetails.getId()));
     }
 }

@@ -6,6 +6,8 @@ import com.gogoring.dongoorami.global.util.S3ImageUtil;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
+import com.gogoring.dongoorami.member.dto.request.MemberUpdateRequest;
+import com.gogoring.dongoorami.member.dto.response.MemberInfoResponse;
 import com.gogoring.dongoorami.member.dto.response.MemberUpdateProfileImageResponse;
 import com.gogoring.dongoorami.member.dto.response.TokenDto;
 import com.gogoring.dongoorami.member.exception.InvalidRefreshTokenException;
@@ -15,7 +17,6 @@ import com.gogoring.dongoorami.member.repository.MemberRepository;
 import com.gogoring.dongoorami.member.repository.TokenRepository;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,9 +32,6 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final TokenRepository tokenRepository;
     private final S3ImageUtil s3ImageUtil;
-
-    @Value("${cloud.aws.s3.bucket}/member")
-    private String bucket;
 
     @Override
     public TokenDto reissueToken(MemberReissueRequest memberReissueRequest) {
@@ -88,5 +86,24 @@ public class MemberServiceImpl implements MemberService {
         member.updateProfileImage(newProfileImageUrl);
 
         return MemberUpdateProfileImageResponse.of(newProfileImageUrl);
+    }
+
+    @Transactional
+    @Override
+    public MemberInfoResponse updateMember(MemberUpdateRequest memberUpdateRequest, Long memberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+        member.updateInfo(memberUpdateRequest.getGender(), memberUpdateRequest.getBirthDate(),
+                memberUpdateRequest.getIntroduction());
+
+        return MemberInfoResponse.of(member);
+    }
+
+    @Override
+    public MemberInfoResponse getMember(Long memberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        return MemberInfoResponse.of(member);
     }
 }

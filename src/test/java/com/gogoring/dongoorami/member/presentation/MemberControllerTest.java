@@ -2,6 +2,7 @@ package com.gogoring.dongoorami.member.presentation;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -15,12 +16,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
+import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
+import com.gogoring.dongoorami.member.dto.request.MemberUpdateRequest;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.io.FileInputStream;
+import java.time.LocalDate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,6 +55,9 @@ public class MemberControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @BeforeEach
     void setUp() {
         memberRepository.deleteAll();
@@ -80,7 +87,7 @@ public class MemberControllerTest {
         // when
         ResultActions resultActions = mockMvc.perform(
                 patch("/api/v1/members/reissue")
-                        .content(new ObjectMapper().writeValueAsString(memberReissueRequest))
+                        .content(objectMapper.writeValueAsString(memberReissueRequest))
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -128,7 +135,7 @@ public class MemberControllerTest {
         ResultActions resultActions = mockMvc.perform(
                 patch("/api/v1/members/logout")
                         .header("Authorization", accessToken)
-                        .content(new ObjectMapper().writeValueAsString(memberLogoutAndQuitRequest))
+                        .content(objectMapper.writeValueAsString(memberLogoutAndQuitRequest))
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -151,10 +158,10 @@ public class MemberControllerTest {
     @DisplayName("회원 탈퇴를 할 수 있다.")
     void success_quit() throws Exception {
         // given
-        Member member = (Member) SecurityContextHolder
+        Member member = ((CustomUserDetails) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
-                .getPrincipal();
+                .getPrincipal()).getMember();
         memberRepository.save(member);
 
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
@@ -168,7 +175,7 @@ public class MemberControllerTest {
         ResultActions resultActions = mockMvc.perform(
                 delete("/api/v1/members")
                         .header("Authorization", accessToken)
-                        .content(new ObjectMapper().writeValueAsString(memberLogoutAndQuitRequest))
+                        .content(objectMapper.writeValueAsString(memberLogoutAndQuitRequest))
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -191,10 +198,10 @@ public class MemberControllerTest {
     @DisplayName("프로필 이미지를 수정할 수 있다.")
     void success_updateProfileImage() throws Exception {
         // given
-        Member member = (Member) SecurityContextHolder
+        Member member = ((CustomUserDetails) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
-                .getPrincipal();
+                .getPrincipal()).getMember();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
@@ -221,5 +228,114 @@ public class MemberControllerTest {
                                         .description("프로필 이미지 주소")
                         )
                 ));
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("프로필 정보를 수정할 수 있다.")
+    void success_updateMember() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        MemberUpdateRequest memberUpdateRequest = new MemberUpdateRequest();
+        ReflectionTestUtils.setField(memberUpdateRequest, "gender", "남자");
+        ReflectionTestUtils.setField(memberUpdateRequest, "birthDate", LocalDate.of(2000, 12, 31));
+        ReflectionTestUtils.setField(memberUpdateRequest, "introduction", "안녕하세요~");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/members")
+                        .header("Authorization", accessToken)
+                        .content(objectMapper.writeValueAsString(memberUpdateRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(member.getName()))
+                .andExpect(jsonPath("$.profileImage").value(member.getProfileImage()))
+                .andExpect(jsonPath("$.gender").value(memberUpdateRequest.getGender()))
+                .andExpect(jsonPath("$.age").value(
+                        LocalDate.now().getYear() - memberUpdateRequest.getBirthDate().getYear()
+                                + 1))
+                .andExpect(jsonPath("$.introduction").value(memberUpdateRequest.getIntroduction()))
+                .andDo(document("{ClassName}/updateMember",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("gender").type(JsonFieldType.STRING)
+                                        .description("남자/여자"),
+                                fieldWithPath("birthDate").type("LocalDate")
+                                        .description("생년월일"),
+                                fieldWithPath("introduction").type(JsonFieldType.STRING)
+                                        .description("한줄 소개")
+                        ),
+                        responseFields(
+                                fieldWithPath("name").type(JsonFieldType.STRING)
+                                        .description("이름"),
+                                fieldWithPath("profileImage").type(JsonFieldType.STRING)
+                                        .description("프로필 이미지 주소"),
+                                fieldWithPath("gender").type(JsonFieldType.STRING)
+                                        .description("남자/여자"),
+                                fieldWithPath("age").type(JsonFieldType.NUMBER)
+                                        .description("나이"),
+                                fieldWithPath("introduction").type(JsonFieldType.STRING)
+                                        .description("한줄 소개")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("프로필 정보를 조회할 수 있다.")
+    void success_getMember() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "gender", "남자");
+        ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2000, 12, 31));
+        ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
+
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/members")
+                        .header("Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(member.getName()))
+                .andExpect(jsonPath("$.profileImage").value(member.getProfileImage()))
+                .andExpect(jsonPath("$.gender").value(member.getGender()))
+                .andExpect(jsonPath("$.age").value(member.getAge()))
+                .andExpect(jsonPath("$.introduction").value(member.getIntroduction()))
+                .andDo(document("{ClassName}/getMember",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("name").type(JsonFieldType.STRING)
+                                        .description("이름"),
+                                fieldWithPath("profileImage").type(JsonFieldType.STRING)
+                                        .description("프로필 이미지 주소"),
+                                fieldWithPath("gender").type(JsonFieldType.STRING)
+                                        .description("남자/여자"),
+                                fieldWithPath("age").type(JsonFieldType.NUMBER)
+                                        .description("나이"),
+                                fieldWithPath("introduction").type(JsonFieldType.STRING)
+                                        .description("한줄 소개")
+                        ))
+                );
     }
 }

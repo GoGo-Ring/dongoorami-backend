@@ -21,6 +21,7 @@ import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
+import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
@@ -81,10 +82,10 @@ class AccompanyControllerTest {
     @DisplayName("동행 구인글을 게시할 수 있다.")
     void success_createAccompanyPost() throws Exception {
         // given
-        Member member = (Member) SecurityContextHolder
+        Member member = ((CustomUserDetails) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
-                .getPrincipal();
+                .getPrincipal()).getMember();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
@@ -158,10 +159,10 @@ class AccompanyControllerTest {
     @DisplayName("동행 구인글 목록을 조회할 수 있다. - 최초 요청")
     void success_getAccompanyPostsFirst() throws Exception {
         // given
-        Member member = (Member) SecurityContextHolder
+        Member member = ((CustomUserDetails) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
-                .getPrincipal();
+                .getPrincipal()).getMember();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
@@ -223,10 +224,10 @@ class AccompanyControllerTest {
     @DisplayName("동행 구인글 목록을 조회할 수 있다. - 이후 요청")
     void success_getAccompanyPostsAfterFirst() throws Exception {
         // given
-        Member member = (Member) SecurityContextHolder
+        Member member = ((CustomUserDetails) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
-                .getPrincipal();
+                .getPrincipal()).getMember();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
