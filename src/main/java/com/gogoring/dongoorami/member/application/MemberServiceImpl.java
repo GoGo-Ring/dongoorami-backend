@@ -1,36 +1,25 @@
 package com.gogoring.dongoorami.member.application;
 
-import com.amazonaws.SdkClientException;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.gogoring.dongoorami.global.exception.FailFileUploadException;
-import com.gogoring.dongoorami.global.exception.GlobalErrorCode;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
+import com.gogoring.dongoorami.global.util.ImageType;
+import com.gogoring.dongoorami.global.util.S3ImageUtil;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
 import com.gogoring.dongoorami.member.dto.response.MemberUpdateProfileImageResponse;
 import com.gogoring.dongoorami.member.dto.response.TokenDto;
-import com.gogoring.dongoorami.global.exception.InvalidFileExtensionException;
 import com.gogoring.dongoorami.member.exception.InvalidRefreshTokenException;
 import com.gogoring.dongoorami.member.exception.MemberErrorCode;
 import com.gogoring.dongoorami.member.exception.MemberNotFoundException;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import com.gogoring.dongoorami.member.repository.TokenRepository;
-import java.io.IOException;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -41,7 +30,7 @@ public class MemberServiceImpl implements MemberService {
     private final TokenProvider tokenProvider;
     private final MemberRepository memberRepository;
     private final TokenRepository tokenRepository;
-    private final AmazonS3 amazonS3;
+    private final S3ImageUtil s3ImageUtil;
 
     @Value("${cloud.aws.s3.bucket}/member")
     private String bucket;
@@ -87,49 +76,17 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     @Override
-    public MemberUpdateProfileImageResponse updateProfileImage(MultipartFile multipartFile, Long memberId) {
+    public MemberUpdateProfileImageResponse updateProfileImage(MultipartFile multipartFile,
+            Long memberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        String originalFilename = multipartFile.getOriginalFilename();
-        validateFileExtension(originalFilename);
-        String s3Filename = UUID.randomUUID() + "-" + originalFilename;
-
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType(multipartFile.getContentType());
-        objectMetadata.setContentLength(multipartFile.getSize());
-
-        try {
-            amazonS3.putObject(bucket, s3Filename, multipartFile.getInputStream(), objectMetadata);
-        } catch (AmazonS3Exception e) {
-            log.error("Amazon S3 error while uploading file: " + e.getMessage());
-            throw new FailFileUploadException(GlobalErrorCode.FAIL_FILE_UPLOAD);
-        } catch (SdkClientException e) {
-            log.error("AWS SDK client error while uploading file: " + e.getMessage());
-            throw new FailFileUploadException(GlobalErrorCode.FAIL_FILE_UPLOAD);
-        } catch (IOException e) {
-            log.error("IO error while uploading file: " + e.getMessage());
-            throw new FailFileUploadException(GlobalErrorCode.FAIL_FILE_UPLOAD);
-        }
-
+        String newProfileImageUrl = s3ImageUtil.putObject(multipartFile, ImageType.MEMBER);
         if (member.getProfileImage() != null) {
-            String profileImageUrl = member.getProfileImage();
-            String filename = profileImageUrl.substring(profileImageUrl.lastIndexOf(".com/") + 1);
-            amazonS3.deleteObject(bucket, filename);
+            s3ImageUtil.deleteObject(member.getProfileImage(), ImageType.MEMBER);
         }
-        String newProfileImageUrl = amazonS3.getUrl(bucket, s3Filename).toString();
         member.updateProfileImage(newProfileImageUrl);
 
         return MemberUpdateProfileImageResponse.of(newProfileImageUrl);
-    }
-
-    private void validateFileExtension(String originalFilename) {
-        List<String> allowedExtensions = Arrays.asList("jpg", "png", "jpeg");
-
-        String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1)
-                .toLowerCase();
-        if (!allowedExtensions.contains(fileExtension)) {
-            throw new InvalidFileExtensionException(GlobalErrorCode.INVALID_FILE_EXTENSION);
-        }
     }
 }

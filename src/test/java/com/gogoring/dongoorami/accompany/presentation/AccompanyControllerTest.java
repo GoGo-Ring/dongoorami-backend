@@ -2,15 +2,18 @@ package com.gogoring.dongoorami.accompany.presentation;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.formParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +24,7 @@ import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
+import java.io.FileInputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +37,12 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.multipart.MultipartFile;
 
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
@@ -82,6 +88,12 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
+        List<MultipartFile> images = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            images.add(new MockMultipartFile("image", "김영한.JPG",
+                    MediaType.MULTIPART_FORM_DATA_VALUE,
+                    new FileInputStream("src/test/resources/김영한.JPG")));
+        }
         AccompanyPostRequest accompanyPostRequest = AccompanyPostRequest.builder()
                 .concertName("2024 SG워너비 콘서트 : 우리의 노래")
                 .concertPlace("KSPO DOME")
@@ -94,44 +106,48 @@ class AccompanyControllerTest {
                 .startAge(23L)
                 .endAge(37L)
                 .totalPeople(2L)
+                .images(images)
                 .build();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/accompany/posts")
+                multipart("/api/v1/accompany/posts")
+                        .file("images", accompanyPostRequest.getImages().get(0).getBytes())
+                        .file("images", accompanyPostRequest.getImages().get(1).getBytes())
+                        .param("concertName", accompanyPostRequest.getConcertName())
+                        .param("concertPlace", accompanyPostRequest.getConcertPlace())
+                        .param("startDate", accompanyPostRequest.getStartDate().toString())
+                        .param("endDate", accompanyPostRequest.getEndDate().toString())
+                        .param("gender", accompanyPostRequest.getGender())
+                        .param("region", accompanyPostRequest.getRegion())
+                        .param("content", accompanyPostRequest.getContent())
+                        .param("startAge", accompanyPostRequest.getStartAge().toString())
+                        .param("endAge", accompanyPostRequest.getEndAge().toString())
+                        .param("totalPeople", accompanyPostRequest.getTotalPeople().toString())
+                        .param("title", accompanyPostRequest.getTitle())
+                        .with(csrf().asHeader())
                         .header("Authorization", accessToken)
-                        .content(objectMapper.writeValueAsString(accompanyPostRequest))
-                        .contentType(MediaType.APPLICATION_JSON)
         );
 
         // then
         resultActions.andExpect(status().isCreated())
                 .andDo(document("{ClassName}/createAccompanyPost",
                                 preprocessRequest(prettyPrint()),
-                                preprocessResponse(prettyPrint()),
-                                requestFields(
-                                        fieldWithPath("title").type(JsonFieldType.STRING)
-                                                .description("제목"),
-                                        fieldWithPath("concertName").type(JsonFieldType.STRING)
-                                                .description("공연명"),
-                                        fieldWithPath("concertPlace").type(JsonFieldType.STRING)
-                                                .description("공연장소"),
-                                        fieldWithPath("region").type(JsonFieldType.STRING)
-                                                .description("지역"),
-                                        fieldWithPath("startAge").type(JsonFieldType.NUMBER)
-                                                .description("시작 연령"),
-                                        fieldWithPath("endAge").type(JsonFieldType.NUMBER)
-                                                .description("종료 연령"),
-                                        fieldWithPath("totalPeople").type(JsonFieldType.NUMBER)
-                                                .description("인원 수"),
-                                        fieldWithPath("gender").type(JsonFieldType.STRING)
-                                                .description("성별"),
-                                        fieldWithPath("startDate").type(JsonFieldType.STRING)
-                                                .description("시작 날짜")
-                                        , fieldWithPath("endDate").type(JsonFieldType.STRING)
-                                                .description("종료 날짜")
-                                        , fieldWithPath("content").type(JsonFieldType.STRING)
-                                                .description("내용")
+                                requestParts(
+                                        partWithName("images").description("이미지 0개 이상")
+                                ),
+                                formParameters(
+                                        parameterWithName("concertName").description("공연명").optional(),
+                                        parameterWithName("concertPlace").description("공연장소").optional(),
+                                        parameterWithName("startDate").description("시작 날짜").optional(),
+                                        parameterWithName("endDate").description("종료 날짜").optional(),
+                                        parameterWithName("gender").description("성별").optional(),
+                                        parameterWithName("region").description("지역").optional(),
+                                        parameterWithName("content").description("내용").optional(),
+                                        parameterWithName("startAge").description("시작 연령").optional(),
+                                        parameterWithName("endAge").description("종료 연령").optional(),
+                                        parameterWithName("totalPeople").description("인원 수").optional(),
+                                        parameterWithName("title").description("제목").optional()
                                 )
                         )
                 );
