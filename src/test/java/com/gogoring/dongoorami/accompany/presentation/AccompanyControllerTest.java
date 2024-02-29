@@ -26,6 +26,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
@@ -413,6 +414,68 @@ class AccompanyControllerTest {
                 ));
     }
 
+    @Test
+    @WithCustomMockUser
+    @DisplayName("특정 동행 구인글의 전체 댓글을 조회할 수 있다.")
+    void success_getAccompanyComments() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        member.updateInfo("여자", LocalDate.of(2001, 1, 17), "안녕하세요~");
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 1)).get(0);
+        List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
+        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompany/comments/{accompanyPostId}", accompanyPost.getId())
+                        .header("Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getAccompanyComments",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                        ),
+                        responseFields(
+                                fieldWithPath("accompanyCommentInfos").type(ARRAY)
+                                        .description("동행 구인글 댓글 목록"),
+                                fieldWithPath("accompanyCommentInfos[].id").type(NUMBER)
+                                        .description("댓글 id"),
+                                fieldWithPath("accompanyCommentInfos[].content").type(STRING)
+                                        .description("내용"),
+                                fieldWithPath("accompanyCommentInfos[].createdAt").type(STRING)
+                                        .description("생성 날짜"),
+                                fieldWithPath("accompanyCommentInfos[].updatedAt").type(STRING)
+                                        .description("수정 날짜"),
+                                fieldWithPath("accompanyCommentInfos[].memberInfo.id").type(NUMBER)
+                                        .description("작성자 id"),
+                                fieldWithPath("accompanyCommentInfos[].memberInfo.name").type(
+                                        STRING).description("작성자 이름"),
+                                fieldWithPath(
+                                        "accompanyCommentInfos[].memberInfo.profileImage").type(
+                                        STRING).description("작성자 프로필 이미지 url"),
+                                fieldWithPath("accompanyCommentInfos[].memberInfo.gender").type(
+                                        STRING).description("작성자 성별"),
+                                fieldWithPath("accompanyCommentInfos[].memberInfo.age").type(NUMBER)
+                                        .description("작성자 나이"),
+                                fieldWithPath(
+                                        "accompanyCommentInfos[].memberInfo.introduction").type(
+                                        STRING).description("작성자 소개")
+                        )
+                ));
+    }
+
     private List<AccompanyPost> createAccompanyPosts(Member member, int size) throws Exception {
         List<AccompanyPost> accompanyPosts = new ArrayList<>();
         for (int i = 0; i < size; i++) {
@@ -453,5 +516,16 @@ class AccompanyControllerTest {
         }
 
         return imageUrls;
+    }
+
+    private List<AccompanyComment> createAccompanyComment(Member member, int size) {
+        List<AccompanyComment> accompanyComments = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            accompanyComments.add(
+                    AccompanyComment.builder().member(member).content("가는 길만 동행해도 괜찮을까요!?")
+                            .build());
+        }
+
+        return accompanyComments;
     }
 }
