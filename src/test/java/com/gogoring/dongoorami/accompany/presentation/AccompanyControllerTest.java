@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -13,6 +14,7 @@ import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.formParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -25,7 +27,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
+import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
+import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
@@ -65,6 +69,9 @@ class AccompanyControllerTest {
     private AccompanyPostRepository accompanyPostRepository;
 
     @Autowired
+    private AccompanyCommentRepository accompanyCommentRepository;
+
+    @Autowired
     private TokenProvider tokenProvider;
 
     @Autowired
@@ -78,12 +85,14 @@ class AccompanyControllerTest {
 
     @BeforeEach
     void setUp() {
+        accompanyCommentRepository.deleteAll();
         accompanyPostRepository.deleteAll();
         memberRepository.deleteAll();
     }
 
     @AfterEach
     void tearDown() {
+        accompanyCommentRepository.deleteAll();
         accompanyPostRepository.deleteAll();
         memberRepository.deleteAll();
     }
@@ -362,6 +371,45 @@ class AccompanyControllerTest {
         Long afterViewCount = accompanyPostRepository.findById(accompanyPost.getId()).get()
                 .getViewCount();
         assertThat(afterViewCount, equalTo(beforeViewCount + 1));
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("동행 구인글에 댓글을 작성할 수 있다.")
+    void success_createAccompanyComment() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 1)).get(0);
+        AccompanyCommentRequest accompanyCommentRequest = new AccompanyCommentRequest(
+                "가는 길만 동행해도 괜찮을까요!?");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                post("/api/v1/accompany/comments/{accompanyPostId}", accompanyPost.getId())
+                        .header("Authorization", accessToken)
+                        .content(objectMapper.writeValueAsString(accompanyCommentRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isCreated())
+                .andDo(document("{ClassName}/createAccompanyComment",
+                        preprocessRequest(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                        ),
+                        requestFields(
+                                fieldWithPath("content").type(JsonFieldType.STRING)
+                                        .description("내용")
+                        )
+                ));
     }
 
     private List<AccompanyPost> createAccompanyPosts(Member member, int size) throws Exception {
