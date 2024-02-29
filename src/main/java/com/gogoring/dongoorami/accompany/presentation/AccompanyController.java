@@ -3,6 +3,7 @@ package com.gogoring.dongoorami.accompany.presentation;
 import com.gogoring.dongoorami.accompany.application.AccompanyService;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
@@ -58,6 +59,12 @@ public class AccompanyController {
                 customUserDetails.getId());
         return ResponseEntity.created(URI.create("/api/v1/accompany/posts/" + accompanyPostId))
                 .build();
+    }
+
+    @GetMapping("/comments/{accompanyPostId}")
+    public ResponseEntity<AccompanyCommentsResponse> getAccompanyComments(
+            @PathVariable Long accompanyPostId) {
+        return ResponseEntity.ok(accompanyService.getAccompanyComments(accompanyPostId));
     }
 
 }
