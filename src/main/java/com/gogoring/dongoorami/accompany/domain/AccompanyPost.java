@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AccessLevel;
@@ -41,6 +42,8 @@ public class AccompanyPost extends BaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private String content;
+    @OneToMany(mappedBy = "accompanyPost")
+    private List<AccompanyComment> accompanyComments;
 
     @ElementCollection
     private List<String> images;
@@ -66,6 +69,11 @@ public class AccompanyPost extends BaseEntity {
 
     public void increaseViewCount(Long viewCount) {
         this.viewCount += viewCount;
+    }
+
+    public void addAccompanyComment(AccompanyComment accompanyComment) {
+        accompanyComments.add(accompanyComment);
+        accompanyComment.setAccompanyPost(this);
     }
 
     public enum RecruitmentStatus {
