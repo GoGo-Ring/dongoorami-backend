@@ -4,9 +4,12 @@ import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse.AccompanyCommentInfo;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
+import com.gogoring.dongoorami.accompany.dto.response.MemberInfo;
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
 import com.gogoring.dongoorami.accompany.exception.AccompanyNotFoundException;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
@@ -82,7 +85,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                         AccompanyErrorCode.ACCOMPANY_NOT_FOUND));
         accompanyPost.increaseViewCount(1L);
         return AccompanyPostResponse.of(accompanyPost,
-                AccompanyPostResponse.MemberInfo.of(accompanyPost.getMember()));
+                MemberInfo.of(accompanyPost.getMember()));
     }
 
     @Override
@@ -101,5 +104,19 @@ public class AccompanyServiceImpl implements AccompanyService {
         return accompanyPost.getId();
     }
 
+    @Override
+    public AccompanyCommentsResponse getAccompanyComments(Long accompanyPostId) {
+        AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyPostId)
+                .orElseThrow(() -> new AccompanyNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_NOT_FOUND));
+        List<AccompanyCommentInfo> accompanyCommentInfos = accompanyPost.getAccompanyComments()
+                .stream()
+                .filter(AccompanyComment::isActivated)
+                .map(AccompanyCommentInfo::of)
+                .toList();
+
+        return new AccompanyCommentsResponse(accompanyCommentInfos);
+    }
 
 }
