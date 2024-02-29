@@ -110,3 +110,13 @@ include::{snippets}/AccompanyControllerTest/getAccompanyPost/path-parameters.ado
 .Response
 include::{snippets}/AccompanyControllerTest/getAccompanyPost/http-response.adoc[]
 include::{snippets}/AccompanyControllerTest/getAccompanyPost/response-fields.adoc[]
+
+=== 동행 구인글 댓글 작성
+
+.Request
+include::{snippets}/AccompanyControllerTest/createAccompanyComment/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyComment/path-parameters.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyComment/request-fields.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/createAccompanyComment/http-response.adoc[]
