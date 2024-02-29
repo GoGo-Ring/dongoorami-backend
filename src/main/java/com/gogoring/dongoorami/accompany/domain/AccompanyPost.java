@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -43,7 +44,7 @@ public class AccompanyPost extends BaseEntity {
     private LocalDate endDate;
     private String content;
     @OneToMany(mappedBy = "accompanyPost")
-    private List<AccompanyComment> accompanyComments;
+    private final List<AccompanyComment> accompanyComments = new ArrayList<>();
 
     @ElementCollection
     private List<String> images;
