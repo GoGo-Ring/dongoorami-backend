@@ -1,7 +1,6 @@
 package com.gogoring.dongoorami.accompany.dto.response;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
-import com.gogoring.dongoorami.member.domain.Member;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,7 +15,7 @@ public class AccompanyPostResponse {
 
     private Long id;
     private String title;
-    private MemberInfo writer;
+    private MemberInfo memberInfo;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long viewCount;
@@ -48,7 +47,7 @@ public class AccompanyPostResponse {
                 .updatedAt(accompanyPost.getUpdatedAt())
                 .viewCount(accompanyPost.getViewCount())
                 .commentCount(0L) // 임시
-                .writer(writer)
+                .memberInfo(writer)
                 .concertPlace(accompanyPost.getConcertPlace())
                 .region(accompanyPost.getRegion())
                 .startAge(accompanyPost.getStartAge())
@@ -60,33 +59,5 @@ public class AccompanyPostResponse {
                 .images(accompanyPost.getImages())
                 .isWish(true) // 임시
                 .build();
-    }
-
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    public static class MemberInfo {
-
-        private Long id;
-
-        private String name;
-
-        private String profileImage;
-
-        private String gender;
-
-        private Integer age;
-
-        private String introduction;
-
-        public static MemberInfo of(Member member) {
-            return MemberInfo.builder()
-                    .id(member.getId())
-                    .age(member.getAge())
-                    .introduction(member.getIntroduction())
-                    .name(member.getName())
-                    .profileImage(member.getProfileImage())
-                    .gender(member.getGender()).build();
-        }
     }
 }

@@ -340,13 +340,14 @@ class AccompanyControllerTest {
                         responseFields(
                                 fieldWithPath("id").type(NUMBER).description("동행 구인글 id"),
                                 fieldWithPath("title").type(STRING).description("제목"),
-                                fieldWithPath("writer.id").type(NUMBER).description("작성자 id"),
-                                fieldWithPath("writer.name").type(STRING).description("작성자 이름"),
-                                fieldWithPath("writer.profileImage").type(STRING)
+                                fieldWithPath("memberInfo.id").type(NUMBER).description("작성자 id"),
+                                fieldWithPath("memberInfo.name").type(STRING).description("작성자 이름"),
+                                fieldWithPath("memberInfo.profileImage").type(STRING)
                                         .description("작성자 프로필 이미지 url"),
-                                fieldWithPath("writer.gender").type(STRING).description("작성자 성별"),
-                                fieldWithPath("writer.age").type(NUMBER).description("작성자 나이"),
-                                fieldWithPath("writer.introduction").type(STRING)
+                                fieldWithPath("memberInfo.gender").type(STRING)
+                                        .description("작성자 성별"),
+                                fieldWithPath("memberInfo.age").type(NUMBER).description("작성자 나이"),
+                                fieldWithPath("memberInfo.introduction").type(STRING)
                                         .description("작성자 소개"),
                                 fieldWithPath("createdAt").type(STRING).description("생성 날짜"),
                                 fieldWithPath("updatedAt").type(STRING).description("수정 날짜"),
