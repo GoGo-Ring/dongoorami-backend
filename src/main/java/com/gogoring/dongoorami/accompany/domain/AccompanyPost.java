@@ -77,6 +77,22 @@ public class AccompanyPost extends BaseEntity {
         accompanyComment.setAccompanyPost(this);
     }
 
+    public void update(AccompanyPost accompanyPost) {
+        this.member = accompanyPost.member;
+        this.title = accompanyPost.title;
+        this.concertName = accompanyPost.concertName;
+        this.concertPlace = accompanyPost.concertPlace;
+        this.region = accompanyPost.region;
+        this.startAge = accompanyPost.startAge;
+        this.endAge = accompanyPost.endAge;
+        this.totalPeople = accompanyPost.totalPeople;
+        this.gender = accompanyPost.gender;
+        this.startDate = accompanyPost.startDate;
+        this.endDate = accompanyPost.endDate;
+        this.content = accompanyPost.content;
+        this.images = accompanyPost.images;
+    }
+
     public enum RecruitmentStatus {
         PROCEEDING("모집 중"), COMPLETED("모집 완료");
 

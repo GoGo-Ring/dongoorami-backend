@@ -12,8 +12,10 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.Acc
 import com.gogoring.dongoorami.accompany.dto.response.MemberInfo;
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
 import com.gogoring.dongoorami.accompany.exception.AccompanyPostNotFoundException;
+import com.gogoring.dongoorami.accompany.exception.OnlyWriterCanModifyException;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
+import com.gogoring.dongoorami.global.common.BaseEntity;
 import com.gogoring.dongoorami.global.util.ImageType;
 import com.gogoring.dongoorami.global.util.S3ImageUtil;
 import com.gogoring.dongoorami.member.domain.Member;
@@ -73,6 +75,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
         accompanyPost.increaseViewCount();
+
         return AccompanyPostResponse.of(accompanyPost,
                 MemberInfo.of(accompanyPost.getMember()));
     }
@@ -108,4 +111,20 @@ public class AccompanyServiceImpl implements AccompanyService {
         return new AccompanyCommentsResponse(accompanyCommentInfos);
     }
 
+    @Transactional
+    @Override
+    public void updateAccompanyPost(AccompanyPostRequest accompanyPostRequest, Long memberId,
+            Long accompanyPostId) {
+        AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyPostId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
+        checkMemberIsWriter(accompanyPost, memberId);
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+        List<String> imageUrls = s3ImageUtil.putObjects(accompanyPostRequest.getImages(),
+                ImageType.ACCOMPANY_POST);
+        s3ImageUtil.deleteObjects(accompanyPost.getImages(), ImageType.ACCOMPANY_POST);
+        accompanyPost.update(accompanyPostRequest.toEntity(member, imageUrls));
+    }
 }
