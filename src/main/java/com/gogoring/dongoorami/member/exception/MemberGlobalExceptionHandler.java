@@ -18,6 +18,13 @@ public class MemberGlobalExceptionHandler {
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
 
+    @ExceptionHandler(AlreadySignUpException.class)
+    public ResponseEntity<ErrorResponse> catchAlreadySignUpException(AlreadySignUpException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
+
     @ExceptionHandler(InvalidRefreshTokenException.class)
     public ResponseEntity<ErrorResponse> catchInvalidRefreshTokenException(
             InvalidRefreshTokenException e) {
