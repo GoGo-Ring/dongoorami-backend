@@ -3,11 +3,11 @@ package com.gogoring.dongoorami.accompany.exception;
 import lombok.Getter;
 
 @Getter
-public class AccompanyNotFoundException extends RuntimeException {
+public class AccompanyPostNotFoundException extends RuntimeException {
 
     private final String errorCode;
 
-    public AccompanyNotFoundException(AccompanyErrorCode errorCode) {
+    public AccompanyPostNotFoundException(AccompanyErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode.name();
     }

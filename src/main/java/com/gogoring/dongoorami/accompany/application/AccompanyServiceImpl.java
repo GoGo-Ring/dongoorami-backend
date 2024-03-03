@@ -11,7 +11,7 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
 import com.gogoring.dongoorami.accompany.dto.response.MemberInfo;
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
-import com.gogoring.dongoorami.accompany.exception.AccompanyNotFoundException;
+import com.gogoring.dongoorami.accompany.exception.AccompanyPostNotFoundException;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
 import com.gogoring.dongoorami.global.util.ImageType;
@@ -81,8 +81,8 @@ public class AccompanyServiceImpl implements AccompanyService {
     public AccompanyPostResponse getAccompanyPost(Long accompanyPostId) {
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
-                .orElseThrow(() -> new AccompanyNotFoundException(
-                        AccompanyErrorCode.ACCOMPANY_NOT_FOUND));
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
         accompanyPost.increaseViewCount();
         return AccompanyPostResponse.of(accompanyPost,
                 MemberInfo.of(accompanyPost.getMember()));
@@ -95,8 +95,8 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
-                .orElseThrow(() -> new AccompanyNotFoundException(
-                        AccompanyErrorCode.ACCOMPANY_NOT_FOUND));
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
         AccompanyComment accompanyComment = accompanyCommentRequest.toEntity(member);
         accompanyPost.addAccompanyComment(accompanyComment);
         accompanyCommentRepository.save(accompanyComment);
@@ -108,8 +108,8 @@ public class AccompanyServiceImpl implements AccompanyService {
     public AccompanyCommentsResponse getAccompanyComments(Long accompanyPostId) {
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
-                .orElseThrow(() -> new AccompanyNotFoundException(
-                        AccompanyErrorCode.ACCOMPANY_NOT_FOUND));
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
         List<AccompanyCommentInfo> accompanyCommentInfos = accompanyPost.getAccompanyComments()
                 .stream()
                 .filter(AccompanyComment::isActivated)
