@@ -130,6 +130,7 @@ include::{snippets}/AccompanyControllerTest/getAccompanyComments/path-parameters
 
 .Response
 include::{snippets}/AccompanyControllerTest/getAccompanyComments/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/getAccompanyComments/response-fields.adoc[]
 
 === 동행 구인 게시글 수정
 
@@ -142,3 +143,11 @@ include::{snippets}/AccompanyControllerTest/updateAccompanyPost/path-parameters.
 .Response
 include::{snippets}/AccompanyControllerTest/updateAccompanyPost/http-response.adoc[]
 
+=== 동행 구인 게시글 삭제
+
+.Request
+include::{snippets}/AccompanyControllerTest/deleteAccompanyPost/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/deleteAccompanyPost/path-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/deleteAccompanyPost/http-response.adoc[]
