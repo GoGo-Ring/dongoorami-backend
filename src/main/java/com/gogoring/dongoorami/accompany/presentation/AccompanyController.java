@@ -35,7 +35,7 @@ public class AccompanyController {
     }
 
     @GetMapping("/posts/{accompanyPostId}")
-    public ResponseEntity<AccompanyPostResponse> getAccompanyPosts(
+    public ResponseEntity<AccompanyPostResponse> getAccompanyPost(
             @PathVariable Long accompanyPostId) {
         return ResponseEntity.ok(accompanyService.getAccompanyPost(accompanyPostId));
     }
@@ -62,7 +62,7 @@ public class AccompanyController {
     }
 
     @GetMapping("/comments/{accompanyPostId}")
-    public ResponseEntity<AccompanyCommentsResponse> getAccompanyComments(
+    public ResponseEntity<AccompanyCommentsResponse> getAccompanyPostComments(
             @PathVariable Long accompanyPostId) {
         return ResponseEntity.ok(accompanyService.getAccompanyComments(accompanyPostId));
     }
