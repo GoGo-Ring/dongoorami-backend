@@ -43,6 +43,8 @@ public class Member extends BaseEntity {
 
     private String introduction;
 
+    private Integer manner;
+
     @Builder
     public Member(String name, String profileImage, String provider, String providerId) {
         this.name = name;
@@ -52,6 +54,7 @@ public class Member extends BaseEntity {
         this.roles = new ArrayList<>() {{
             add(Role.ROLE_MEMBER);
         }};
+        this.manner = 0;
     }
 
     public List<GrantedAuthority> getRoles() {
