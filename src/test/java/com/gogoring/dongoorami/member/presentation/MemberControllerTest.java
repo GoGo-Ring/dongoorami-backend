@@ -21,6 +21,7 @@ import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
+import com.gogoring.dongoorami.member.dto.request.MemberSignupRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberUpdateRequest;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.io.FileInputStream;
@@ -113,15 +114,52 @@ public class MemberControllerTest {
 
     @Test
     @WithCustomMockUser
+    @DisplayName("최초 회원가입 시 기본 정보를 저장할 수 있다.")
+    void success_signup() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        MemberSignupRequest memberSignUpRequest = new MemberSignupRequest();
+        ReflectionTestUtils.setField(memberSignUpRequest, "gender", "남자");
+        ReflectionTestUtils.setField(memberSignUpRequest, "birthDate", LocalDate.of(2000, 12, 31));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/members/signUp")
+                        .header("Authorization", accessToken)
+                        .content(objectMapper.writeValueAsString(memberSignUpRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/signup",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("gender").type(JsonFieldType.STRING)
+                                        .description("남자/여자"),
+                                fieldWithPath("birthDate").type("LocalDate")
+                                        .description("생년월일")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
     @DisplayName("로그아웃을 할 수 있다.")
     void success_logout() throws Exception {
         // given
-        Member member = Member.builder()
-                .name("김뫄뫄")
-                .profileImage("image.png")
-                .provider("kakao")
-                .providerId("alsjkghlaskdjgh")
-                .build();
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
         memberRepository.save(member);
 
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
@@ -239,13 +277,14 @@ public class MemberControllerTest {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "gender", "남자");
+        ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2000, 12, 31));
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
 
         MemberUpdateRequest memberUpdateRequest = new MemberUpdateRequest();
-        ReflectionTestUtils.setField(memberUpdateRequest, "gender", "남자");
-        ReflectionTestUtils.setField(memberUpdateRequest, "birthDate", LocalDate.of(2000, 12, 31));
+        ReflectionTestUtils.setField(memberUpdateRequest, "name", "이롸롸");
         ReflectionTestUtils.setField(memberUpdateRequest, "introduction", "안녕하세요~");
 
         // when
@@ -258,21 +297,18 @@ public class MemberControllerTest {
 
         // then
         resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(member.getName()))
+                .andExpect(jsonPath("$.name").value(memberUpdateRequest.getName()))
                 .andExpect(jsonPath("$.profileImage").value(member.getProfileImage()))
-                .andExpect(jsonPath("$.gender").value(memberUpdateRequest.getGender()))
-                .andExpect(jsonPath("$.age").value(
-                        LocalDate.now().getYear() - memberUpdateRequest.getBirthDate().getYear()
-                                + 1))
+                .andExpect(jsonPath("$.gender").value(member.getGender()))
+                .andExpect(jsonPath("$.age").value(member.getAge()))
                 .andExpect(jsonPath("$.introduction").value(memberUpdateRequest.getIntroduction()))
+                .andExpect(jsonPath("$.manner").value(member.getManner()))
                 .andDo(document("{ClassName}/updateMember",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
-                                fieldWithPath("gender").type(JsonFieldType.STRING)
-                                        .description("남자/여자"),
-                                fieldWithPath("birthDate").type("LocalDate")
-                                        .description("생년월일"),
+                                fieldWithPath("name").type(JsonFieldType.STRING)
+                                        .description("닉네임"),
                                 fieldWithPath("introduction").type(JsonFieldType.STRING)
                                         .description("한줄 소개")
                         ),
@@ -286,7 +322,9 @@ public class MemberControllerTest {
                                 fieldWithPath("age").type(JsonFieldType.NUMBER)
                                         .description("나이"),
                                 fieldWithPath("introduction").type(JsonFieldType.STRING)
-                                        .description("한줄 소개")
+                                        .description("한줄 소개"),
+                                fieldWithPath("manner").type(JsonFieldType.NUMBER)
+                                        .description("매너 지수")
                         ))
                 );
     }
@@ -321,6 +359,7 @@ public class MemberControllerTest {
                 .andExpect(jsonPath("$.gender").value(member.getGender()))
                 .andExpect(jsonPath("$.age").value(member.getAge()))
                 .andExpect(jsonPath("$.introduction").value(member.getIntroduction()))
+                .andExpect(jsonPath("$.manner").value(member.getManner()))
                 .andDo(document("{ClassName}/getMember",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
@@ -334,7 +373,9 @@ public class MemberControllerTest {
                                 fieldWithPath("age").type(JsonFieldType.NUMBER)
                                         .description("나이"),
                                 fieldWithPath("introduction").type(JsonFieldType.STRING)
-                                        .description("한줄 소개")
+                                        .description("한줄 소개"),
+                                fieldWithPath("manner").type(JsonFieldType.NUMBER)
+                                        .description("매너 지수")
                         ))
                 );
     }
