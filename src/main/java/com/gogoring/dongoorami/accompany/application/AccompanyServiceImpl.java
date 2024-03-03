@@ -127,4 +127,23 @@ public class AccompanyServiceImpl implements AccompanyService {
         s3ImageUtil.deleteObjects(accompanyPost.getImages(), ImageType.ACCOMPANY_POST);
         accompanyPost.update(accompanyPostRequest.toEntity(member, imageUrls));
     }
+
+    @Transactional
+    @Override
+    public void deleteAccompanyPost(Long memberId, Long accompanyPostId) {
+        AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyPostId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
+        checkMemberIsWriter(accompanyPost, memberId);
+        accompanyPost.getAccompanyComments().forEach(BaseEntity::updateIsActivatedFalse);
+        accompanyPost.updateIsActivatedFalse();
+    }
+
+    private void checkMemberIsWriter(AccompanyPost accompanyPost, Long memberId) {
+        if (accompanyPost.getMember().getId() != memberId) {
+            throw new OnlyWriterCanModifyException(AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND);
+        }
+    }
+
 }
