@@ -83,7 +83,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_NOT_FOUND));
-        accompanyPost.increaseViewCount(1L);
+        accompanyPost.increaseViewCount();
         return AccompanyPostResponse.of(accompanyPost,
                 MemberInfo.of(accompanyPost.getMember()));
     }

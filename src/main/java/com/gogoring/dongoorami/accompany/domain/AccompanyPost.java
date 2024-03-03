@@ -68,8 +68,8 @@ public class AccompanyPost extends BaseEntity {
         this.images = images;
     }
 
-    public void increaseViewCount(Long viewCount) {
-        this.viewCount += viewCount;
+    public void increaseViewCount() {
+        this.viewCount ++;
     }
 
     public void addAccompanyComment(AccompanyComment accompanyComment) {
