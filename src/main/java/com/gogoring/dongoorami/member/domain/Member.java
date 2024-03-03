@@ -1,6 +1,8 @@
 package com.gogoring.dongoorami.member.domain;
 
 import com.gogoring.dongoorami.global.common.BaseEntity;
+import com.gogoring.dongoorami.member.exception.AlreadySignUpException;
+import com.gogoring.dongoorami.member.exception.MemberErrorCode;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -80,9 +82,20 @@ public class Member extends BaseEntity {
         this.profileImage = profileImage;
     }
 
-    public void updateInfo(String gender, LocalDate birthDate, String introduction) {
+    public void updateGenderAndBirthDate(String gender, LocalDate birthDate) {
+        checkGenderAndBirthDateIsNull();
         this.gender = gender;
         this.birthDate = birthDate;
+    }
+
+    public void updateNameAndIntroduction(String name, String introduction) {
+        this.name = name;
         this.introduction = introduction;
+    }
+
+    private void checkGenderAndBirthDateIsNull() {
+        if (gender != null || birthDate != null) {
+            throw new AlreadySignUpException(MemberErrorCode.ALREADY_SIGN_UP);
+        }
     }
 }
