@@ -67,4 +67,14 @@ public class AccompanyController {
         return ResponseEntity.ok(accompanyService.getAccompanyComments(accompanyPostId));
     }
 
+    @PostMapping("/posts/{accompanyPostId}")
+    public ResponseEntity<Void> updateAccompanyPost(
+            @Valid AccompanyPostRequest accompanyPostRequest,
+            @PathVariable Long accompanyPostId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        accompanyService.updateAccompanyPost(accompanyPostRequest, customUserDetails.getId(),
+                accompanyPostId);
+        return ResponseEntity.ok().build();
+    }
+
 }
