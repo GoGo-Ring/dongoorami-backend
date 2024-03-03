@@ -72,6 +72,12 @@ public class S3ImageUtil {
         amazonS3.deleteObject(bucket + imageType.getName(), filename);
     }
 
+    public void deleteObjects(List<String> originImageUrls, ImageType imageType) {
+        if (originImageUrls.size() != 1 || !originImageUrls.get(0).equals(defaultImageUrl)) {
+            originImageUrls.forEach(originImageUrl -> deleteObject(originImageUrl, imageType));
+        }
+    }
+
     private void validateFileExtension(String originalFilename) {
         String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1)
                 .toLowerCase();
