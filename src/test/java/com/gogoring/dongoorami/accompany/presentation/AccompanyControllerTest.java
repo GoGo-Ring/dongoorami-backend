@@ -129,8 +129,8 @@ class AccompanyControllerTest {
         // when
         ResultActions resultActions = mockMvc.perform(
                 multipart("/api/v1/accompany/posts")
-                        .file("images", accompanyPostRequest.getImages().get(0).getBytes())
-                        .file("images", accompanyPostRequest.getImages().get(1).getBytes())
+                        .file((MockMultipartFile) accompanyPostRequest.getImages().get(0))
+                        .file((MockMultipartFile) accompanyPostRequest.getImages().get(1))
                         .param("concertName", accompanyPostRequest.getConcertName())
                         .param("concertPlace", accompanyPostRequest.getConcertPlace())
                         .param("startDate", accompanyPostRequest.getStartDate().toString())
@@ -491,6 +491,7 @@ class AccompanyControllerTest {
                 member.getRoles());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1)).get(0);
+        List<MultipartFile> mockMultipartFiles = createMockMultipartFiles(2);
         AccompanyPostRequest accompanyPostRequest = AccompanyPostRequest.builder()
                 .concertName("2024 SG워너비 콘서트 : 우리의 노래")
                 .concertPlace("KSPO DOME")
@@ -509,8 +510,8 @@ class AccompanyControllerTest {
         // when
         ResultActions resultActions = mockMvc.perform(
                 multipart("/api/v1/accompany/posts/{accompanyPostId}", accompanyPost.getId())
-                        .file("images", accompanyPostRequest.getImages().get(0).getBytes())
-                        .file("images", accompanyPostRequest.getImages().get(1).getBytes())
+                        .file((MockMultipartFile) accompanyPostRequest.getImages().get(0))
+                        .file((MockMultipartFile) accompanyPostRequest.getImages().get(1))
                         .param("concertName", accompanyPostRequest.getConcertName())
                         .param("concertPlace", accompanyPostRequest.getConcertPlace())
                         .param("startDate", accompanyPostRequest.getStartDate().toString())
@@ -613,7 +614,7 @@ class AccompanyControllerTest {
     private List<MultipartFile> createMockMultipartFiles(int size) throws Exception {
         List<MultipartFile> images = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            images.add(new MockMultipartFile("image", "김영한.JPG",
+            images.add(new MockMultipartFile("images", "김영한.JPG",
                     MediaType.MULTIPART_FORM_DATA_VALUE,
                     new FileInputStream("src/test/resources/김영한.JPG")));
         }
