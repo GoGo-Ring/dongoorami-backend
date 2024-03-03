@@ -26,6 +26,8 @@ public class AccompanyPost extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private final RecruitmentStatus status = RecruitmentStatus.PROCEEDING;
+    @OneToMany(mappedBy = "accompanyPost")
+    private final List<AccompanyComment> accompanyComments = new ArrayList<>();
     private Long viewCount = 0L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,9 +45,6 @@ public class AccompanyPost extends BaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private String content;
-    @OneToMany(mappedBy = "accompanyPost")
-    private final List<AccompanyComment> accompanyComments = new ArrayList<>();
-
     @ElementCollection
     private List<String> images;
 
@@ -69,7 +68,7 @@ public class AccompanyPost extends BaseEntity {
     }
 
     public void increaseViewCount() {
-        this.viewCount ++;
+        this.viewCount++;
     }
 
     public void addAccompanyComment(AccompanyComment accompanyComment) {
