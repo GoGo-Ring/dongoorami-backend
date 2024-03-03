@@ -6,6 +6,7 @@ import com.gogoring.dongoorami.global.util.S3ImageUtil;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
+import com.gogoring.dongoorami.member.dto.request.MemberSignupRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberUpdateRequest;
 import com.gogoring.dongoorami.member.dto.response.MemberInfoResponse;
 import com.gogoring.dongoorami.member.dto.response.MemberUpdateProfileImageResponse;
@@ -48,6 +49,15 @@ public class MemberServiceImpl implements MemberService {
         String refreshToken = tokenProvider.createRefreshToken(member.getProviderId());
 
         return TokenDto.of(accessToken, refreshToken);
+    }
+
+    @Transactional
+    @Override
+    public void signup(MemberSignupRequest memberSignUpRequest, Long memberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+        member.updateGenderAndBirthDate(memberSignUpRequest.getGender(),
+                memberSignUpRequest.getBirthDate());
     }
 
     @Override
@@ -93,7 +103,7 @@ public class MemberServiceImpl implements MemberService {
     public MemberInfoResponse updateMember(MemberUpdateRequest memberUpdateRequest, Long memberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        member.updateInfo(memberUpdateRequest.getGender(), memberUpdateRequest.getBirthDate(),
+        member.updateNameAndIntroduction(memberUpdateRequest.getName(),
                 memberUpdateRequest.getIntroduction());
 
         return MemberInfoResponse.of(member);

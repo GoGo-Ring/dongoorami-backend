@@ -2,6 +2,7 @@ package com.gogoring.dongoorami.member.application;
 
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
+import com.gogoring.dongoorami.member.dto.request.MemberSignupRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberUpdateRequest;
 import com.gogoring.dongoorami.member.dto.response.MemberInfoResponse;
 import com.gogoring.dongoorami.member.dto.response.MemberUpdateProfileImageResponse;
@@ -11,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 public interface MemberService {
 
     TokenDto reissueToken(MemberReissueRequest memberReissueRequest);
+
+    void signup(MemberSignupRequest memberSignUpRequest, Long memberId);
 
     void logout(MemberLogoutAndQuitRequest memberLogoutAndQuitRequest);
 
