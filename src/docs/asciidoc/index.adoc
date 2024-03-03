@@ -100,3 +100,33 @@ include::{snippets}/AccompanyControllerTest/getAccompanyPostsAfterFirst/query-pa
 .Response
 include::{snippets}/AccompanyControllerTest/getAccompanyPostsAfterFirst/http-response.adoc[]
 include::{snippets}/AccompanyControllerTest/getAccompanyPostsAfterFirst/response-fields.adoc[]
+
+=== 동행 구인글 단건 상세 조회
+
+.Request
+include::{snippets}/AccompanyControllerTest/getAccompanyPost/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/getAccompanyPost/path-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/getAccompanyPost/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/getAccompanyPost/response-fields.adoc[]
+
+=== 동행 구인글 댓글 작성
+
+.Request
+include::{snippets}/AccompanyControllerTest/createAccompanyComment/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyComment/path-parameters.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyComment/request-fields.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/createAccompanyComment/http-response.adoc[]
+
+=== 특정 동행 구인글 전체 댓글 조회
+
+.Request
+include::{snippets}/AccompanyControllerTest/getAccompanyComments/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/getAccompanyComments/path-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/getAccompanyComments/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/getAccompanyComments/response-fields.adoc[]
