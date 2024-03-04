@@ -34,8 +34,9 @@ public class AccompanyPostResponse {
     private String content;
     private List<String> images;
     private Boolean isWish;
+    private Boolean isWriter;
 
-    public static AccompanyPostResponse of(AccompanyPost accompanyPost, MemberInfo writer) {
+    public static AccompanyPostResponse of(AccompanyPost accompanyPost, MemberInfo writer, Boolean isWriter) {
         return AccompanyPostResponse.builder()
                 .id(accompanyPost.getId())
                 .title(accompanyPost.getTitle())
@@ -58,6 +59,7 @@ public class AccompanyPostResponse {
                 .content(accompanyPost.getContent())
                 .images(accompanyPost.getImages())
                 .isWish(true) // 임시
+                .isWriter(isWriter)
                 .build();
     }
 }

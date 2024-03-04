@@ -69,7 +69,7 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     @Transactional
     @Override
-    public AccompanyPostResponse getAccompanyPost(Long accompanyPostId) {
+    public AccompanyPostResponse getAccompanyPost(Long memberId, Long accompanyPostId) {
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
@@ -77,7 +77,8 @@ public class AccompanyServiceImpl implements AccompanyService {
         accompanyPost.increaseViewCount();
 
         return AccompanyPostResponse.of(accompanyPost,
-                MemberInfo.of(accompanyPost.getMember()));
+                MemberInfo.of(accompanyPost.getMember()),
+                isMemberIsWriter(accompanyPost.getId(), memberId));
     }
 
     @Override
@@ -141,9 +142,13 @@ public class AccompanyServiceImpl implements AccompanyService {
     }
 
     private void checkMemberIsWriter(AccompanyPost accompanyPost, Long memberId) {
-        if (accompanyPost.getMember().getId() != memberId) {
+        if (!isMemberIsWriter(accompanyPost.getMember().getId(), memberId)) {
             throw new OnlyWriterCanModifyException(AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND);
         }
+    }
+
+    private boolean isMemberIsWriter(Long writerId, Long memberId){
+        return writerId == memberId;
     }
 
 }

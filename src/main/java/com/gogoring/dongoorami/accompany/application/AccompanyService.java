@@ -12,7 +12,7 @@ public interface AccompanyService {
 
     AccompanyPostsResponse getAccompanyPosts(Long cursorId, int size);
 
-    AccompanyPostResponse getAccompanyPost(Long accompanyPostId);
+    AccompanyPostResponse getAccompanyPost(Long memberId, Long accompanyPostId);
 
     Long createAccompanyComment(Long accompanyPostId,
             AccompanyCommentRequest accompanyCommentRequest, Long memberId);
