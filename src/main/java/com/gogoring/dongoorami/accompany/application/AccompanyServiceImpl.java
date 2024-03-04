@@ -28,6 +28,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -39,10 +40,10 @@ public class AccompanyServiceImpl implements AccompanyService {
     private final S3ImageUtil s3ImageUtil;
 
     @Override
-    public Long createAccompanyPost(AccompanyPostRequest accompanyPostRequest, Long memberId) {
+    public Long createAccompanyPost(AccompanyPostRequest accompanyPostRequest, List<MultipartFile> images, Long memberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        List<String> imageUrls = s3ImageUtil.putObjects(accompanyPostRequest.getImages(),
+        List<String> imageUrls = s3ImageUtil.putObjects(images,
                 ImageType.ACCOMPANY_POST);
 
         return accompanyPostRepository.save(accompanyPostRequest.toEntity(member, imageUrls))
@@ -69,7 +70,7 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     @Transactional
     @Override
-    public AccompanyPostResponse getAccompanyPost(Long accompanyPostId) {
+    public AccompanyPostResponse getAccompanyPost(Long memberId, Long accompanyPostId) {
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
@@ -77,7 +78,8 @@ public class AccompanyServiceImpl implements AccompanyService {
         accompanyPost.increaseViewCount();
 
         return AccompanyPostResponse.of(accompanyPost,
-                MemberInfo.of(accompanyPost.getMember()));
+                MemberInfo.of(accompanyPost.getMember()),
+                isMemberIsWriter(accompanyPost.getId(), memberId));
     }
 
     @Override
@@ -113,7 +115,7 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     @Transactional
     @Override
-    public void updateAccompanyPost(AccompanyPostRequest accompanyPostRequest, Long memberId,
+    public void updateAccompanyPost(AccompanyPostRequest accompanyPostRequest, List<MultipartFile> images, Long memberId,
             Long accompanyPostId) {
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
@@ -122,7 +124,7 @@ public class AccompanyServiceImpl implements AccompanyService {
         checkMemberIsWriter(accompanyPost, memberId);
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        List<String> imageUrls = s3ImageUtil.putObjects(accompanyPostRequest.getImages(),
+        List<String> imageUrls = s3ImageUtil.putObjects(images,
                 ImageType.ACCOMPANY_POST);
         s3ImageUtil.deleteObjects(accompanyPost.getImages(), ImageType.ACCOMPANY_POST);
         accompanyPost.update(accompanyPostRequest.toEntity(member, imageUrls));
@@ -141,9 +143,13 @@ public class AccompanyServiceImpl implements AccompanyService {
     }
 
     private void checkMemberIsWriter(AccompanyPost accompanyPost, Long memberId) {
-        if (accompanyPost.getMember().getId() != memberId) {
+        if (!isMemberIsWriter(accompanyPost.getMember().getId(), memberId)) {
             throw new OnlyWriterCanModifyException(AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND);
         }
+    }
+
+    private boolean isMemberIsWriter(Long writerId, Long memberId){
+        return writerId == memberId;
     }
 
 }

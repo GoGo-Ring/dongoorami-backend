@@ -1,11 +1,13 @@
 package com.gogoring.dongoorami.accompany.dto.request;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
+import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
 import com.gogoring.dongoorami.member.domain.Member;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -55,7 +57,8 @@ public class AccompanyPostRequest {
     @NotBlank(message = "content은 공백일 수 없습니다.")
     private String content;
 
-    private List<MultipartFile> images;
+    @Size(min=1, message = "purposes는 1개 이상 필요합니다.")
+    private List<String> purposes;
 
     public AccompanyPost toEntity(Member member, List<String> images) {
         return AccompanyPost.builder()
@@ -72,6 +75,7 @@ public class AccompanyPostRequest {
                 .startAge(startAge)
                 .member(member)
                 .images(images)
+                .purposes(purposes.stream().map(AccompanyPurposeType::getValue).toList())
                 .build();
     }
 }

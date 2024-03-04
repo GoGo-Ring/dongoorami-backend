@@ -9,17 +9,21 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/accompany")
@@ -37,15 +41,17 @@ public class AccompanyController {
 
     @GetMapping("/posts/{accompanyPostId}")
     public ResponseEntity<AccompanyPostResponse> getAccompanyPost(
-            @PathVariable Long accompanyPostId) {
-        return ResponseEntity.ok(accompanyService.getAccompanyPost(accompanyPostId));
+            @PathVariable Long accompanyPostId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(accompanyService.getAccompanyPost(customUserDetails.getId(), accompanyPostId));
     }
 
     @PostMapping("/posts")
     public ResponseEntity<Void> createAccompanyPost(
-            @Valid AccompanyPostRequest accompanyPostRequest,
+            @Valid @RequestPart AccompanyPostRequest accompanyPostRequest,
+            @RequestPart List<MultipartFile> images,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        Long accompanyPostId = accompanyService.createAccompanyPost(accompanyPostRequest,
+        Long accompanyPostId = accompanyService.createAccompanyPost(accompanyPostRequest, images,
                 customUserDetails.getId());
         return ResponseEntity.created(URI.create("/api/v1/accompany/posts/" + accompanyPostId))
                 .build();
@@ -70,10 +76,11 @@ public class AccompanyController {
 
     @PostMapping("/posts/{accompanyPostId}")
     public ResponseEntity<Void> updateAccompanyPost(
-            @Valid AccompanyPostRequest accompanyPostRequest,
+            @Valid @RequestPart AccompanyPostRequest accompanyPostRequest,
+            @RequestPart List<MultipartFile> images,
             @PathVariable Long accompanyPostId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        accompanyService.updateAccompanyPost(accompanyPostRequest, customUserDetails.getId(),
+        accompanyService.updateAccompanyPost(accompanyPostRequest, images, customUserDetails.getId(),
                 accompanyPostId);
         return ResponseEntity.ok().build();
     }

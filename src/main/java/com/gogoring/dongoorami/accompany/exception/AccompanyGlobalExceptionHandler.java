@@ -26,4 +26,12 @@ public class AccompanyGlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
+
+    @ExceptionHandler(InvalidAccompanyPurposeTypeException.class)
+    public ResponseEntity<ErrorResponse> catchInvalidAccompanyPurposeTypeExceptionException(
+            InvalidAccompanyPurposeTypeException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
 }

@@ -78,12 +78,16 @@ include::{snippets}/MemberControllerTest/getMember/http-response.adoc[]
 include::{snippets}/MemberControllerTest/getMember/response-fields.adoc[]
 
 == 동행 API
+
+=== 동행 목적 종류
+관람, 숙박, 이동
+
 === 동행 구인 게시글 작성
 
 .Request
 include::{snippets}/AccompanyControllerTest/createAccompanyPost/http-request.adoc[]
-include::{snippets}/AccompanyControllerTest/createAccompanyPost/form-parameters.adoc[]
 include::{snippets}/AccompanyControllerTest/createAccompanyPost/request-parts.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyPost/request-part-accompanyPostRequest-fields.adoc[]
 
 .Response
 include::{snippets}/AccompanyControllerTest/createAccompanyPost/http-response.adoc[]
@@ -145,9 +149,9 @@ include::{snippets}/AccompanyControllerTest/getAccompanyComments/response-fields
 
 .Request
 include::{snippets}/AccompanyControllerTest/updateAccompanyPost/http-request.adoc[]
-include::{snippets}/AccompanyControllerTest/updateAccompanyPost/form-parameters.adoc[]
-include::{snippets}/AccompanyControllerTest/updateAccompanyPost/request-parts.adoc[]
 include::{snippets}/AccompanyControllerTest/updateAccompanyPost/path-parameters.adoc[]
+include::{snippets}/AccompanyControllerTest/updateAccompanyPost/request-parts.adoc[]
+include::{snippets}/AccompanyControllerTest/updateAccompanyPost/request-part-accompanyPostRequest-fields.adoc[]
 
 .Response
 include::{snippets}/AccompanyControllerTest/updateAccompanyPost/http-response.adoc[]
