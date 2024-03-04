@@ -373,7 +373,8 @@ class AccompanyControllerTest {
                                 fieldWithPath("content").type(STRING).description("내용"),
                                 fieldWithPath("images").type(ARRAY).description("이미지 리스트"),
                                 fieldWithPath("isWish").type(BOOLEAN).description("찜 여부"),
-                                fieldWithPath("isWriter").type(BOOLEAN).description("본인 작성 여부")
+                                fieldWithPath("isWriter").type(BOOLEAN).description("본인 작성 여부"),
+                                fieldWithPath("purposes").type(ARRAY).description("동행 목적 리스트")
                         )
                 ));
         Long afterViewCount = accompanyPostRepository.findById(accompanyPost.getId()).get()
@@ -610,7 +611,9 @@ class AccompanyControllerTest {
                     .startAge(23L)
                     .endAge(37L)
                     .totalPeople(2L)
-                    .images(createImageUrls(2)).build());
+                    .images(createImageUrls(2))
+                    .purposes(Arrays.asList(AccompanyPurposeType.ACCOMMODATION,
+                            AccompanyPurposeType.TRANSPORTATION)).build());
         }
 
         return accompanyPosts;

@@ -1,6 +1,7 @@
 package com.gogoring.dongoorami.accompany.dto.response;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
+import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,8 +36,10 @@ public class AccompanyPostResponse {
     private List<String> images;
     private Boolean isWish;
     private Boolean isWriter;
+    private List<String> purposes;
 
-    public static AccompanyPostResponse of(AccompanyPost accompanyPost, MemberInfo writer, Boolean isWriter) {
+    public static AccompanyPostResponse of(AccompanyPost accompanyPost, MemberInfo writer,
+            Boolean isWriter) {
         return AccompanyPostResponse.builder()
                 .id(accompanyPost.getId())
                 .title(accompanyPost.getTitle())
@@ -60,6 +63,8 @@ public class AccompanyPostResponse {
                 .images(accompanyPost.getImages())
                 .isWish(true) // 임시
                 .isWriter(isWriter)
+                .purposes(accompanyPost.getPurposes().stream().map(AccompanyPurposeType::getName)
+                        .toList())
                 .build();
     }
 }
