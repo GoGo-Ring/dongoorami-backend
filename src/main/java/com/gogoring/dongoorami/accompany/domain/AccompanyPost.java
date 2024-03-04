@@ -77,7 +77,6 @@ public class AccompanyPost extends BaseEntity {
     }
 
     public void update(AccompanyPost accompanyPost) {
-        this.member = accompanyPost.member;
         this.title = accompanyPost.title;
         this.concertName = accompanyPost.concertName;
         this.concertPlace = accompanyPost.concertPlace;
