@@ -8,6 +8,7 @@ import com.gogoring.dongoorami.global.exception.FailFileUploadException;
 import com.gogoring.dongoorami.global.exception.GlobalErrorCode;
 import com.gogoring.dongoorami.global.exception.InvalidFileExtensionException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +26,9 @@ public class S3ImageUtil {
     private final AmazonS3 amazonS3;
 
     private final List<String> allowedExtensions = Arrays.asList("jpg", "png", "jpeg");
+
+    @Value("${cloud.aws.s3.default-image-url}")
+    private String defaultImageUrl;
 
     @Value("${cloud.aws.s3.bucket}/")
     private String bucket;
@@ -51,9 +55,27 @@ public class S3ImageUtil {
         return amazonS3.getUrl(bucket + imageType.getName(), s3Filename).toString();
     }
 
+    public List<String> putObjects(List<MultipartFile> multipartFiles, ImageType imageType) {
+        List<String> imageUrls = new ArrayList<>();
+        if (multipartFiles.isEmpty() || multipartFiles.get(0).isEmpty()) {
+            imageUrls.add(defaultImageUrl);
+        } else {
+            multipartFiles.forEach(
+                    multipartFile -> imageUrls.add(putObject(multipartFile, imageType)));
+        }
+
+        return imageUrls;
+    }
+
     public void deleteObject(String originImageUrl, ImageType imageType) {
         String filename = originImageUrl.substring(originImageUrl.lastIndexOf(".com/") + 1);
         amazonS3.deleteObject(bucket + imageType.getName(), filename);
+    }
+
+    public void deleteObjects(List<String> originImageUrls, ImageType imageType) {
+        if (originImageUrls.size() != 1 || !originImageUrls.get(0).equals(defaultImageUrl)) {
+            originImageUrls.forEach(originImageUrl -> deleteObject(originImageUrl, imageType));
+        }
     }
 
     private void validateFileExtension(String originalFilename) {

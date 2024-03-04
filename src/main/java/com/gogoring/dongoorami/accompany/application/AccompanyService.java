@@ -18,4 +18,9 @@ public interface AccompanyService {
             AccompanyCommentRequest accompanyCommentRequest, Long memberId);
 
     AccompanyCommentsResponse getAccompanyComments(Long accompanyPostId);
+
+    void updateAccompanyPost(AccompanyPostRequest accompanyPostRequest, Long memberId,
+            Long accompanyPostId);
+
+    void deleteAccompanyPost(Long memberId, Long accompanyPostId);
 }

@@ -11,19 +11,19 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
 import com.gogoring.dongoorami.accompany.dto.response.MemberInfo;
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
-import com.gogoring.dongoorami.accompany.exception.AccompanyNotFoundException;
+import com.gogoring.dongoorami.accompany.exception.AccompanyPostNotFoundException;
+import com.gogoring.dongoorami.accompany.exception.OnlyWriterCanModifyException;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
+import com.gogoring.dongoorami.global.common.BaseEntity;
 import com.gogoring.dongoorami.global.util.ImageType;
 import com.gogoring.dongoorami.global.util.S3ImageUtil;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.exception.MemberErrorCode;
 import com.gogoring.dongoorami.member.exception.MemberNotFoundException;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -37,22 +37,13 @@ public class AccompanyServiceImpl implements AccompanyService {
     private final AccompanyCommentRepository accompanyCommentRepository;
     private final MemberRepository memberRepository;
     private final S3ImageUtil s3ImageUtil;
-    @Value("${cloud.aws.s3.default-image-url}")
-    private String defaultImageUrl;
 
     @Override
     public Long createAccompanyPost(AccompanyPostRequest accompanyPostRequest, Long memberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        List<String> imageUrls = new ArrayList<>();
-        if (accompanyPostRequest.getImages().isEmpty() || accompanyPostRequest.getImages().get(0)
-                .isEmpty()) {
-            imageUrls.add(defaultImageUrl);
-        } else {
-            accompanyPostRequest.getImages().stream()
-                    .map(image -> imageUrls.add(
-                            s3ImageUtil.putObject(image, ImageType.ACCOMPANY_POST)));
-        }
+        List<String> imageUrls = s3ImageUtil.putObjects(accompanyPostRequest.getImages(),
+                ImageType.ACCOMPANY_POST);
 
         return accompanyPostRepository.save(accompanyPostRequest.toEntity(member, imageUrls))
                 .getId();
@@ -81,9 +72,10 @@ public class AccompanyServiceImpl implements AccompanyService {
     public AccompanyPostResponse getAccompanyPost(Long accompanyPostId) {
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
-                .orElseThrow(() -> new AccompanyNotFoundException(
-                        AccompanyErrorCode.ACCOMPANY_NOT_FOUND));
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
         accompanyPost.increaseViewCount();
+
         return AccompanyPostResponse.of(accompanyPost,
                 MemberInfo.of(accompanyPost.getMember()));
     }
@@ -95,8 +87,8 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
-                .orElseThrow(() -> new AccompanyNotFoundException(
-                        AccompanyErrorCode.ACCOMPANY_NOT_FOUND));
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
         AccompanyComment accompanyComment = accompanyCommentRequest.toEntity(member);
         accompanyPost.addAccompanyComment(accompanyComment);
         accompanyCommentRepository.save(accompanyComment);
@@ -108,8 +100,8 @@ public class AccompanyServiceImpl implements AccompanyService {
     public AccompanyCommentsResponse getAccompanyComments(Long accompanyPostId) {
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
-                .orElseThrow(() -> new AccompanyNotFoundException(
-                        AccompanyErrorCode.ACCOMPANY_NOT_FOUND));
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
         List<AccompanyCommentInfo> accompanyCommentInfos = accompanyPost.getAccompanyComments()
                 .stream()
                 .filter(AccompanyComment::isActivated)
@@ -117,6 +109,41 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .toList();
 
         return new AccompanyCommentsResponse(accompanyCommentInfos);
+    }
+
+    @Transactional
+    @Override
+    public void updateAccompanyPost(AccompanyPostRequest accompanyPostRequest, Long memberId,
+            Long accompanyPostId) {
+        AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyPostId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
+        checkMemberIsWriter(accompanyPost, memberId);
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+        List<String> imageUrls = s3ImageUtil.putObjects(accompanyPostRequest.getImages(),
+                ImageType.ACCOMPANY_POST);
+        s3ImageUtil.deleteObjects(accompanyPost.getImages(), ImageType.ACCOMPANY_POST);
+        accompanyPost.update(accompanyPostRequest.toEntity(member, imageUrls));
+    }
+
+    @Transactional
+    @Override
+    public void deleteAccompanyPost(Long memberId, Long accompanyPostId) {
+        AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyPostId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
+        checkMemberIsWriter(accompanyPost, memberId);
+        accompanyPost.getAccompanyComments().forEach(BaseEntity::updateIsActivatedFalse);
+        accompanyPost.updateIsActivatedFalse();
+    }
+
+    private void checkMemberIsWriter(AccompanyPost accompanyPost, Long memberId) {
+        if (accompanyPost.getMember().getId() != memberId) {
+            throw new OnlyWriterCanModifyException(AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND);
+        }
     }
 
 }

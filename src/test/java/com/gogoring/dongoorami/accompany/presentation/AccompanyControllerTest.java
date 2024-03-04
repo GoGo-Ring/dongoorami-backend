@@ -3,6 +3,7 @@ package com.gogoring.dongoorami.accompany.presentation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
@@ -129,8 +130,8 @@ class AccompanyControllerTest {
         // when
         ResultActions resultActions = mockMvc.perform(
                 multipart("/api/v1/accompany/posts")
-                        .file("images", accompanyPostRequest.getImages().get(0).getBytes())
-                        .file("images", accompanyPostRequest.getImages().get(1).getBytes())
+                        .file((MockMultipartFile) accompanyPostRequest.getImages().get(0))
+                        .file((MockMultipartFile) accompanyPostRequest.getImages().get(1))
                         .param("concertName", accompanyPostRequest.getConcertName())
                         .param("concertPlace", accompanyPostRequest.getConcertPlace())
                         .param("startDate", accompanyPostRequest.getStartDate().toString())
@@ -481,6 +482,118 @@ class AccompanyControllerTest {
                 ));
     }
 
+    @Test
+    @WithCustomMockUser
+    @DisplayName("작성자는 해당 동행 구인글을 수정할 수 있다.")
+    void success_updateAccompanyPost() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 1)).get(0);
+        List<MultipartFile> mockMultipartFiles = createMockMultipartFiles(2);
+        AccompanyPostRequest accompanyPostRequest = AccompanyPostRequest.builder()
+                .concertName("2024 SG워너비 콘서트 : 우리의 노래")
+                .concertPlace("KSPO DOME")
+                .startDate(LocalDate.of(2024, 3, 22))
+                .endDate(LocalDate.of(2024, 3, 22))
+                .title("서울 같이 갈 울싼 사람 구합니다~~")
+                .gender("여")
+                .region("서울")
+                .content("같이 올라갈 사람 구해요~")
+                .startAge(23L)
+                .endAge(37L)
+                .totalPeople(2L)
+                .images(createMockMultipartFiles(2))
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                multipart("/api/v1/accompany/posts/{accompanyPostId}", accompanyPost.getId())
+                        .file((MockMultipartFile) accompanyPostRequest.getImages().get(0))
+                        .file((MockMultipartFile) accompanyPostRequest.getImages().get(1))
+                        .param("concertName", accompanyPostRequest.getConcertName())
+                        .param("concertPlace", accompanyPostRequest.getConcertPlace())
+                        .param("startDate", accompanyPostRequest.getStartDate().toString())
+                        .param("endDate", accompanyPostRequest.getEndDate().toString())
+                        .param("gender", accompanyPostRequest.getGender())
+                        .param("region", accompanyPostRequest.getRegion())
+                        .param("content", accompanyPostRequest.getContent())
+                        .param("startAge", accompanyPostRequest.getStartAge().toString())
+                        .param("endAge", accompanyPostRequest.getEndAge().toString())
+                        .param("totalPeople", accompanyPostRequest.getTotalPeople().toString())
+                        .param("title", accompanyPostRequest.getTitle())
+                        .with(csrf().asHeader())
+                        .header("Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/updateAccompanyPost",
+                                preprocessRequest(prettyPrint()),
+                                pathParameters(
+                                        parameterWithName("accompanyPostId").description("동행 구인글 id")
+                                ),
+                                requestParts(
+                                        partWithName("images").description("이미지 0개 이상")
+                                ),
+                                formParameters(
+                                        parameterWithName("concertName").description("공연명").optional(),
+                                        parameterWithName("concertPlace").description("공연 장소").optional(),
+                                        parameterWithName("startDate").description("시작 날짜").optional(),
+                                        parameterWithName("endDate").description("종료 날짜").optional(),
+                                        parameterWithName("gender").description("성별").optional(),
+                                        parameterWithName("region").description("공연 지역").optional(),
+                                        parameterWithName("content").description("내용").optional(),
+                                        parameterWithName("startAge").description("시작 연령").optional(),
+                                        parameterWithName("endAge").description("종료 연령").optional(),
+                                        parameterWithName("totalPeople").description("인원 수").optional(),
+                                        parameterWithName("title").description("제목").optional()
+                                )
+                        )
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("작성자는 해당 동행 구인글을 삭제할 수 있다.")
+    void success_deleteAccompanyPost() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 1)).get(0);
+        List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
+        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/v1/accompany/posts/{accompanyPostId}", accompanyPost.getId())
+                        .header("Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/deleteAccompanyPost",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                        )
+                ));
+    }
+
     private List<AccompanyPost> createAccompanyPosts(Member member, int size) throws Exception {
         List<AccompanyPost> accompanyPosts = new ArrayList<>();
         for (int i = 0; i < size; i++) {
@@ -506,7 +619,7 @@ class AccompanyControllerTest {
     private List<MultipartFile> createMockMultipartFiles(int size) throws Exception {
         List<MultipartFile> images = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            images.add(new MockMultipartFile("image", "김영한.JPG",
+            images.add(new MockMultipartFile("images", "김영한.JPG",
                     MediaType.MULTIPART_FORM_DATA_VALUE,
                     new FileInputStream("src/test/resources/김영한.JPG")));
         }
