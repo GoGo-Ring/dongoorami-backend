@@ -54,6 +54,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.multipart.MultipartFile;
@@ -317,7 +318,9 @@ class AccompanyControllerTest {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
-        member.updateInfo("여자", LocalDate.of(2001, 1, 17), "안녕하세요~");
+        ReflectionTestUtils.setField(member, "gender", "여자");
+        ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
+        ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
@@ -423,7 +426,9 @@ class AccompanyControllerTest {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
-        member.updateInfo("여자", LocalDate.of(2001, 1, 17), "안녕하세요~");
+        ReflectionTestUtils.setField(member, "gender", "여자");
+        ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
+        ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());

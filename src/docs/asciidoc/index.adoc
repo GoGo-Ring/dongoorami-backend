@@ -21,6 +21,15 @@ include::{snippets}/MemberControllerTest/reissueToken/request-fields.adoc[]
 include::{snippets}/MemberControllerTest/reissueToken/http-response.adoc[]
 include::{snippets}/MemberControllerTest/reissueToken/response-fields.adoc[]
 
+=== 최초 회원가입 시 성별, 생년월일 저장
+
+.Request
+include::{snippets}/MemberControllerTest/signup/http-request.adoc[]
+include::{snippets}/MemberControllerTest/signup/request-fields.adoc[]
+
+.Response
+include::{snippets}/MemberControllerTest/signup/http-response.adoc[]
+
 === 로그아웃
 
 .Request
@@ -49,7 +58,7 @@ include::{snippets}/MemberControllerTest/updateProfileImage/http-request.adoc[]
 include::{snippets}/MemberControllerTest/updateProfileImage/http-response.adoc[]
 include::{snippets}/MemberControllerTest/updateProfileImage/response-fields.adoc[]
 
-=== 프로필 정보 수정
+=== 프로필 정보(닉네임, 한줄소개) 수정
 
 .Request
 include::{snippets}/MemberControllerTest/updateMember/http-request.adoc[]

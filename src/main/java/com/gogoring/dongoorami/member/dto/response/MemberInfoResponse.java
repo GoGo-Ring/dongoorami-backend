@@ -17,14 +17,17 @@ public class MemberInfoResponse {
 
     private final String introduction;
 
+    private final Integer manner;
+
     @Builder
     public MemberInfoResponse(String name, String profileImage, String gender, Integer age,
-            String introduction) {
+            String introduction, Integer manner) {
         this.name = name;
         this.profileImage = profileImage;
         this.gender = gender;
         this.age = age;
         this.introduction = introduction;
+        this.manner = manner;
     }
 
     public static MemberInfoResponse of(Member member) {
@@ -34,6 +37,7 @@ public class MemberInfoResponse {
                 .gender(member.getGender())
                 .age(member.getAge())
                 .introduction(member.getIntroduction())
+                .manner(member.getManner())
                 .build();
     }
 }
