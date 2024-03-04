@@ -16,8 +16,8 @@ import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.formParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
+import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
@@ -39,8 +40,10 @@ import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +61,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.web.multipart.MultipartFile;
 
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
@@ -112,6 +114,7 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
+        List<MockMultipartFile> images = createMockMultipartFiles(2);
         AccompanyPostRequest accompanyPostRequest = AccompanyPostRequest.builder()
                 .concertName("2024 SG워너비 콘서트 : 우리의 노래")
                 .concertPlace("KSPO DOME")
@@ -124,25 +127,21 @@ class AccompanyControllerTest {
                 .startAge(23L)
                 .endAge(37L)
                 .totalPeople(2L)
-                .images(createMockMultipartFiles(2))
+                .purposes(Arrays.asList(AccompanyPurposeType.ACCOMMODATION.getName(),
+                        AccompanyPurposeType.TRANSPORTATION.getName()))
                 .build();
+        MockMultipartFile request = new MockMultipartFile("accompanyPostRequest", null,
+                "application/json", objectMapper.writeValueAsString(accompanyPostRequest)
+                .getBytes(StandardCharsets.UTF_8));
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 multipart("/api/v1/accompany/posts")
-                        .file((MockMultipartFile) accompanyPostRequest.getImages().get(0))
-                        .file((MockMultipartFile) accompanyPostRequest.getImages().get(1))
-                        .param("concertName", accompanyPostRequest.getConcertName())
-                        .param("concertPlace", accompanyPostRequest.getConcertPlace())
-                        .param("startDate", accompanyPostRequest.getStartDate().toString())
-                        .param("endDate", accompanyPostRequest.getEndDate().toString())
-                        .param("gender", accompanyPostRequest.getGender())
-                        .param("region", accompanyPostRequest.getRegion())
-                        .param("content", accompanyPostRequest.getContent())
-                        .param("startAge", accompanyPostRequest.getStartAge().toString())
-                        .param("endAge", accompanyPostRequest.getEndAge().toString())
-                        .param("totalPeople", accompanyPostRequest.getTotalPeople().toString())
-                        .param("title", accompanyPostRequest.getTitle())
+                        .file(images.get(0))
+                        .file(images.get(1))
+                        .file(request)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
                         .with(csrf().asHeader())
                         .header("Authorization", accessToken)
         );
@@ -152,20 +151,22 @@ class AccompanyControllerTest {
                 .andDo(document("{ClassName}/createAccompanyPost",
                                 preprocessRequest(prettyPrint()),
                                 requestParts(
-                                        partWithName("images").description("이미지 0개 이상")
+                                        partWithName("images").description("이미지 0개 이상"),
+                                        partWithName("accompanyPostRequest").description("동행 게시글 정보")
                                 ),
-                                formParameters(
-                                        parameterWithName("concertName").description("공연명").optional(),
-                                        parameterWithName("concertPlace").description("공연 장소").optional(),
-                                        parameterWithName("startDate").description("시작 날짜").optional(),
-                                        parameterWithName("endDate").description("종료 날짜").optional(),
-                                        parameterWithName("gender").description("성별").optional(),
-                                        parameterWithName("region").description("공연 지역").optional(),
-                                        parameterWithName("content").description("내용").optional(),
-                                        parameterWithName("startAge").description("시작 연령").optional(),
-                                        parameterWithName("endAge").description("종료 연령").optional(),
-                                        parameterWithName("totalPeople").description("인원 수").optional(),
-                                        parameterWithName("title").description("제목").optional()
+                                requestPartFields("accompanyPostRequest",
+                                        fieldWithPath("concertName").description("공연명"),
+                                        fieldWithPath("concertPlace").description("공연 장소"),
+                                        fieldWithPath("startDate").description("시작 날짜"),
+                                        fieldWithPath("endDate").description("종료 날짜"),
+                                        fieldWithPath("gender").description("성별"),
+                                        fieldWithPath("region").description("공연 지역"),
+                                        fieldWithPath("content").description("내용"),
+                                        fieldWithPath("startAge").description("시작 연령"),
+                                        fieldWithPath("endAge").description("종료 연령"),
+                                        fieldWithPath("totalPeople").description("인원 수"),
+                                        fieldWithPath("title").description("제목"),
+                                        fieldWithPath("purposes").description("동행 목적 1개 이상")
                                 )
                         )
                 );
@@ -497,7 +498,7 @@ class AccompanyControllerTest {
                 member.getRoles());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1)).get(0);
-        List<MultipartFile> mockMultipartFiles = createMockMultipartFiles(2);
+        List<MockMultipartFile> images = createMockMultipartFiles(2);
         AccompanyPostRequest accompanyPostRequest = AccompanyPostRequest.builder()
                 .concertName("2024 SG워너비 콘서트 : 우리의 노래")
                 .concertPlace("KSPO DOME")
@@ -510,25 +511,21 @@ class AccompanyControllerTest {
                 .startAge(23L)
                 .endAge(37L)
                 .totalPeople(2L)
-                .images(createMockMultipartFiles(2))
+                .purposes(Arrays.asList(AccompanyPurposeType.ACCOMMODATION.getName(),
+                        AccompanyPurposeType.TRANSPORTATION.getName()))
                 .build();
+        MockMultipartFile request = new MockMultipartFile("accompanyPostRequest", null,
+                "application/json", objectMapper.writeValueAsString(accompanyPostRequest)
+                .getBytes(StandardCharsets.UTF_8));
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 multipart("/api/v1/accompany/posts/{accompanyPostId}", accompanyPost.getId())
-                        .file((MockMultipartFile) accompanyPostRequest.getImages().get(0))
-                        .file((MockMultipartFile) accompanyPostRequest.getImages().get(1))
-                        .param("concertName", accompanyPostRequest.getConcertName())
-                        .param("concertPlace", accompanyPostRequest.getConcertPlace())
-                        .param("startDate", accompanyPostRequest.getStartDate().toString())
-                        .param("endDate", accompanyPostRequest.getEndDate().toString())
-                        .param("gender", accompanyPostRequest.getGender())
-                        .param("region", accompanyPostRequest.getRegion())
-                        .param("content", accompanyPostRequest.getContent())
-                        .param("startAge", accompanyPostRequest.getStartAge().toString())
-                        .param("endAge", accompanyPostRequest.getEndAge().toString())
-                        .param("totalPeople", accompanyPostRequest.getTotalPeople().toString())
-                        .param("title", accompanyPostRequest.getTitle())
+                        .file(images.get(0))
+                        .file(images.get(1))
+                        .file(request)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
                         .with(csrf().asHeader())
                         .header("Authorization", accessToken)
         );
@@ -541,20 +538,22 @@ class AccompanyControllerTest {
                                         parameterWithName("accompanyPostId").description("동행 구인글 id")
                                 ),
                                 requestParts(
-                                        partWithName("images").description("이미지 0개 이상")
+                                        partWithName("images").description("이미지 0개 이상"),
+                                        partWithName("accompanyPostRequest").description("동행 게시글 정보")
                                 ),
-                                formParameters(
-                                        parameterWithName("concertName").description("공연명").optional(),
-                                        parameterWithName("concertPlace").description("공연 장소").optional(),
-                                        parameterWithName("startDate").description("시작 날짜").optional(),
-                                        parameterWithName("endDate").description("종료 날짜").optional(),
-                                        parameterWithName("gender").description("성별").optional(),
-                                        parameterWithName("region").description("공연 지역").optional(),
-                                        parameterWithName("content").description("내용").optional(),
-                                        parameterWithName("startAge").description("시작 연령").optional(),
-                                        parameterWithName("endAge").description("종료 연령").optional(),
-                                        parameterWithName("totalPeople").description("인원 수").optional(),
-                                        parameterWithName("title").description("제목").optional()
+                                requestPartFields("accompanyPostRequest",
+                                        fieldWithPath("concertName").description("공연명"),
+                                        fieldWithPath("concertPlace").description("공연 장소"),
+                                        fieldWithPath("startDate").description("시작 날짜"),
+                                        fieldWithPath("endDate").description("종료 날짜"),
+                                        fieldWithPath("gender").description("성별"),
+                                        fieldWithPath("region").description("공연 지역"),
+                                        fieldWithPath("content").description("내용"),
+                                        fieldWithPath("startAge").description("시작 연령"),
+                                        fieldWithPath("endAge").description("종료 연령"),
+                                        fieldWithPath("totalPeople").description("인원 수"),
+                                        fieldWithPath("title").description("제목"),
+                                        fieldWithPath("purposes").description("동행 목적 1개 이상")
                                 )
                         )
                 );
@@ -617,8 +616,8 @@ class AccompanyControllerTest {
         return accompanyPosts;
     }
 
-    private List<MultipartFile> createMockMultipartFiles(int size) throws Exception {
-        List<MultipartFile> images = new ArrayList<>();
+    private List<MockMultipartFile> createMockMultipartFiles(int size) throws Exception {
+        List<MockMultipartFile> images = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             images.add(new MockMultipartFile("images", "김영한.JPG",
                     MediaType.MULTIPART_FORM_DATA_VALUE,
