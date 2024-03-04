@@ -371,7 +371,8 @@ class AccompanyControllerTest {
                                 fieldWithPath("waitingCount").type(NUMBER).description("대기 인원 수"),
                                 fieldWithPath("content").type(STRING).description("내용"),
                                 fieldWithPath("images").type(ARRAY).description("이미지 리스트"),
-                                fieldWithPath("isWish").type(BOOLEAN).description("찜 여부")
+                                fieldWithPath("isWish").type(BOOLEAN).description("찜 여부"),
+                                fieldWithPath("isWriter").type(BOOLEAN).description("본인 작성 여부")
                         )
                 ));
         Long afterViewCount = accompanyPostRepository.findById(accompanyPost.getId()).get()
