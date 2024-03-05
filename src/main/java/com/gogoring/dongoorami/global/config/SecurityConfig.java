@@ -5,6 +5,8 @@ import com.gogoring.dongoorami.global.jwt.JwtAuthenticationEntryPoint;
 import com.gogoring.dongoorami.global.jwt.JwtAuthenticationFilter;
 import com.gogoring.dongoorami.global.oauth2.CustomOAuth2UserService;
 import com.gogoring.dongoorami.global.oauth2.OAuth2LoginSuccessHandler;
+import java.util.Arrays;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -67,7 +69,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.addAllowedOriginPattern("*");
+        List<String> allowedOriginPatterns = Arrays.asList("http://localhost:3000",
+                "https://dongoorami.netlify.app/");
+        configuration.setAllowedOriginPatterns(allowedOriginPatterns);
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
