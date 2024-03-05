@@ -38,6 +38,15 @@ jobs:
           touch ./src/main/resources/application.yml
           echo "${{ secrets.APPLICATION }}" >> ./src/main/resources/application.yml
 
+      - name: create keystore.p12
+        shell: bash
+        run: |
+          if [ ! -d "./src/main/resources" ]; then
+            mkdir -p ./src/main/resources
+          fi
+          touch ./src/main/resources/keystore.p12
+          echo "${{ secrets.KEYSTORE }}" | base64 --decode >> ./src/main/resources/keystore.p12
+
       - name: create application.yml for test
         shell: bash
         run: |
