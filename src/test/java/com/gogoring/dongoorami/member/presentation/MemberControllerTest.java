@@ -126,6 +126,7 @@ public class MemberControllerTest {
                 member.getRoles());
 
         MemberSignupRequest memberSignUpRequest = new MemberSignupRequest();
+        ReflectionTestUtils.setField(memberSignUpRequest, "nickname", "롸롸롸");
         ReflectionTestUtils.setField(memberSignUpRequest, "gender", "남자");
         ReflectionTestUtils.setField(memberSignUpRequest, "birthDate", LocalDate.of(2000, 12, 31));
 
@@ -143,9 +144,11 @@ public class MemberControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
+                                fieldWithPath("nickname").type(JsonFieldType.STRING)
+                                        .description("닉네임"),
                                 fieldWithPath("gender").type(JsonFieldType.STRING)
                                         .description("남자/여자"),
-                                fieldWithPath("birthDate").type("LocalDate")
+                                fieldWithPath("birthDate").type(JsonFieldType.STRING)
                                         .description("생년월일")
                         ))
                 );
