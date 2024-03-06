@@ -21,14 +21,14 @@ include::{snippets}/MemberControllerTest/reissueToken/request-fields.adoc[]
 include::{snippets}/MemberControllerTest/reissueToken/http-response.adoc[]
 include::{snippets}/MemberControllerTest/reissueToken/response-fields.adoc[]
 
-=== 최초 회원가입 시 성별, 생년월일 저장
+=== 최초 회원가입 시 닉네임, 성별, 생년월일 저장
 
 .Request
-include::{snippets}/MemberControllerTest/signup/http-request.adoc[]
-include::{snippets}/MemberControllerTest/signup/request-fields.adoc[]
+include::{snippets}/MemberControllerTest/signUp/http-request.adoc[]
+include::{snippets}/MemberControllerTest/signUp/request-fields.adoc[]
 
 .Response
-include::{snippets}/MemberControllerTest/signup/http-response.adoc[]
+include::{snippets}/MemberControllerTest/signUp/http-response.adoc[]
 
 === 로그아웃
 

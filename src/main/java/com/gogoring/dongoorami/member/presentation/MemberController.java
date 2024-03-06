@@ -4,7 +4,7 @@ import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import com.gogoring.dongoorami.member.application.MemberService;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
-import com.gogoring.dongoorami.member.dto.request.MemberSignupRequest;
+import com.gogoring.dongoorami.member.dto.request.MemberSignUpRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberUpdateRequest;
 import com.gogoring.dongoorami.member.dto.response.MemberInfoResponse;
 import com.gogoring.dongoorami.member.dto.response.MemberUpdateProfileImageResponse;
@@ -37,9 +37,9 @@ public class MemberController {
     }
 
     @PatchMapping("/members/signUp")
-    public ResponseEntity<Void> signup(@Valid @RequestBody MemberSignupRequest memberSignUpRequest,
+    public ResponseEntity<Void> signUp(@Valid @RequestBody MemberSignUpRequest memberSignUpRequest,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        memberService.signup(memberSignUpRequest, customUserDetails.getId());
+        memberService.signUp(memberSignUpRequest, customUserDetails.getId());
         return ResponseEntity.ok().build();
     }
 
