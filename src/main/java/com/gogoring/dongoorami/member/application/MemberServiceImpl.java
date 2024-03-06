@@ -56,8 +56,8 @@ public class MemberServiceImpl implements MemberService {
     public void signup(MemberSignupRequest memberSignUpRequest, Long memberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        member.updateGenderAndBirthDate(memberSignUpRequest.getGender(),
-                memberSignUpRequest.getBirthDate());
+        member.updateNameAndGenderAndBirthDate(memberSignUpRequest.getNickname(),
+                memberSignUpRequest.getGender(), memberSignUpRequest.getBirthDate());
     }
 
     @Override
