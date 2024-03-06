@@ -48,7 +48,8 @@ public class SecurityConfig {
                         requests -> requests.requestMatchers("/error", "/favicon.ico", "/docs/**")
                                 .permitAll()
                                 .requestMatchers("/oauth2/authorization/**", "/login/**",
-                                        "/login/oauth2/code/**", "/oauth/**", "/test", "/api/v1/concerts/test").permitAll()
+                                        "/login/oauth2/code/**", "/oauth/**", "/test",
+                                        "/api/v1/concerts/test", "/monitoring/**").permitAll()
                                 .requestMatchers("/api/v1/members/reissue").permitAll()
                                 .anyRequest().authenticated()
                 )
