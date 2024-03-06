@@ -49,7 +49,7 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers("/oauth2/authorization/**", "/login/**",
                                         "/login/oauth2/code/**", "/oauth/**", "/test",
-                                        "/api/v1/concerts/test", "/monitoring/**").permitAll()
+                                        "/api/v1/concerts/test", "/actuator/**").permitAll()
                                 .requestMatchers("/api/v1/members/reissue").permitAll()
                                 .anyRequest().authenticated()
                 )
