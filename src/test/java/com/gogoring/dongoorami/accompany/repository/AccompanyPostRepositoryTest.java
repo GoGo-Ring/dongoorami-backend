@@ -162,7 +162,9 @@ class AccompanyPostRepositoryTest {
                     .content("같이 올라갈 사람 구해요~")
                     .startAge(23L)
                     .endAge(37L)
-                    .totalPeople(2L).build());
+                    .totalPeople(2L)
+                    .purposes(Arrays.asList(AccompanyPurposeType.ACCOMMODATION,
+                            AccompanyPurposeType.TRANSPORTATION)).build());
         }
 
         return accompanyPosts;

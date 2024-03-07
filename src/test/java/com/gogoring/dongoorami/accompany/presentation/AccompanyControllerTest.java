@@ -125,11 +125,11 @@ class AccompanyControllerTest {
                 .gender("여")
                 .region("경상북도/경상남도")
                 .content("같이 올라갈 사람 구해요~")
-                .startAge(23L)
-                .endAge(37L)
-                .totalPeople(2L)
-                .purposes(Arrays.asList(AccompanyPurposeType.ACCOMMODATION.getName(),
-                        AccompanyPurposeType.TRANSPORTATION.getName()))
+                .startAge(13L)
+                .endAge(17L)
+                .totalPeople(1L)
+                .concertPlace("2024 SG워너비 콘서트 : 우리의 노래")
+                .purposes(Arrays.asList("관람", "숙박"))
                 .build();
         MockMultipartFile request = new MockMultipartFile("accompanyPostRequest", null,
                 "application/json", objectMapper.writeValueAsString(accompanyPostRequest)
