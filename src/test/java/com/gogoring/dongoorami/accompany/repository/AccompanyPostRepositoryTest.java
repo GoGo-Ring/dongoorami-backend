@@ -147,6 +147,112 @@ class AccompanyPostRepositoryTest {
                         .toList(), everyItem(equalTo(true)));
     }
 
+    @Test
+    @DisplayName("주어진 게시글 id 이후에 생성된 특정 개수의 동행 구인 게시글을 검색 필터 기반으로 조회할 수 있다. - 동행 목적 테스트")
+    void success_findByAccompanyPostFilterRequest_given_purposes() {
+        // given
+        Member member = Member.builder()
+                .name("김뫄뫄")
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        memberRepository.save(member);
+        AccompanyPostFilterRequest accompanyPostFilterRequest1 = AccompanyPostFilterRequest.builder()
+                .gender("남")
+                .region("수도권(경기, 인천 포함)")
+                .startAge(13L)
+                .endAge(17L)
+                .totalPeople(1L)
+                .concertPlace("KSPO DOME")
+                .purposes(Arrays.asList("관람", "숙박"))
+                .build();
+        AccompanyPostFilterRequest accompanyPostFilterRequest2 = AccompanyPostFilterRequest.builder()
+                .gender("여")
+                .region("경상북도/경상남도")
+                .startAge(13L)
+                .endAge(17L)
+                .totalPeople(1L)
+                .concertPlace("KSPO DOME")
+                .purposes(Arrays.asList("관람"))
+                .build();
+        AccompanyPostFilterRequest accompanyPostFilterRequest3 = AccompanyPostFilterRequest.builder()
+                .purposes(Arrays.asList("관람"))
+                .build();
+        accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 3, accompanyPostFilterRequest1));
+        accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 3, accompanyPostFilterRequest2));
+        Long cursorId = 1000000L;
+        int size = 10;
+
+        // when
+        Slice<AccompanyPost> accompanyPostSlice = accompanyPostRepository.findByAccompanyPostFilterRequest(
+                cursorId, size, accompanyPostFilterRequest3);
+
+        // then
+        assertThat(accompanyPostSlice.getContent().size(), equalTo(6));
+        assertThat(
+                accompanyPostSlice.getContent().stream()
+                        .map(accompanyPost -> isAccompanyPostEqualsAccompanyPostFilterRequest(
+                                accompanyPost, accompanyPostFilterRequest3))
+                        .toList(), everyItem(equalTo(true)));
+    }
+
+    @Test
+    @DisplayName("주어진 게시글 id 이후에 생성된 특정 개수의 동행 구인 게시글을 검색 필터 기반으로 조회할 수 있다. - 나이 범위 테스트")
+    void success_findByAccompanyPostFilterRequest_given_ages() {
+        // given
+        Member member = Member.builder()
+                .name("김뫄뫄")
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        memberRepository.save(member);
+        AccompanyPostFilterRequest accompanyPostFilterRequest1 = AccompanyPostFilterRequest.builder()
+                .gender("남")
+                .region("수도권(경기, 인천 포함)")
+                .startAge(13L)
+                .endAge(17L)
+                .totalPeople(1L)
+                .concertPlace("KSPO DOME")
+                .purposes(Arrays.asList("관람", "숙박"))
+                .build();
+        AccompanyPostFilterRequest accompanyPostFilterRequest2 = AccompanyPostFilterRequest.builder()
+                .gender("여")
+                .region("경상북도/경상남도")
+                .startAge(13L)
+                .endAge(17L)
+                .totalPeople(1L)
+                .concertPlace("KSPO DOME")
+                .purposes(Arrays.asList("관람"))
+                .build();
+        AccompanyPostFilterRequest accompanyPostFilterRequest3 = AccompanyPostFilterRequest.builder()
+                .startAge(11L)
+                .endAge(13L)
+                .purposes(Arrays.asList("관람"))
+                .build();
+        accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 3, accompanyPostFilterRequest1));
+        accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 3, accompanyPostFilterRequest2));
+        Long cursorId = 1000000L;
+        int size = 10;
+
+        // when
+        Slice<AccompanyPost> accompanyPostSlice = accompanyPostRepository.findByAccompanyPostFilterRequest(
+                cursorId, size, accompanyPostFilterRequest3);
+
+        // then
+        assertThat(accompanyPostSlice.getContent().size(), equalTo(6));
+        assertThat(
+                accompanyPostSlice.getContent().stream()
+                        .map(accompanyPost -> isAccompanyPostEqualsAccompanyPostFilterRequest(
+                                accompanyPost, accompanyPostFilterRequest3))
+                        .toList(), everyItem(equalTo(true)));
+    }
+
     private List<AccompanyPost> createAccompanyPosts(Member member, int size) {
         List<AccompanyPost> accompanyPosts = new ArrayList<>();
         for (int i = 0; i < size; i++) {
