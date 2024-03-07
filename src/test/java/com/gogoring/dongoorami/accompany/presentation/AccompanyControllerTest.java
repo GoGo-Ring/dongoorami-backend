@@ -649,6 +649,37 @@ class AccompanyControllerTest {
                 ));
     }
 
+    @Test
+    @WithCustomMockUser
+    @DisplayName("지역 목록을 조회할 수 있다.")
+    void success_getAccompanyPostRegions() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompany/posts/regions")
+                        .header("Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getAccompanyPostRegions",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("regions").type(ARRAY)
+                                        .description("지역 리스트")
+                        )
+                ));
+    }
+
     private List<AccompanyPost> createAccompanyPosts(Member member, int size) throws Exception {
         List<AccompanyPost> accompanyPosts = new ArrayList<>();
         for (int i = 0; i < size; i++) {
