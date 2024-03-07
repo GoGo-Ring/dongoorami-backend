@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.lessThan;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
+import com.gogoring.dongoorami.global.config.QueryDslConfig;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.time.LocalDate;
@@ -19,9 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 
+@Import(QueryDslConfig.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 class AccompanyPostRepositoryTest {
