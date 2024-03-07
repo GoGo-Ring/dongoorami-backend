@@ -31,6 +31,7 @@ import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
+import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
@@ -614,6 +615,30 @@ class AccompanyControllerTest {
                     .images(createImageUrls(2))
                     .purposes(Arrays.asList(AccompanyPurposeType.ACCOMMODATION,
                             AccompanyPurposeType.TRANSPORTATION)).build());
+        }
+
+        return accompanyPosts;
+    }
+
+    private List<AccompanyPost> createAccompanyPosts(Member member, int size,
+            AccompanyPostFilterRequest accompanyPostFilterRequest) {
+        List<AccompanyPost> accompanyPosts = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            accompanyPosts.add(AccompanyPost.builder()
+                    .member(member)
+                    .concertName("2024 SG워너비 콘서트 : 우리의 노래")
+                    .concertPlace(accompanyPostFilterRequest.getConcertPlace())
+                    .startDate(LocalDate.of(2024, 3, 22))
+                    .endDate(LocalDate.of(2024, 3, 22))
+                    .title("서울 같이 갈 울싼 사람 구합니다~~")
+                    .gender(accompanyPostFilterRequest.getGender())
+                    .region(accompanyPostFilterRequest.getRegion())
+                    .content("같이 올라갈 사람 구해요~")
+                    .startAge(accompanyPostFilterRequest.getStartAge())
+                    .endAge(accompanyPostFilterRequest.getEndAge())
+                    .totalPeople(accompanyPostFilterRequest.getTotalPeople())
+                    .purposes(accompanyPostFilterRequest.getPurposes().stream().map(
+                            AccompanyPurposeType::getValue).toList()).build());
         }
 
         return accompanyPosts;

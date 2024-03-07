@@ -6,11 +6,14 @@ import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.lessThan;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
+import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
+import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.global.config.QueryDslConfig;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -111,6 +114,30 @@ class AccompanyPostRepositoryTest {
                     .startAge(23L)
                     .endAge(37L)
                     .totalPeople(2L).build());
+        }
+
+        return accompanyPosts;
+    }
+
+    private List<AccompanyPost> createAccompanyPosts(Member member, int size,
+            AccompanyPostFilterRequest accompanyPostFilterRequest) {
+        List<AccompanyPost> accompanyPosts = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            accompanyPosts.add(AccompanyPost.builder()
+                    .member(member)
+                    .concertName("2024 SG워너비 콘서트 : 우리의 노래")
+                    .concertPlace(accompanyPostFilterRequest.getConcertPlace())
+                    .startDate(LocalDate.of(2024, 3, 22))
+                    .endDate(LocalDate.of(2024, 3, 22))
+                    .title("서울 같이 갈 울싼 사람 구합니다~~")
+                    .gender(accompanyPostFilterRequest.getGender())
+                    .region(accompanyPostFilterRequest.getRegion())
+                    .content("같이 올라갈 사람 구해요~")
+                    .startAge(accompanyPostFilterRequest.getStartAge())
+                    .endAge(accompanyPostFilterRequest.getEndAge())
+                    .totalPeople(accompanyPostFilterRequest.getTotalPeople())
+                    .purposes(accompanyPostFilterRequest.getPurposes().stream().map(
+                            AccompanyPurposeType::getValue).toList()).build());
         }
 
         return accompanyPosts;
