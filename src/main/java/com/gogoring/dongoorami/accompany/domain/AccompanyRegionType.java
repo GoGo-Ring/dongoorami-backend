@@ -1,5 +1,7 @@
 package com.gogoring.dongoorami.accompany.domain;
 
+import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
+import com.gogoring.dongoorami.accompany.exception.InvalidAccompanyRegionTypeException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,6 +22,8 @@ public enum AccompanyRegionType {
     public static AccompanyRegionType getValue(String name) {
         return Arrays.stream(AccompanyRegionType.values()).filter(
                         regionType -> regionType.getName().equals(name)).findAny()
+                .orElseThrow(() -> new InvalidAccompanyRegionTypeException(
+                        AccompanyErrorCode.INVALID_REGION_TYPE));
     }
 
     public static List<String> getNames() {
