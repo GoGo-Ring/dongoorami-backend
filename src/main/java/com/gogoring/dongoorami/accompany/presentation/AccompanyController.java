@@ -113,7 +113,7 @@ public class AccompanyController {
     }
 
     @GetMapping("/posts/regions")
-    public ResponseEntity<Map<String, Object>> getRegions() {
+    public ResponseEntity<Map<String, Object>> getAccompanyPostRegions() {
         return ResponseEntity.ok(Map.of("regions", AccompanyRegionType.getNames()));
     }
 
