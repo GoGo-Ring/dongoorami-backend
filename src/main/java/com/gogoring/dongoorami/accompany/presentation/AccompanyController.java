@@ -2,6 +2,7 @@ package com.gogoring.dongoorami.accompany.presentation;
 
 import com.gogoring.dongoorami.accompany.application.AccompanyService;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
+import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
@@ -35,8 +36,25 @@ public class AccompanyController {
     @GetMapping("/posts")
     public ResponseEntity<AccompanyPostsResponse> getAccompanyPosts(
             @RequestParam(required = false) Long cursorId,
-            @RequestParam(required = false, defaultValue = "10") int size) {
-        return ResponseEntity.ok(accompanyService.getAccompanyPosts(cursorId, size));
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @RequestParam(required = false) String gender,
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) Long startAge,
+            @RequestParam(required = false) Long endAge,
+            @RequestParam(required = false) Long totalPeople,
+            @RequestParam(required = false) String concertPlace,
+            @RequestParam(required = false) List<String> purposes) {
+        return ResponseEntity.ok(
+                accompanyService.getAccompanyPosts(cursorId, size,
+                        AccompanyPostFilterRequest.builder()
+                                .gender(gender)
+                                .region(region)
+                                .startAge(startAge)
+                                .endAge(endAge)
+                                .totalPeople(totalPeople)
+                                .concertPlace(concertPlace)
+                                .purposes(purposes)
+                                .build()));
     }
 
     @GetMapping("/posts/{accompanyPostId}")
@@ -91,6 +109,11 @@ public class AccompanyController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         accompanyService.deleteAccompanyPost(customUserDetails.getId(), accompanyPostId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/posts/regions")
+    public ResponseEntity<Map<String, Object>> getRegions() {
+        return ResponseEntity.ok(Map.of("regions", AccompanyRegionType.getNames()));
     }
 
 }
