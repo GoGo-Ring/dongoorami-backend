@@ -6,7 +6,10 @@ import java.time.LocalDate;
 import lombok.Getter;
 
 @Getter
-public class MemberSignupRequest {
+public class MemberSignUpRequest {
+
+    @NotBlank(message = "닉네임은 공백일 수 없습니다.")
+    private String nickname;
 
     @NotBlank(message = "성별은 공백일 수 없습니다.")
     private String gender;

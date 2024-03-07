@@ -1,7 +1,6 @@
 package com.gogoring.dongoorami.global.oauth2;
 
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,7 +24,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException, ServletException {
+            Authentication authentication) throws IOException {
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
 
         String accessToken = tokenProvider.createAccessToken(oAuth2User.getProviderId(),
@@ -44,8 +43,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         queryParams.add("isFirstLogin", isFirstLogin.toString());
 
         return UriComponentsBuilder
-                .newInstance()
-                .path("/oauth")
+                .fromHttpUrl("http://localhost:3000/oauth")
                 .queryParams(queryParams)
                 .build()
                 .toUri().toString();

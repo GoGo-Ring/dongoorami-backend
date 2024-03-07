@@ -34,7 +34,6 @@ dependencies {
     implementation 'it.ozimov:embedded-redis:0.7.2'
     testRuntimeOnly 'com.h2database:h2'
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
@@ -48,6 +47,9 @@ dependencies {
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'org.springframework.security:spring-security-test'
+
+    // Spring Actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // QueryDsl
     implementation "com.querydsl:querydsl-jpa:5.0.0:jakarta"
