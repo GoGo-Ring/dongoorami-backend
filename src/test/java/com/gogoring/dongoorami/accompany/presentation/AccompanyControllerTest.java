@@ -185,21 +185,48 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
-        String postCnt = "3";
-        accompanyPostRepository.saveAll(createAccompanyPosts(member, 5));
+        String size = "3";
+        AccompanyPostFilterRequest accompanyPostFilterRequest1 = AccompanyPostFilterRequest.builder()
+                .gender("여")
+                .region("경상북도/경상남도")
+                .startAge(13L)
+                .endAge(17L)
+                .totalPeople(1L)
+                .concertPlace("KSPO DOME")
+                .purposes(Arrays.asList("관람", "숙박"))
+                .build();
+        accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 3, accompanyPostFilterRequest1));
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/v1/accompany/posts")
                         .header("Authorization", accessToken)
-                        .param("size", postCnt)
+                        .param("size", size)
+                        .param("gender", accompanyPostFilterRequest1.getGender())
+                        .param("region", accompanyPostFilterRequest1.getRegion())
+                        .param("startAge", accompanyPostFilterRequest1.getStartAge().toString())
+                        .param("endAge", accompanyPostFilterRequest1.getEndAge().toString())
+                        .param("totalPeople", accompanyPostFilterRequest1.getTotalPeople().toString())
+                        .param("concertPlace", accompanyPostFilterRequest1.getConcertPlace())
+                        .param("purposes", accompanyPostFilterRequest1.getPurposes().get(0))
+                        .param("purposes", accompanyPostFilterRequest1.getPurposes().get(1))
         );
 
         // then
         resultActions.andExpect(status().isOk())
                 .andDo(document("{ClassName}/getAccompanyPostsFirst",
                         preprocessResponse(prettyPrint()),
-                        queryParameters(parameterWithName("size").description("요청할 동행 구인글 개수")),
+                        queryParameters(
+                                parameterWithName("size").description("요청할 동행 구인글 개수").optional(),
+                                parameterWithName("gender").description("성별").optional(),
+                                parameterWithName("region").description("지역").optional(),
+                                parameterWithName("startAge").description("시작 나이").optional(),
+                                parameterWithName("endAge").description("종료 나이").optional(),
+                                parameterWithName("totalPeople").description("인원 수").optional(),
+                                parameterWithName("concertPlace").description("공연 장소").optional(),
+                                parameterWithName("purposes").description("동행 목적").optional()
+                        ),
                         responseFields(
                                 fieldWithPath("hasNext").type(BOOLEAN)
                                         .description("다음 동행 구인글 존재 여부"),
@@ -253,15 +280,33 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
-        String cursorId = "17", postCnt = "3";
-        accompanyPostRepository.saveAll(createAccompanyPosts(member, 5));
+        String cursorId = "17", size = "3";
+        AccompanyPostFilterRequest accompanyPostFilterRequest1 = AccompanyPostFilterRequest.builder()
+                .gender("여")
+                .region("경상북도/경상남도")
+                .startAge(13L)
+                .endAge(17L)
+                .totalPeople(1L)
+                .concertPlace("KSPO DOME")
+                .purposes(Arrays.asList("관람", "숙박"))
+                .build();
+        accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 3, accompanyPostFilterRequest1));
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/v1/accompany/posts")
                         .header("Authorization", accessToken)
                         .param("cursorId", cursorId)
-                        .param("size", postCnt)
+                        .param("size", size)
+                        .param("gender", accompanyPostFilterRequest1.getGender())
+                        .param("region", accompanyPostFilterRequest1.getRegion())
+                        .param("startAge", accompanyPostFilterRequest1.getStartAge().toString())
+                        .param("endAge", accompanyPostFilterRequest1.getEndAge().toString())
+                        .param("totalPeople", accompanyPostFilterRequest1.getTotalPeople().toString())
+                        .param("concertPlace", accompanyPostFilterRequest1.getConcertPlace())
+                        .param("purposes", accompanyPostFilterRequest1.getPurposes().get(0))
+                        .param("purposes", accompanyPostFilterRequest1.getPurposes().get(1))
         );
 
         // then
@@ -270,7 +315,15 @@ class AccompanyControllerTest {
                         preprocessResponse(prettyPrint()),
                         queryParameters(
                                 parameterWithName("cursorId").description("마지막으로 받은 동행 구인글 id"),
-                                parameterWithName("size").description("요청할 동행 구인글 개수")),
+                                parameterWithName("size").description("요청할 동행 구인글 개수").optional(),
+                                parameterWithName("gender").description("성별").optional(),
+                                parameterWithName("region").description("지역").optional(),
+                                parameterWithName("startAge").description("시작 나이").optional(),
+                                parameterWithName("endAge").description("종료 나이").optional(),
+                                parameterWithName("totalPeople").description("인원 수").optional(),
+                                parameterWithName("concertPlace").description("공연 장소").optional(),
+                                parameterWithName("purposes").description("동행 목적").optional()
+                        ),
                         responseFields(
                                 fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN)
                                         .description("다음 동행 구인글 존재 여부"),
