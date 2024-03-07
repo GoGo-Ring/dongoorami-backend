@@ -1,6 +1,7 @@
 package com.gogoring.dongoorami.accompany.presentation;
 
 import com.gogoring.dongoorami.accompany.application.AccompanyService;
+import com.gogoring.dongoorami.accompany.domain.AccompanyRegionType;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
@@ -11,12 +12,12 @@ import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
