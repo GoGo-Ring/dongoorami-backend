@@ -62,7 +62,8 @@ public class AccompanyController {
     public ResponseEntity<AccompanyPostResponse> getAccompanyPost(
             @PathVariable Long accompanyPostId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        return ResponseEntity.ok(accompanyService.getAccompanyPost(customUserDetails.getId(), accompanyPostId));
+        return ResponseEntity.ok(
+                accompanyService.getAccompanyPost(customUserDetails.getId(), accompanyPostId));
     }
 
     @PostMapping("/posts")
@@ -99,7 +100,8 @@ public class AccompanyController {
             @RequestPart List<MultipartFile> images,
             @PathVariable Long accompanyPostId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        accompanyService.updateAccompanyPost(accompanyPostRequest, images, customUserDetails.getId(),
+        accompanyService.updateAccompanyPost(accompanyPostRequest, images,
+                customUserDetails.getId(),
                 accompanyPostId);
         return ResponseEntity.ok().build();
     }

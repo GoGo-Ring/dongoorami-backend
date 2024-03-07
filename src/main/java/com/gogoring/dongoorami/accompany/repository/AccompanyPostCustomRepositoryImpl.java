@@ -2,8 +2,8 @@ package com.gogoring.dongoorami.accompany.repository;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
-import com.gogoring.dongoorami.accompany.domain.QAccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyRegionType;
+import com.gogoring.dongoorami.accompany.domain.QAccompanyPost;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -15,6 +15,7 @@ import org.springframework.data.domain.SliceImpl;
 
 @RequiredArgsConstructor
 public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRepository {
+
     private final JPAQueryFactory jpaQueryFactory;
     private final QAccompanyPost accompanyPost = QAccompanyPost.accompanyPost;
 
@@ -48,7 +49,8 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
     }
 
     private BooleanExpression regionEquals(String region) {
-        return region != null ? accompanyPost.region.eq(AccompanyRegionType.getValue(region)) : null;
+        return region != null ? accompanyPost.region.eq(AccompanyRegionType.getValue(region))
+                : null;
     }
 
     private BooleanExpression ageOverlap(Long startAge, Long endAge) {

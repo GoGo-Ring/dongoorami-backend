@@ -27,7 +27,8 @@ public enum AccompanyRegionType {
     }
 
     public static List<String> getNames() {
-        return Arrays.stream(AccompanyRegionType.values()).map(AccompanyRegionType::getName).toList();
+        return Arrays.stream(AccompanyRegionType.values()).map(AccompanyRegionType::getName)
+                .toList();
     }
 
     public String getName() {

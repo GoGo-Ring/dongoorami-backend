@@ -13,7 +13,6 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 @Builder
 @AllArgsConstructor
@@ -57,7 +56,7 @@ public class AccompanyPostRequest {
     @NotBlank(message = "content은 공백일 수 없습니다.")
     private String content;
 
-    @Size(min=1, message = "purposes는 1개 이상 필요합니다.")
+    @Size(min = 1, message = "purposes는 1개 이상 필요합니다.")
     private List<String> purposes;
 
     public AccompanyPost toEntity(Member member, List<String> images) {

@@ -124,14 +124,15 @@ public class AccompanyPost extends BaseEntity {
             this.name = name;
         }
 
-        public String getName() {
-            return name;
-        }
-
-        public static AccompanyPurposeType getValue(String name){
+        public static AccompanyPurposeType getValue(String name) {
             return Arrays.stream(AccompanyPurposeType.values()).filter(
                             accompanyPurposeType -> accompanyPurposeType.getName().equals(name)).findAny()
-                    .orElseThrow(() -> new InvalidAccompanyPurposeTypeException(AccompanyErrorCode.INVALID_ACCOMPANY_PURPOSE_TYPE));
+                    .orElseThrow(() -> new InvalidAccompanyPurposeTypeException(
+                            AccompanyErrorCode.INVALID_ACCOMPANY_PURPOSE_TYPE));
+        }
+
+        public String getName() {
+            return name;
         }
     }
 

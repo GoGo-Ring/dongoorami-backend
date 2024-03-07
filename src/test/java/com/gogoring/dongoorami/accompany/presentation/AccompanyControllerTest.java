@@ -207,7 +207,8 @@ class AccompanyControllerTest {
                         .param("region", accompanyPostFilterRequest1.getRegion())
                         .param("startAge", accompanyPostFilterRequest1.getStartAge().toString())
                         .param("endAge", accompanyPostFilterRequest1.getEndAge().toString())
-                        .param("totalPeople", accompanyPostFilterRequest1.getTotalPeople().toString())
+                        .param("totalPeople",
+                                accompanyPostFilterRequest1.getTotalPeople().toString())
                         .param("concertPlace", accompanyPostFilterRequest1.getConcertPlace())
                         .param("purposes", accompanyPostFilterRequest1.getPurposes().get(0))
                         .param("purposes", accompanyPostFilterRequest1.getPurposes().get(1))
@@ -303,7 +304,8 @@ class AccompanyControllerTest {
                         .param("region", accompanyPostFilterRequest1.getRegion())
                         .param("startAge", accompanyPostFilterRequest1.getStartAge().toString())
                         .param("endAge", accompanyPostFilterRequest1.getEndAge().toString())
-                        .param("totalPeople", accompanyPostFilterRequest1.getTotalPeople().toString())
+                        .param("totalPeople",
+                                accompanyPostFilterRequest1.getTotalPeople().toString())
                         .param("concertPlace", accompanyPostFilterRequest1.getConcertPlace())
                         .param("purposes", accompanyPostFilterRequest1.getPurposes().get(0))
                         .param("purposes", accompanyPostFilterRequest1.getPurposes().get(1))

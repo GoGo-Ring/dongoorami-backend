@@ -11,7 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface AccompanyService {
 
-    Long createAccompanyPost(AccompanyPostRequest accompanyPostRequest, List<MultipartFile> images, Long memberId);
+    Long createAccompanyPost(AccompanyPostRequest accompanyPostRequest, List<MultipartFile> images,
+            Long memberId);
 
     AccompanyPostsResponse getAccompanyPosts(Long cursorId, int size,
             AccompanyPostFilterRequest accompanyPostFilterRequest);
@@ -23,7 +24,8 @@ public interface AccompanyService {
 
     AccompanyCommentsResponse getAccompanyComments(Long accompanyPostId);
 
-    void updateAccompanyPost(AccompanyPostRequest accompanyPostRequest, List<MultipartFile> images, Long memberId,
+    void updateAccompanyPost(AccompanyPostRequest accompanyPostRequest, List<MultipartFile> images,
+            Long memberId,
             Long accompanyPostId);
 
     void deleteAccompanyPost(Long memberId, Long accompanyPostId);
