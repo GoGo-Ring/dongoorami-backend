@@ -1,6 +1,7 @@
 package com.gogoring.dongoorami.accompany.application;
 
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
+import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
@@ -12,7 +13,8 @@ public interface AccompanyService {
 
     Long createAccompanyPost(AccompanyPostRequest accompanyPostRequest, List<MultipartFile> images, Long memberId);
 
-    AccompanyPostsResponse getAccompanyPosts(Long cursorId, int size);
+    AccompanyPostsResponse getAccompanyPosts(Long cursorId, int size,
+            AccompanyPostFilterRequest accompanyPostFilterRequest);
 
     AccompanyPostResponse getAccompanyPost(Long memberId, Long accompanyPostId);
 

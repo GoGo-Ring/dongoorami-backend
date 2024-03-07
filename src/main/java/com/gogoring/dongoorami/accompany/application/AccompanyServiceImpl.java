@@ -3,6 +3,7 @@ package com.gogoring.dongoorami.accompany.application;
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
+import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse.AccompanyCommentInfo;
@@ -24,7 +25,6 @@ import com.gogoring.dongoorami.member.exception.MemberNotFoundException;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,21 +51,14 @@ public class AccompanyServiceImpl implements AccompanyService {
     }
 
     @Override
-    public AccompanyPostsResponse getAccompanyPosts(Long cursorId, int size) {
-        Slice<AccompanyPost> accompanyPosts;
-        if (cursorId == null) {
-            accompanyPosts = accompanyPostRepository.findAllByOrderByIdDesc(
-                    PageRequest.of(0, size));
-        } else {
-            accompanyPosts = accompanyPostRepository.findByIdLessThanOrderByIdDesc(
-                    cursorId, PageRequest.of(0, size));
-        }
+    public AccompanyPostsResponse getAccompanyPosts(Long cursorId, int size,
+            AccompanyPostFilterRequest accompanyPostFilterRequest) {
+        Slice<AccompanyPost> accompanyPosts = accompanyPostRepository.findByAccompanyPostFilterRequest(
+                cursorId, size, accompanyPostFilterRequest);
 
         return new AccompanyPostsResponse(
                 accompanyPosts.hasNext(),
-                accompanyPosts.getContent().stream()
-                        .map(AccompanyPostInfo::of)
-                        .toList());
+                accompanyPosts.getContent().stream().map(AccompanyPostInfo::of).toList());
     }
 
     @Transactional
