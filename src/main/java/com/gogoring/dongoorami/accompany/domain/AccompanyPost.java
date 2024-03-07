@@ -40,7 +40,8 @@ public class AccompanyPost extends BaseEntity {
     private String title;
     private String concertName;
     private String concertPlace;
-    private String region;
+    @Enumerated(EnumType.STRING)
+    private AccompanyRegionType region;
     private Long startAge;
     private Long endAge;
     private Long totalPeople;
@@ -57,12 +58,13 @@ public class AccompanyPost extends BaseEntity {
     @Builder
     public AccompanyPost(Member member, String title, String concertName, String concertPlace,
             String region, Long startAge, Long endAge, Long totalPeople, String gender,
-            LocalDate startDate, LocalDate endDate, String content, List<String> images, List<AccompanyPurposeType> purposes) {
+            LocalDate startDate, LocalDate endDate, String content, List<String> images,
+            List<AccompanyPurposeType> purposes) {
         this.member = member;
         this.title = title;
         this.concertName = concertName;
         this.concertPlace = concertPlace;
-        this.region = region;
+        this.region = AccompanyRegionType.getValue(region);
         this.startAge = startAge;
         this.endAge = endAge;
         this.totalPeople = totalPeople;

@@ -106,7 +106,7 @@ class AccompanyPostRepositoryTest {
                     .endDate(LocalDate.of(2024, 3, 22))
                     .title("서울 같이 갈 울싼 사람 구합니다~~")
                     .gender("여")
-                    .region("서울")
+                    .region("수도권(경기, 인천 포함)")
                     .content("같이 올라갈 사람 구해요~")
                     .startAge(23L)
                     .endAge(37L)
