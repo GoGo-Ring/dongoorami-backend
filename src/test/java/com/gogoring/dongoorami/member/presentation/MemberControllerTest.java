@@ -21,7 +21,7 @@ import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
-import com.gogoring.dongoorami.member.dto.request.MemberSignupRequest;
+import com.gogoring.dongoorami.member.dto.request.MemberSignUpRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberUpdateRequest;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.io.FileInputStream;
@@ -115,7 +115,7 @@ public class MemberControllerTest {
     @Test
     @WithCustomMockUser
     @DisplayName("최초 회원가입 시 기본 정보를 저장할 수 있다.")
-    void success_signup() throws Exception {
+    void success_signUp() throws Exception {
         // given
         Member member = ((CustomUserDetails) SecurityContextHolder
                 .getContext()
@@ -125,7 +125,8 @@ public class MemberControllerTest {
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
 
-        MemberSignupRequest memberSignUpRequest = new MemberSignupRequest();
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest();
+        ReflectionTestUtils.setField(memberSignUpRequest, "nickname", "롸롸롸");
         ReflectionTestUtils.setField(memberSignUpRequest, "gender", "남자");
         ReflectionTestUtils.setField(memberSignUpRequest, "birthDate", LocalDate.of(2000, 12, 31));
 
@@ -139,13 +140,15 @@ public class MemberControllerTest {
 
         // then
         resultActions.andExpect(status().isOk())
-                .andDo(document("{ClassName}/signup",
+                .andDo(document("{ClassName}/signUp",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
+                                fieldWithPath("nickname").type(JsonFieldType.STRING)
+                                        .description("닉네임"),
                                 fieldWithPath("gender").type(JsonFieldType.STRING)
                                         .description("남자/여자"),
-                                fieldWithPath("birthDate").type("LocalDate")
+                                fieldWithPath("birthDate").type(JsonFieldType.STRING)
                                         .description("생년월일")
                         ))
                 );

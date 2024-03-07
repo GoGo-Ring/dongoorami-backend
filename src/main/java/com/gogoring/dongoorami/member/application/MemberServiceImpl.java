@@ -6,7 +6,7 @@ import com.gogoring.dongoorami.global.util.S3ImageUtil;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
-import com.gogoring.dongoorami.member.dto.request.MemberSignupRequest;
+import com.gogoring.dongoorami.member.dto.request.MemberSignUpRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberUpdateRequest;
 import com.gogoring.dongoorami.member.dto.response.MemberInfoResponse;
 import com.gogoring.dongoorami.member.dto.response.MemberUpdateProfileImageResponse;
@@ -53,11 +53,11 @@ public class MemberServiceImpl implements MemberService {
 
     @Transactional
     @Override
-    public void signup(MemberSignupRequest memberSignUpRequest, Long memberId) {
+    public void signUp(MemberSignUpRequest memberSignUpRequest, Long memberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        member.updateGenderAndBirthDate(memberSignUpRequest.getGender(),
-                memberSignUpRequest.getBirthDate());
+        member.updateNameAndGenderAndBirthDate(memberSignUpRequest.getNickname(),
+                memberSignUpRequest.getGender(), memberSignUpRequest.getBirthDate());
     }
 
     @Override
