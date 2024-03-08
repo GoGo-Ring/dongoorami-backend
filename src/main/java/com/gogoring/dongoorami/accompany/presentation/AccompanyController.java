@@ -8,6 +8,7 @@ import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
+import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -117,6 +118,15 @@ public class AccompanyController {
     @GetMapping("/posts/regions")
     public ResponseEntity<Map<String, Object>> getAccompanyPostRegions() {
         return ResponseEntity.ok(Map.of("regions", AccompanyRegionType.getNames()));
+    }
+
+    @GetMapping("/profile/{memberId}")
+    public ResponseEntity<MemberProfile> getMemberProfile(
+            @PathVariable Long memberId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        return ResponseEntity.ok(
+                accompanyService.getMemberProfile(memberId, customUserDetails.getId()));
     }
 
 }
