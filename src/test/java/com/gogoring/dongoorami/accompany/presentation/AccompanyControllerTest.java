@@ -24,6 +24,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -680,6 +681,97 @@ class AccompanyControllerTest {
                                         .description("지역 리스트")
                         )
                 ));
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("특정 멤버 정보를 조회할 수 있다. - 본인인 경우")
+    void success_getMemberProfile_given_currentMember() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "gender", "여자");
+        ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
+        ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompany/profile/{memberId}", member.getId())
+                        .header("Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.currentMember").value(Boolean.TRUE))
+                .andDo(document("{ClassName}/getMemberProfile",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("memberId").description("멤버 id")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(NUMBER)
+                                        .description("멤버 id"),
+                                fieldWithPath("name").type(
+                                        STRING).description("이름"),
+                                fieldWithPath(
+                                        "profileImage").type(
+                                        STRING).description("프로필 이미지 url"),
+                                fieldWithPath("gender").type(
+                                        STRING).description("성별"),
+                                fieldWithPath("age").type(NUMBER)
+                                        .description("나이"),
+                                fieldWithPath(
+                                        "introduction").type(
+                                        STRING).description("소개"),
+                                fieldWithPath(
+                                        "currentMember").type(
+                                        BOOLEAN).description("본인 여부")
+                        )
+                ));
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("특정 멤버 정보를 조회할 수 있다. - 본인이 아닌 경우")
+    void success_getMemberProfile_given_notCurrentMember() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "gender", "여자");
+        ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
+        ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
+        Member member2 = Member.builder()
+                .name("김뭐뭐")
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("hajkdflajkflajdklag")
+                .build();
+        ReflectionTestUtils.setField(member2, "gender", "여자");
+        ReflectionTestUtils.setField(member2, "birthDate", LocalDate.of(2001, 1, 17));
+        ReflectionTestUtils.setField(member2, "introduction", "안녕하세요~");
+        memberRepository.save(member);
+        member2 = memberRepository.save(member2);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        System.out.println(member.getId() + ", " + member2.getId());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompany/profile/{memberId}", member2.getId())
+                        .header("Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.currentMember").value(Boolean.FALSE));
     }
 
     private List<AccompanyPost> createAccompanyPosts(Member member, int size) throws Exception {
