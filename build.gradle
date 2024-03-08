@@ -50,6 +50,12 @@ dependencies {
 
     // Spring Actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // QueryDsl
+    implementation "com.querydsl:querydsl-jpa:5.0.0:jakarta"
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 }
 
 tasks.named('test') {
@@ -79,7 +85,7 @@ task copyDocument(type: Copy) {
 
 bootJar {
     dependsOn asciidoctor
-    from ("${asciidoctor.outputDir}") {
+    from("${asciidoctor.outputDir}") {
         into 'static/docs'
     }
     duplicatesStrategy = DuplicatesStrategy.INCLUDE

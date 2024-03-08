@@ -34,4 +34,28 @@ public class AccompanyGlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
+
+    @ExceptionHandler(InvalidAccompanyRegionTypeException.class)
+    public ResponseEntity<ErrorResponse> catchInvalidRegionTypeException(
+            InvalidAccompanyRegionTypeException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidAgeRangeException.class)
+    public ResponseEntity<ErrorResponse> catchInvalidAgeRangeException(
+            InvalidAgeRangeException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(IncompleteAgeException.class)
+    public ResponseEntity<ErrorResponse> catchIncompleteAgeException(
+            IncompleteAgeException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
 }

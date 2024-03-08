@@ -31,6 +31,7 @@ import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
+import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
@@ -122,13 +123,13 @@ class AccompanyControllerTest {
                 .endDate(LocalDate.of(2024, 3, 22))
                 .title("서울 같이 갈 울싼 사람 구합니다~~")
                 .gender("여")
-                .region("서울")
+                .region("경상북도/경상남도")
                 .content("같이 올라갈 사람 구해요~")
-                .startAge(23L)
-                .endAge(37L)
-                .totalPeople(2L)
-                .purposes(Arrays.asList(AccompanyPurposeType.ACCOMMODATION.getName(),
-                        AccompanyPurposeType.TRANSPORTATION.getName()))
+                .startAge(13L)
+                .endAge(17L)
+                .totalPeople(1L)
+                .concertPlace("2024 SG워너비 콘서트 : 우리의 노래")
+                .purposes(Arrays.asList("관람", "숙박"))
                 .build();
         MockMultipartFile request = new MockMultipartFile("accompanyPostRequest", null,
                 "application/json", objectMapper.writeValueAsString(accompanyPostRequest)
@@ -184,21 +185,49 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
-        String postCnt = "3";
-        accompanyPostRepository.saveAll(createAccompanyPosts(member, 5));
+        String size = "3";
+        AccompanyPostFilterRequest accompanyPostFilterRequest1 = AccompanyPostFilterRequest.builder()
+                .gender("여")
+                .region("경상북도/경상남도")
+                .startAge(13L)
+                .endAge(17L)
+                .totalPeople(1L)
+                .concertPlace("KSPO DOME")
+                .purposes(Arrays.asList("관람", "숙박"))
+                .build();
+        accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 3, accompanyPostFilterRequest1));
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/v1/accompany/posts")
                         .header("Authorization", accessToken)
-                        .param("size", postCnt)
+                        .param("size", size)
+                        .param("gender", accompanyPostFilterRequest1.getGender())
+                        .param("region", accompanyPostFilterRequest1.getRegion())
+                        .param("startAge", accompanyPostFilterRequest1.getStartAge().toString())
+                        .param("endAge", accompanyPostFilterRequest1.getEndAge().toString())
+                        .param("totalPeople",
+                                accompanyPostFilterRequest1.getTotalPeople().toString())
+                        .param("concertPlace", accompanyPostFilterRequest1.getConcertPlace())
+                        .param("purposes", accompanyPostFilterRequest1.getPurposes().get(0))
+                        .param("purposes", accompanyPostFilterRequest1.getPurposes().get(1))
         );
 
         // then
         resultActions.andExpect(status().isOk())
                 .andDo(document("{ClassName}/getAccompanyPostsFirst",
                         preprocessResponse(prettyPrint()),
-                        queryParameters(parameterWithName("size").description("요청할 동행 구인글 개수")),
+                        queryParameters(
+                                parameterWithName("size").description("요청할 동행 구인글 개수").optional(),
+                                parameterWithName("gender").description("성별").optional(),
+                                parameterWithName("region").description("지역").optional(),
+                                parameterWithName("startAge").description("시작 나이").optional(),
+                                parameterWithName("endAge").description("종료 나이").optional(),
+                                parameterWithName("totalPeople").description("인원 수").optional(),
+                                parameterWithName("concertPlace").description("공연 장소").optional(),
+                                parameterWithName("purposes").description("동행 목적").optional()
+                        ),
                         responseFields(
                                 fieldWithPath("hasNext").type(BOOLEAN)
                                         .description("다음 동행 구인글 존재 여부"),
@@ -252,15 +281,34 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
-        String cursorId = "17", postCnt = "3";
-        accompanyPostRepository.saveAll(createAccompanyPosts(member, 5));
+        String cursorId = "17", size = "3";
+        AccompanyPostFilterRequest accompanyPostFilterRequest1 = AccompanyPostFilterRequest.builder()
+                .gender("여")
+                .region("경상북도/경상남도")
+                .startAge(13L)
+                .endAge(17L)
+                .totalPeople(1L)
+                .concertPlace("KSPO DOME")
+                .purposes(Arrays.asList("관람", "숙박"))
+                .build();
+        accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 3, accompanyPostFilterRequest1));
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/v1/accompany/posts")
                         .header("Authorization", accessToken)
                         .param("cursorId", cursorId)
-                        .param("size", postCnt)
+                        .param("size", size)
+                        .param("gender", accompanyPostFilterRequest1.getGender())
+                        .param("region", accompanyPostFilterRequest1.getRegion())
+                        .param("startAge", accompanyPostFilterRequest1.getStartAge().toString())
+                        .param("endAge", accompanyPostFilterRequest1.getEndAge().toString())
+                        .param("totalPeople",
+                                accompanyPostFilterRequest1.getTotalPeople().toString())
+                        .param("concertPlace", accompanyPostFilterRequest1.getConcertPlace())
+                        .param("purposes", accompanyPostFilterRequest1.getPurposes().get(0))
+                        .param("purposes", accompanyPostFilterRequest1.getPurposes().get(1))
         );
 
         // then
@@ -269,7 +317,15 @@ class AccompanyControllerTest {
                         preprocessResponse(prettyPrint()),
                         queryParameters(
                                 parameterWithName("cursorId").description("마지막으로 받은 동행 구인글 id"),
-                                parameterWithName("size").description("요청할 동행 구인글 개수")),
+                                parameterWithName("size").description("요청할 동행 구인글 개수").optional(),
+                                parameterWithName("gender").description("성별").optional(),
+                                parameterWithName("region").description("지역").optional(),
+                                parameterWithName("startAge").description("시작 나이").optional(),
+                                parameterWithName("endAge").description("종료 나이").optional(),
+                                parameterWithName("totalPeople").description("인원 수").optional(),
+                                parameterWithName("concertPlace").description("공연 장소").optional(),
+                                parameterWithName("purposes").description("동행 목적").optional()
+                        ),
                         responseFields(
                                 fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN)
                                         .description("다음 동행 구인글 존재 여부"),
@@ -507,7 +563,7 @@ class AccompanyControllerTest {
                 .endDate(LocalDate.of(2024, 3, 22))
                 .title("서울 같이 갈 울싼 사람 구합니다~~")
                 .gender("여")
-                .region("서울")
+                .region("수도권(경기, 인천 포함)")
                 .content("같이 올라갈 사람 구해요~")
                 .startAge(23L)
                 .endAge(37L)
@@ -595,6 +651,37 @@ class AccompanyControllerTest {
                 ));
     }
 
+    @Test
+    @WithCustomMockUser
+    @DisplayName("지역 목록을 조회할 수 있다.")
+    void success_getAccompanyPostRegions() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompany/posts/regions")
+                        .header("Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getAccompanyPostRegions",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("regions").type(ARRAY)
+                                        .description("지역 리스트")
+                        )
+                ));
+    }
+
     private List<AccompanyPost> createAccompanyPosts(Member member, int size) throws Exception {
         List<AccompanyPost> accompanyPosts = new ArrayList<>();
         for (int i = 0; i < size; i++) {
@@ -606,7 +693,7 @@ class AccompanyControllerTest {
                     .endDate(LocalDate.of(2024, 3, 22))
                     .title("서울 같이 갈 울싼 사람 구합니다~~")
                     .gender("여")
-                    .region("서울")
+                    .region("수도권(경기, 인천 포함)")
                     .content("같이 올라갈 사람 구해요~")
                     .startAge(23L)
                     .endAge(37L)
@@ -614,6 +701,30 @@ class AccompanyControllerTest {
                     .images(createImageUrls(2))
                     .purposes(Arrays.asList(AccompanyPurposeType.ACCOMMODATION,
                             AccompanyPurposeType.TRANSPORTATION)).build());
+        }
+
+        return accompanyPosts;
+    }
+
+    private List<AccompanyPost> createAccompanyPosts(Member member, int size,
+            AccompanyPostFilterRequest accompanyPostFilterRequest) {
+        List<AccompanyPost> accompanyPosts = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            accompanyPosts.add(AccompanyPost.builder()
+                    .member(member)
+                    .concertName("2024 SG워너비 콘서트 : 우리의 노래")
+                    .concertPlace(accompanyPostFilterRequest.getConcertPlace())
+                    .startDate(LocalDate.of(2024, 3, 22))
+                    .endDate(LocalDate.of(2024, 3, 22))
+                    .title("서울 같이 갈 울싼 사람 구합니다~~")
+                    .gender(accompanyPostFilterRequest.getGender())
+                    .region(accompanyPostFilterRequest.getRegion())
+                    .content("같이 올라갈 사람 구해요~")
+                    .startAge(accompanyPostFilterRequest.getStartAge())
+                    .endAge(accompanyPostFilterRequest.getEndAge())
+                    .totalPeople(accompanyPostFilterRequest.getTotalPeople())
+                    .purposes(accompanyPostFilterRequest.getPurposes().stream().map(
+                            AccompanyPurposeType::getValue).toList()).build());
         }
 
         return accompanyPosts;

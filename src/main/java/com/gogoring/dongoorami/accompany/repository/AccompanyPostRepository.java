@@ -6,7 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AccompanyPostRepository extends JpaRepository<AccompanyPost, Long> {
+public interface AccompanyPostRepository extends JpaRepository<AccompanyPost, Long>,
+        AccompanyPostCustomRepository {
 
     Slice<AccompanyPost> findAllByOrderByIdDesc(Pageable pageable);
 

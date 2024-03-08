@@ -2,6 +2,7 @@ package com.gogoring.dongoorami.accompany.domain;
 
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
 import com.gogoring.dongoorami.accompany.exception.InvalidAccompanyPurposeTypeException;
+import com.gogoring.dongoorami.accompany.exception.InvalidAccompanyRegionTypeException;
 import com.gogoring.dongoorami.global.common.BaseEntity;
 import com.gogoring.dongoorami.member.domain.Member;
 import jakarta.persistence.ElementCollection;
@@ -40,7 +41,8 @@ public class AccompanyPost extends BaseEntity {
     private String title;
     private String concertName;
     private String concertPlace;
-    private String region;
+    @Enumerated(EnumType.STRING)
+    private AccompanyRegionType region;
     private Long startAge;
     private Long endAge;
     private Long totalPeople;
@@ -57,12 +59,13 @@ public class AccompanyPost extends BaseEntity {
     @Builder
     public AccompanyPost(Member member, String title, String concertName, String concertPlace,
             String region, Long startAge, Long endAge, Long totalPeople, String gender,
-            LocalDate startDate, LocalDate endDate, String content, List<String> images, List<AccompanyPurposeType> purposes) {
+            LocalDate startDate, LocalDate endDate, String content, List<String> images,
+            List<AccompanyPurposeType> purposes) {
         this.member = member;
         this.title = title;
         this.concertName = concertName;
         this.concertPlace = concertPlace;
-        this.region = region;
+        this.region = AccompanyRegionType.getValue(region);
         this.startAge = startAge;
         this.endAge = endAge;
         this.totalPeople = totalPeople;
@@ -122,15 +125,46 @@ public class AccompanyPost extends BaseEntity {
             this.name = name;
         }
 
+        public static AccompanyPurposeType getValue(String name) {
+            return Arrays.stream(AccompanyPurposeType.values()).filter(
+                            accompanyPurposeType -> accompanyPurposeType.getName().equals(name)).findAny()
+                    .orElseThrow(() -> new InvalidAccompanyPurposeTypeException(
+                            AccompanyErrorCode.INVALID_ACCOMPANY_PURPOSE_TYPE));
+        }
+
         public String getName() {
             return name;
         }
-
-        public static AccompanyPurposeType getValue(String name){
-            return Arrays.stream(AccompanyPurposeType.values()).filter(
-                            accompanyPurposeType -> accompanyPurposeType.getName().equals(name)).findAny()
-                    .orElseThrow(() -> new InvalidAccompanyPurposeTypeException(AccompanyErrorCode.INVALID_ACCOMPANY_PURPOSE_TYPE));
-        }
     }
 
+    public enum AccompanyRegionType {
+        CAPITAL_AREA("수도권(경기, 인천 포함)"),
+        GANGWON("강원도"),
+        CHUNGCHEONG("충청북도/충청남도"),
+        GYEONGSANG("경상북도/경상남도"),
+        JEOLLA("전라북도/전라남도"),
+        JEJU("제주도");
+
+        String name;
+
+        AccompanyRegionType(String name) {
+            this.name = name;
+        }
+
+        public static AccompanyRegionType getValue(String name) {
+            return Arrays.stream(AccompanyRegionType.values()).filter(
+                            regionType -> regionType.getName().equals(name)).findAny()
+                    .orElseThrow(() -> new InvalidAccompanyRegionTypeException(
+                            AccompanyErrorCode.INVALID_REGION_TYPE));
+        }
+
+        public static List<String> getNames() {
+            return Arrays.stream(AccompanyRegionType.values()).map(AccompanyRegionType::getName)
+                    .toList();
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
 }

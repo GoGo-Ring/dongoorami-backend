@@ -2,6 +2,7 @@ package com.gogoring.dongoorami.member.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.gogoring.dongoorami.global.config.QueryDslConfig;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.exception.MemberErrorCode;
 import com.gogoring.dongoorami.member.exception.MemberNotFoundException;
@@ -13,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.util.ReflectionTestUtils;
 
+@Import(QueryDslConfig.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 public class MemberRepositoryTest {

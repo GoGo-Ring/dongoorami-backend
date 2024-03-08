@@ -53,7 +53,7 @@ public class AccompanyPostResponse {
                 .commentCount(0L) // 임시
                 .memberInfo(writer)
                 .concertPlace(accompanyPost.getConcertPlace())
-                .region(accompanyPost.getRegion())
+                .region(accompanyPost.getRegion().getName())
                 .startAge(accompanyPost.getStartAge())
                 .endAge(accompanyPost.getEndAge())
                 .startDate(accompanyPost.getStartDate())
