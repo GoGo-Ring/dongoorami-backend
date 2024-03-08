@@ -2,7 +2,7 @@ package com.gogoring.dongoorami.accompany.repository;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
-import com.gogoring.dongoorami.accompany.domain.AccompanyRegionType;
+import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyRegionType;
 import com.gogoring.dongoorami.accompany.domain.QAccompanyPost;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.querydsl.core.types.dsl.BooleanExpression;
