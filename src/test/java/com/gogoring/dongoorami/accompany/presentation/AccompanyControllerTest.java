@@ -403,15 +403,21 @@ class AccompanyControllerTest {
                         responseFields(
                                 fieldWithPath("id").type(NUMBER).description("동행 구인글 id"),
                                 fieldWithPath("title").type(STRING).description("제목"),
-                                fieldWithPath("memberInfo.id").type(NUMBER).description("작성자 id"),
-                                fieldWithPath("memberInfo.name").type(STRING).description("작성자 이름"),
-                                fieldWithPath("memberInfo.profileImage").type(STRING)
+                                fieldWithPath("memberProfile.id").type(NUMBER)
+                                        .description("작성자 id"),
+                                fieldWithPath("memberProfile.name").type(STRING)
+                                        .description("작성자 이름"),
+                                fieldWithPath("memberProfile.profileImage").type(STRING)
                                         .description("작성자 프로필 이미지 url"),
-                                fieldWithPath("memberInfo.gender").type(STRING)
+                                fieldWithPath("memberProfile.gender").type(STRING)
                                         .description("작성자 성별"),
-                                fieldWithPath("memberInfo.age").type(NUMBER).description("작성자 나이"),
-                                fieldWithPath("memberInfo.introduction").type(STRING)
+                                fieldWithPath("memberProfile.age").type(NUMBER)
+                                        .description("작성자 나이"),
+                                fieldWithPath("memberProfile.introduction").type(STRING)
                                         .description("작성자 소개"),
+                                fieldWithPath(
+                                        "memberProfile.currentMember").type(
+                                        BOOLEAN).description("본인 여부"),
                                 fieldWithPath("createdAt").type(STRING).description("생성 날짜"),
                                 fieldWithPath("updatedAt").type(STRING).description("수정 날짜"),
                                 fieldWithPath("viewCount").type(NUMBER).description("조회수"),
@@ -524,20 +530,25 @@ class AccompanyControllerTest {
                                         .description("생성 날짜"),
                                 fieldWithPath("accompanyCommentInfos[].updatedAt").type(STRING)
                                         .description("수정 날짜"),
-                                fieldWithPath("accompanyCommentInfos[].memberInfo.id").type(NUMBER)
+                                fieldWithPath("accompanyCommentInfos[].memberProfile.id").type(
+                                                NUMBER)
                                         .description("작성자 id"),
-                                fieldWithPath("accompanyCommentInfos[].memberInfo.name").type(
+                                fieldWithPath("accompanyCommentInfos[].memberProfile.name").type(
                                         STRING).description("작성자 이름"),
                                 fieldWithPath(
-                                        "accompanyCommentInfos[].memberInfo.profileImage").type(
+                                        "accompanyCommentInfos[].memberProfile.profileImage").type(
                                         STRING).description("작성자 프로필 이미지 url"),
-                                fieldWithPath("accompanyCommentInfos[].memberInfo.gender").type(
+                                fieldWithPath("accompanyCommentInfos[].memberProfile.gender").type(
                                         STRING).description("작성자 성별"),
-                                fieldWithPath("accompanyCommentInfos[].memberInfo.age").type(NUMBER)
+                                fieldWithPath("accompanyCommentInfos[].memberProfile.age").type(
+                                                NUMBER)
                                         .description("작성자 나이"),
                                 fieldWithPath(
-                                        "accompanyCommentInfos[].memberInfo.introduction").type(
-                                        STRING).description("작성자 소개")
+                                        "accompanyCommentInfos[].memberProfile.introduction").type(
+                                        STRING).description("작성자 소개"),
+                                fieldWithPath(
+                                        "accompanyCommentInfos[].memberProfile.currentMember").type(
+                                        BOOLEAN).description("본인 여부")
                         )
                 ));
     }
