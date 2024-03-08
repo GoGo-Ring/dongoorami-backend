@@ -29,4 +29,5 @@ public interface AccompanyService {
             Long accompanyPostId);
 
     void deleteAccompanyPost(Long memberId, Long accompanyPostId);
+    MemberProfile getMemberProfile(Long memberId, Long currentMemberId);
 }

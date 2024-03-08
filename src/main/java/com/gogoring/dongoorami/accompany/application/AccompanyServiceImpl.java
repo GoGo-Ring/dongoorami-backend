@@ -137,6 +137,14 @@ public class AccompanyServiceImpl implements AccompanyService {
         accompanyPost.updateIsActivatedFalse();
     }
 
+    @Override
+    public MemberProfile getMemberProfile(Long memberId, Long currentMemberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        return MemberProfile.of(member, currentMemberId);
+    }
+
     private void checkMemberIsWriter(AccompanyPost accompanyPost, Long memberId) {
         if (!isMemberIsWriter(accompanyPost.getMember().getId(), memberId)) {
             throw new OnlyWriterCanModifyException(AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND);
