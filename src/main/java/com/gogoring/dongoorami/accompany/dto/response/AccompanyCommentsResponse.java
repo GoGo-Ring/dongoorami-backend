@@ -19,15 +19,16 @@ public class AccompanyCommentsResponse {
     public static class AccompanyCommentInfo {
 
         private Long id;
-        private MemberInfo memberInfo;
+        private MemberProfile memberProfile;
         private String content;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 
-        public static AccompanyCommentInfo of(AccompanyComment accompanyComment) {
+        public static AccompanyCommentInfo of(AccompanyComment accompanyComment,
+                Long currentMemberId) {
             return AccompanyCommentInfo.builder()
                     .id(accompanyComment.getId())
-                    .memberInfo(MemberInfo.of(accompanyComment.getMember()))
+                    .memberProfile(MemberProfile.of(accompanyComment.getMember(), currentMemberId))
                     .content(accompanyComment.getContent())
                     .createdAt(accompanyComment.getCreatedAt())
                     .updatedAt(accompanyComment.getUpdatedAt())

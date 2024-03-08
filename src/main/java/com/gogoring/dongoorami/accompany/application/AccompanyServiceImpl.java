@@ -10,7 +10,7 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse.
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
-import com.gogoring.dongoorami.accompany.dto.response.MemberInfo;
+import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
 import com.gogoring.dongoorami.accompany.exception.AccompanyPostNotFoundException;
 import com.gogoring.dongoorami.accompany.exception.OnlyWriterCanModifyException;
