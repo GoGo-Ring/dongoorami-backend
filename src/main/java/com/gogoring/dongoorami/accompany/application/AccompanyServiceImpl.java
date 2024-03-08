@@ -41,8 +41,8 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     @Override
     public Long createAccompanyPost(AccompanyPostRequest accompanyPostRequest,
-            List<MultipartFile> images, Long memberId) {
-        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+            List<MultipartFile> images, Long currentMemberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         List<String> imageUrls = s3ImageUtil.putObjects(images,
                 ImageType.ACCOMPANY_POST);
@@ -59,12 +59,13 @@ public class AccompanyServiceImpl implements AccompanyService {
 
         return new AccompanyPostsResponse(
                 accompanyPosts.hasNext(),
-                accompanyPosts.getContent().stream().map(AccompanyPostInfo::of).toList());
+                accompanyPosts.getContent().stream().map(
+                        AccompanyPostInfo::of).toList());
     }
 
     @Transactional
     @Override
-    public AccompanyPostResponse getAccompanyPost(Long memberId, Long accompanyPostId) {
+    public AccompanyPostResponse getAccompanyPost(Long currentMemberId, Long accompanyPostId) {
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
@@ -72,14 +73,13 @@ public class AccompanyServiceImpl implements AccompanyService {
         accompanyPost.increaseViewCount();
 
         return AccompanyPostResponse.of(accompanyPost,
-                MemberInfo.of(accompanyPost.getMember()),
-                isMemberIsWriter(accompanyPost.getId(), memberId));
+                MemberProfile.of(accompanyPost.getMember(), currentMemberId));
     }
 
     @Override
     public Long createAccompanyComment(Long accompanyPostId,
-            AccompanyCommentRequest accompanyCommentRequest, Long memberId) {
-        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+            AccompanyCommentRequest accompanyCommentRequest, Long currentMemberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
@@ -93,7 +93,8 @@ public class AccompanyServiceImpl implements AccompanyService {
     }
 
     @Override
-    public AccompanyCommentsResponse getAccompanyComments(Long accompanyPostId) {
+    public AccompanyCommentsResponse getAccompanyComments(Long accompanyPostId,
+            Long currentMemberId) {
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
@@ -101,7 +102,8 @@ public class AccompanyServiceImpl implements AccompanyService {
         List<AccompanyCommentInfo> accompanyCommentInfos = accompanyPost.getAccompanyComments()
                 .stream()
                 .filter(AccompanyComment::isActivated)
-                .map(AccompanyCommentInfo::of)
+                .map((AccompanyComment accompanyComment) -> AccompanyCommentInfo.of(
+                        accompanyComment, currentMemberId))
                 .toList();
 
         return new AccompanyCommentsResponse(accompanyCommentInfos);
@@ -110,14 +112,14 @@ public class AccompanyServiceImpl implements AccompanyService {
     @Transactional
     @Override
     public void updateAccompanyPost(AccompanyPostRequest accompanyPostRequest,
-            List<MultipartFile> images, Long memberId,
+            List<MultipartFile> images, Long currentMemberId,
             Long accompanyPostId) {
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        checkMemberIsWriter(accompanyPost, memberId);
-        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+        checkMemberIsWriter(accompanyPost, currentMemberId);
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         List<String> imageUrls = s3ImageUtil.putObjects(images,
                 ImageType.ACCOMPANY_POST);
@@ -127,12 +129,12 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     @Transactional
     @Override
-    public void deleteAccompanyPost(Long memberId, Long accompanyPostId) {
+    public void deleteAccompanyPost(Long currentMemberId, Long accompanyPostId) {
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        checkMemberIsWriter(accompanyPost, memberId);
+        checkMemberIsWriter(accompanyPost, currentMemberId);
         accompanyPost.getAccompanyComments().forEach(BaseEntity::updateIsActivatedFalse);
         accompanyPost.updateIsActivatedFalse();
     }

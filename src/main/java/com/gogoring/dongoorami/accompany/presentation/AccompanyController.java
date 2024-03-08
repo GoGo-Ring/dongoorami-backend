@@ -91,8 +91,10 @@ public class AccompanyController {
 
     @GetMapping("/comments/{accompanyPostId}")
     public ResponseEntity<AccompanyCommentsResponse> getAccompanyPostComments(
-            @PathVariable Long accompanyPostId) {
-        return ResponseEntity.ok(accompanyService.getAccompanyComments(accompanyPostId));
+            @PathVariable Long accompanyPostId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(
+                accompanyService.getAccompanyComments(accompanyPostId, customUserDetails.getId()));
     }
 
     @PostMapping("/posts/{accompanyPostId}")
