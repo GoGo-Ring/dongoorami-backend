@@ -8,7 +8,7 @@ import lombok.Getter;
 @Builder
 @Getter
 @AllArgsConstructor
-public class MemberInfo {
+public class MemberProfile {
 
     private Long id;
 
@@ -22,13 +22,16 @@ public class MemberInfo {
 
     private String introduction;
 
-    public static MemberInfo of(Member member) {
-        return MemberInfo.builder()
+    private boolean currentMember;
+
+    public static MemberProfile of(Member member, Long currentMemberId) {
+        return MemberProfile.builder()
                 .id(member.getId())
                 .age(member.getAge())
                 .introduction(member.getIntroduction())
                 .name(member.getName())
                 .profileImage(member.getProfileImage())
+                .currentMember(member.getId() == currentMemberId)
                 .gender(member.getGender()).build();
     }
 }

@@ -177,3 +177,13 @@ include::{snippets}/AccompanyControllerTest/getAccompanyPostRegions/http-request
 .Response
 include::{snippets}/AccompanyControllerTest/getAccompanyPostRegions/http-response.adoc[]
 include::{snippets}/AccompanyControllerTest/getAccompanyPostRegions/response-fields.adoc[]
+
+=== 특정 멤버 정보 조회
+
+.Request
+include::{snippets}/AccompanyControllerTest/getMemberProfile/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/getMemberProfile/path-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/getMemberProfile/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/getMemberProfile/response-fields.adoc[]

@@ -16,7 +16,7 @@ public class AccompanyPostResponse {
 
     private Long id;
     private String title;
-    private MemberInfo memberInfo;
+    private MemberProfile memberProfile;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long viewCount;
@@ -38,8 +38,8 @@ public class AccompanyPostResponse {
     private Boolean isWriter;
     private List<String> purposes;
 
-    public static AccompanyPostResponse of(AccompanyPost accompanyPost, MemberInfo writer,
-            Boolean isWriter) {
+    public static AccompanyPostResponse of(AccompanyPost accompanyPost,
+            MemberProfile memberProfile) {
         return AccompanyPostResponse.builder()
                 .id(accompanyPost.getId())
                 .title(accompanyPost.getTitle())
@@ -51,7 +51,7 @@ public class AccompanyPostResponse {
                 .updatedAt(accompanyPost.getUpdatedAt())
                 .viewCount(accompanyPost.getViewCount())
                 .commentCount(0L) // 임시
-                .memberInfo(writer)
+                .memberProfile(memberProfile)
                 .concertPlace(accompanyPost.getConcertPlace())
                 .region(accompanyPost.getRegion().getName())
                 .startAge(accompanyPost.getStartAge())
@@ -62,7 +62,7 @@ public class AccompanyPostResponse {
                 .content(accompanyPost.getContent())
                 .images(accompanyPost.getImages())
                 .isWish(true) // 임시
-                .isWriter(isWriter)
+                .isWriter(memberProfile.isCurrentMember())
                 .purposes(accompanyPost.getPurposes().stream().map(AccompanyPurposeType::getName)
                         .toList())
                 .build();
