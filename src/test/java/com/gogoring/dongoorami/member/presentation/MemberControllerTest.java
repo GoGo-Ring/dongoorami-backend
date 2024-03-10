@@ -16,8 +16,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
-import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
+import com.gogoring.dongoorami.global.util.TestDataUtil;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
@@ -37,7 +37,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -73,12 +72,7 @@ public class MemberControllerTest {
     @DisplayName("토큰을 재발급할 수 있다.")
     void success_reissueToken() throws Exception {
         // given
-        Member member = Member.builder()
-                .name("김뫄뫄")
-                .profileImage("image.png")
-                .provider("kakao")
-                .providerId("alsjkghlaskdjgh")
-                .build();
+        Member member = TestDataUtil.createMember();
         memberRepository.save(member);
 
         String refreshToken = tokenProvider.createRefreshToken(member.getProviderId());
@@ -117,10 +111,7 @@ public class MemberControllerTest {
     @DisplayName("최초 회원가입 시 기본 정보를 저장할 수 있다.")
     void success_signUp() throws Exception {
         // given
-        Member member = ((CustomUserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal()).getMember();
+        Member member = TestDataUtil.createLoginMember();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
@@ -159,10 +150,7 @@ public class MemberControllerTest {
     @DisplayName("로그아웃을 할 수 있다.")
     void success_logout() throws Exception {
         // given
-        Member member = ((CustomUserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal()).getMember();
+        Member member = TestDataUtil.createLoginMember();
         memberRepository.save(member);
 
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
@@ -199,10 +187,7 @@ public class MemberControllerTest {
     @DisplayName("회원 탈퇴를 할 수 있다.")
     void success_quit() throws Exception {
         // given
-        Member member = ((CustomUserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal()).getMember();
+        Member member = TestDataUtil.createLoginMember();
         memberRepository.save(member);
 
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
@@ -239,10 +224,7 @@ public class MemberControllerTest {
     @DisplayName("프로필 이미지를 수정할 수 있다.")
     void success_updateProfileImage() throws Exception {
         // given
-        Member member = ((CustomUserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal()).getMember();
+        Member member = TestDataUtil.createLoginMember();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
@@ -276,10 +258,7 @@ public class MemberControllerTest {
     @DisplayName("프로필 정보를 수정할 수 있다.")
     void success_updateMember() throws Exception {
         // given
-        Member member = ((CustomUserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal()).getMember();
+        Member member = TestDataUtil.createLoginMember();
         ReflectionTestUtils.setField(member, "gender", "남자");
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2000, 12, 31));
         memberRepository.save(member);
@@ -337,10 +316,7 @@ public class MemberControllerTest {
     @DisplayName("프로필 정보를 조회할 수 있다.")
     void success_getMember() throws Exception {
         // given
-        Member member = ((CustomUserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal()).getMember();
+        Member member = TestDataUtil.createLoginMember();
         ReflectionTestUtils.setField(member, "gender", "남자");
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2000, 12, 31));
         ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
