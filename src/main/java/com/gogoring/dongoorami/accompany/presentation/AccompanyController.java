@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/v1/accompany")
+@RequestMapping("/api/v1/accompanies")
 @RequiredArgsConstructor
 public class AccompanyController {
 

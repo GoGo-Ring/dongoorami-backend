@@ -138,7 +138,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                multipart("/api/v1/accompany/posts")
+                multipart("/api/v1/accompanies/posts")
                         .file(images.get(0))
                         .file(images.get(1))
                         .file(request)
@@ -201,7 +201,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/accompany/posts")
+                get("/api/v1/accompanies/posts")
                         .header("Authorization", accessToken)
                         .param("size", size)
                         .param("gender", accompanyPostFilterRequest1.getGender())
@@ -297,7 +297,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/accompany/posts")
+                get("/api/v1/accompanies/posts")
                         .header("Authorization", accessToken)
                         .param("cursorId", cursorId)
                         .param("size", size)
@@ -389,7 +389,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/accompany/posts/{accompanyPostId}", accompanyPost.getId())
+                get("/api/v1/accompanies/posts/{accompanyPostId}", accompanyPost.getId())
                         .header("Authorization", accessToken)
         );
 
@@ -464,7 +464,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/accompany/comments/{accompanyPostId}", accompanyPost.getId())
+                post("/api/v1/accompanies/comments/{accompanyPostId}", accompanyPost.getId())
                         .header("Authorization", accessToken)
                         .content(objectMapper.writeValueAsString(accompanyCommentRequest))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -507,7 +507,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/accompany/comments/{accompanyPostId}", accompanyPost.getId())
+                get("/api/v1/accompanies/comments/{accompanyPostId}", accompanyPost.getId())
                         .header("Authorization", accessToken)
         );
 
@@ -589,7 +589,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                multipart("/api/v1/accompany/posts/{accompanyPostId}", accompanyPost.getId())
+                multipart("/api/v1/accompanies/posts/{accompanyPostId}", accompanyPost.getId())
                         .file(images.get(0))
                         .file(images.get(1))
                         .file(request)
@@ -648,7 +648,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/v1/accompany/posts/{accompanyPostId}", accompanyPost.getId())
+                delete("/api/v1/accompanies/posts/{accompanyPostId}", accompanyPost.getId())
                         .header("Authorization", accessToken)
         );
 
@@ -678,7 +678,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/accompany/posts/regions")
+                get("/api/v1/accompanies/posts/regions")
                         .header("Authorization", accessToken)
         );
 
@@ -712,7 +712,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/accompany/profile/{memberId}", member.getId())
+                get("/api/v1/accompanies/profile/{memberId}", member.getId())
                         .header("Authorization", accessToken)
         );
 
@@ -776,7 +776,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/accompany/profile/{memberId}", member2.getId())
+                get("/api/v1/accompanies/profile/{memberId}", member2.getId())
                         .header("Authorization", accessToken)
         );
 
