@@ -92,6 +92,35 @@ include::{snippets}/AccompanyControllerTest/createAccompanyPost/request-part-acc
 .Response
 include::{snippets}/AccompanyControllerTest/createAccompanyPost/http-response.adoc[]
 
+=== 동행 구인글 수정
+
+.Request
+include::{snippets}/AccompanyControllerTest/updateAccompanyPost/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/updateAccompanyPost/path-parameters.adoc[]
+include::{snippets}/AccompanyControllerTest/updateAccompanyPost/request-parts.adoc[]
+include::{snippets}/AccompanyControllerTest/updateAccompanyPost/request-part-accompanyPostRequest-fields.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/updateAccompanyPost/http-response.adoc[]
+
+=== 동행 구인글 삭제
+
+.Request
+include::{snippets}/AccompanyControllerTest/deleteAccompanyPost/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/deleteAccompanyPost/path-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/deleteAccompanyPost/http-response.adoc[]
+
+=== 동행 구인글 지역 목록 조회
+
+.Request
+include::{snippets}/AccompanyControllerTest/getAccompanyPostRegions/http-request.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/getAccompanyPostRegions/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/getAccompanyPostRegions/response-fields.adoc[]
+
 === 동행 구인 게시글 필터링 목록 조회(무한 스크롤)
 필터 항목의 경우, 사용자가 설정한 값들만 보내주시면 됩니다~
 
@@ -129,13 +158,6 @@ include::{snippets}/AccompanyControllerTest/getAccompanyPost/path-parameters.ado
 include::{snippets}/AccompanyControllerTest/getAccompanyPost/http-response.adoc[]
 include::{snippets}/AccompanyControllerTest/getAccompanyPost/response-fields.adoc[]
 
-=== 동행 구인글 댓글 작성
-
-.Request
-include::{snippets}/AccompanyControllerTest/createAccompanyComment/http-request.adoc[]
-include::{snippets}/AccompanyControllerTest/createAccompanyComment/path-parameters.adoc[]
-include::{snippets}/AccompanyControllerTest/createAccompanyComment/request-fields.adoc[]
-
 .Response
 include::{snippets}/AccompanyControllerTest/createAccompanyComment/http-response.adoc[]
 
@@ -149,34 +171,31 @@ include::{snippets}/AccompanyControllerTest/getAccompanyComments/path-parameters
 include::{snippets}/AccompanyControllerTest/getAccompanyComments/http-response.adoc[]
 include::{snippets}/AccompanyControllerTest/getAccompanyComments/response-fields.adoc[]
 
-=== 동행 구인 게시글 수정
+=== 동행 구인글 댓글 작성
 
 .Request
-include::{snippets}/AccompanyControllerTest/updateAccompanyPost/http-request.adoc[]
-include::{snippets}/AccompanyControllerTest/updateAccompanyPost/path-parameters.adoc[]
-include::{snippets}/AccompanyControllerTest/updateAccompanyPost/request-parts.adoc[]
-include::{snippets}/AccompanyControllerTest/updateAccompanyPost/request-part-accompanyPostRequest-fields.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyComment/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyComment/path-parameters.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyComment/request-fields.adoc[]
 
-.Response
-include::{snippets}/AccompanyControllerTest/updateAccompanyPost/http-response.adoc[]
-
-=== 동행 구인 게시글 삭제
+=== 동행 구인글 댓글 수정
 
 .Request
-include::{snippets}/AccompanyControllerTest/deleteAccompanyPost/http-request.adoc[]
-include::{snippets}/AccompanyControllerTest/deleteAccompanyPost/path-parameters.adoc[]
+include::{snippets}/AccompanyControllerTest/updateAccompanyComment/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/updateAccompanyComment/path-parameters.adoc[]
+include::{snippets}/AccompanyControllerTest/updateAccompanyComment/request-fields.adoc[]
 
 .Response
-include::{snippets}/AccompanyControllerTest/deleteAccompanyPost/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/updateAccompanyComment/http-response.adoc[]
 
-=== 동행 구인 게시글 지역 목록 조회
+=== 동행 구인글 댓글 삭제
 
 .Request
-include::{snippets}/AccompanyControllerTest/getAccompanyPostRegions/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/deleteAccompanyComment/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/deleteAccompanyComment/path-parameters.adoc[]
 
 .Response
-include::{snippets}/AccompanyControllerTest/getAccompanyPostRegions/http-response.adoc[]
-include::{snippets}/AccompanyControllerTest/getAccompanyPostRegions/response-fields.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyComment/http-response.adoc[]
 
 === 특정 멤버 정보 조회
 
