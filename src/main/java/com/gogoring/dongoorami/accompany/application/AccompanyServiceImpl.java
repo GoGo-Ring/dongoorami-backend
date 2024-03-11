@@ -147,6 +147,17 @@ public class AccompanyServiceImpl implements AccompanyService {
         return MemberProfile.of(member, currentMemberId);
     }
 
+    @Transactional
+    @Override
+    public void updateAccompanyComment(Long accompanyCommentId,
+            AccompanyCommentRequest accompanyCommentRequest, Long currentMemberId) {
+        AccompanyComment accompanyComment = accompanyCommentRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyCommentId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_COMMENT_NOT_FOUND));
+        checkMemberIsWriter(accompanyComment.getMember().getId(), currentMemberId);
+        accompanyComment.updateContent(accompanyCommentRequest.getContent());
+    }
     }
 
     private void checkMemberIsWriter(Long writerId, Long memberId) {

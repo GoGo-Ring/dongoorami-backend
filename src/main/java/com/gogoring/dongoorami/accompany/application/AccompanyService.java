@@ -32,4 +32,7 @@ public interface AccompanyService {
     void deleteAccompanyPost(Long currentMemberId, Long accompanyPostId);
 
     MemberProfile getMemberProfile(Long memberId, Long currentMemberId);
+
+    void updateAccompanyComment(Long accompanyCommentId,
+            AccompanyCommentRequest accompanyCommentRequest, Long currentMemberId);
 }
