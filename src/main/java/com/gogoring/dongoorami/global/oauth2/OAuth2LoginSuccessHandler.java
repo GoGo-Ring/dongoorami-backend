@@ -30,7 +30,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String accessToken = tokenProvider.createAccessToken(oAuth2User.getProviderId(),
                 (List<GrantedAuthority>) oAuth2User.getAuthorities());
         String refreshToken = tokenProvider.createRefreshToken(oAuth2User.getProviderId());
-        Boolean isFirstLogin = oAuth2User.getMember().getBirthDate() == null;
+        Boolean isFirstLogin = oAuth2User.getMember().getNickname() == null;
         String uri = createURI(accessToken, refreshToken, isFirstLogin);
 
         getRedirectStrategy().sendRedirect(request, response, uri);

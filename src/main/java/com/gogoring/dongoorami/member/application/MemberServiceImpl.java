@@ -56,7 +56,7 @@ public class MemberServiceImpl implements MemberService {
     public void signUp(MemberSignUpRequest memberSignUpRequest, Long memberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        member.updateNameAndGenderAndBirthDate(memberSignUpRequest.getNickname(),
+        member.updateNicknameAndGenderAndBirthDate(memberSignUpRequest.getNickname(),
                 memberSignUpRequest.getGender(), memberSignUpRequest.getBirthDate());
     }
 
@@ -103,7 +103,7 @@ public class MemberServiceImpl implements MemberService {
     public MemberInfoResponse updateMember(MemberUpdateRequest memberUpdateRequest, Long memberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        member.updateNameAndIntroduction(memberUpdateRequest.getName(),
+        member.updateNicknameAndIntroduction(memberUpdateRequest.getNickname(),
                 memberUpdateRequest.getIntroduction());
 
         return MemberInfoResponse.of(member);

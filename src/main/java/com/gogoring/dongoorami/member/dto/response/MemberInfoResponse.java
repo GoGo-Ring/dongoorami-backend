@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class MemberInfoResponse {
 
-    private final String name;
+    private final String nickname;
 
     private final String profileImage;
 
@@ -20,9 +20,9 @@ public class MemberInfoResponse {
     private final Integer manner;
 
     @Builder
-    public MemberInfoResponse(String name, String profileImage, String gender, Integer age,
+    public MemberInfoResponse(String nickname, String profileImage, String gender, Integer age,
             String introduction, Integer manner) {
-        this.name = name;
+        this.nickname = nickname;
         this.profileImage = profileImage;
         this.gender = gender;
         this.age = age;
@@ -32,7 +32,7 @@ public class MemberInfoResponse {
 
     public static MemberInfoResponse of(Member member) {
         return MemberInfoResponse.builder()
-                .name(member.getName())
+                .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .gender(member.getGender())
                 .age(member.getAge())
