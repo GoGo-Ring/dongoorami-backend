@@ -3,6 +3,7 @@ package com.gogoring.dongoorami.member.domain;
 import com.gogoring.dongoorami.global.common.BaseEntity;
 import com.gogoring.dongoorami.member.exception.AlreadySignUpException;
 import com.gogoring.dongoorami.member.exception.MemberErrorCode;
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,14 +30,18 @@ public class Member extends BaseEntity {
     private Long id;
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @Column(nullable = false)
     private List<Role> roles;
 
-    private String name;
+    private String nickname;
 
+    @Column(nullable = false)
     private String profileImage;
 
+    @Column(nullable = false)
     private String provider;
 
+    @Column(nullable = false)
     private String providerId;
 
     private String gender;
@@ -45,11 +50,11 @@ public class Member extends BaseEntity {
 
     private String introduction;
 
+    @Column(nullable = false)
     private Integer manner;
 
     @Builder
-    public Member(String name, String profileImage, String provider, String providerId) {
-        this.name = name;
+    public Member(String profileImage, String provider, String providerId) {
         this.profileImage = profileImage;
         this.provider = provider;
         this.providerId = providerId;
@@ -73,29 +78,25 @@ public class Member extends BaseEntity {
                 : (LocalDate.now().getYear() - this.getBirthDate().getYear()) + 1;
     }
 
-    public Member updateName(String name) {
-        this.name = name;
+    public Member updateProfileImage(String profileImage) {
+        this.profileImage = profileImage;
         return this;
     }
 
-    public void updateProfileImage(String profileImage) {
-        this.profileImage = profileImage;
-    }
-
-    public void updateNameAndGenderAndBirthDate(String name, String gender, LocalDate birthDate) {
-        checkGenderAndBirthDateIsNull();
-        this.name = name;
+    public void updateNicknameAndGenderAndBirthDate(String nickname, String gender, LocalDate birthDate) {
+        checkIsNull();
+        this.nickname = nickname;
         this.gender = gender;
         this.birthDate = birthDate;
     }
 
-    public void updateNameAndIntroduction(String name, String introduction) {
-        this.name = name;
+    public void updateNicknameAndIntroduction(String nickname, String introduction) {
+        this.nickname = nickname;
         this.introduction = introduction;
     }
 
-    private void checkGenderAndBirthDateIsNull() {
-        if (gender != null || birthDate != null) {
+    private void checkIsNull() {
+        if (this.nickname != null || this.gender != null || this.birthDate != null) {
             throw new AlreadySignUpException(MemberErrorCode.ALREADY_SIGN_UP);
         }
     }

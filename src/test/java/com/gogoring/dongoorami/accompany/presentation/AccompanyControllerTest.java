@@ -183,6 +183,7 @@ class AccompanyControllerTest {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
@@ -279,6 +280,7 @@ class AccompanyControllerTest {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
@@ -377,6 +379,7 @@ class AccompanyControllerTest {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         ReflectionTestUtils.setField(member, "gender", "여자");
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
         ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
@@ -405,8 +408,8 @@ class AccompanyControllerTest {
                                 fieldWithPath("title").type(STRING).description("제목"),
                                 fieldWithPath("memberProfile.id").type(NUMBER)
                                         .description("작성자 id"),
-                                fieldWithPath("memberProfile.name").type(STRING)
-                                        .description("작성자 이름"),
+                                fieldWithPath("memberProfile.nickname").type(STRING)
+                                        .description("작성자 닉네임"),
                                 fieldWithPath("memberProfile.profileImage").type(STRING)
                                         .description("작성자 프로필 이미지 url"),
                                 fieldWithPath("memberProfile.gender").type(STRING)
@@ -493,6 +496,7 @@ class AccompanyControllerTest {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         ReflectionTestUtils.setField(member, "gender", "여자");
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
         ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
@@ -533,8 +537,8 @@ class AccompanyControllerTest {
                                 fieldWithPath("accompanyCommentInfos[].memberProfile.id").type(
                                                 NUMBER)
                                         .description("작성자 id"),
-                                fieldWithPath("accompanyCommentInfos[].memberProfile.name").type(
-                                        STRING).description("작성자 이름"),
+                                fieldWithPath("accompanyCommentInfos[].memberProfile.nickname").type(
+                                        STRING).description("작성자 닉네임"),
                                 fieldWithPath(
                                         "accompanyCommentInfos[].memberProfile.profileImage").type(
                                         STRING).description("작성자 프로필 이미지 url"),
@@ -703,6 +707,7 @@ class AccompanyControllerTest {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         ReflectionTestUtils.setField(member, "gender", "여자");
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
         ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
@@ -728,8 +733,8 @@ class AccompanyControllerTest {
                         responseFields(
                                 fieldWithPath("id").type(NUMBER)
                                         .description("멤버 id"),
-                                fieldWithPath("name").type(
-                                        STRING).description("이름"),
+                                fieldWithPath("nickname").type(
+                                        STRING).description("닉네임"),
                                 fieldWithPath(
                                         "profileImage").type(
                                         STRING).description("프로필 이미지 url"),
@@ -760,11 +765,11 @@ class AccompanyControllerTest {
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
         ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
         Member member2 = Member.builder()
-                .name("김뭐뭐")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("hajkdflajkflajdklag")
                 .build();
+        ReflectionTestUtils.setField(member2, "nickname", "김뭐뭐");
         ReflectionTestUtils.setField(member2, "gender", "여자");
         ReflectionTestUtils.setField(member2, "birthDate", LocalDate.of(2001, 1, 17));
         ReflectionTestUtils.setField(member2, "introduction", "안녕하세요~");

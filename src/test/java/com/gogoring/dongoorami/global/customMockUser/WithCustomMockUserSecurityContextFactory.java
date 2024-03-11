@@ -14,13 +14,11 @@ public class WithCustomMockUserSecurityContextFactory implements
     @Override
     public SecurityContext createSecurityContext(WithCustomMockUser annotation) {
         Long id = 1L;
-        String name = annotation.name();
         String profileImage = annotation.profileImage();
         String provider = annotation.provider();
         String providerId = annotation.providerId();
 
         Member member = Member.builder()
-                .name(name)
                 .profileImage(profileImage)
                 .provider(provider)
                 .providerId(providerId)

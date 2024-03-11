@@ -10,14 +10,12 @@ public class OAuth2UserInfo {
 
     private final String providerId;
     private final String provider;
-    private final String name;
     private final String profileImage;
 
     @Builder
-    public OAuth2UserInfo(String providerId, String provider, String name, String profileImage) {
+    public OAuth2UserInfo(String providerId, String provider, String profileImage) {
         this.providerId = providerId;
         this.provider = provider;
-        this.name = name;
         this.profileImage = profileImage;
     }
 
@@ -40,7 +38,6 @@ public class OAuth2UserInfo {
         return OAuth2UserInfo.builder()
                 .providerId(attributes.get("id").toString())
                 .provider("kakao")
-                .name((String) kakaoProfile.get("nickname"))
                 .profileImage((String) kakaoProfile.get("profile_image_url"))
                 .build();
     }
@@ -49,7 +46,6 @@ public class OAuth2UserInfo {
         return OAuth2UserInfo.builder()
                 .providerId((String) attributes.get("sub"))
                 .provider("google")
-                .name((String) attributes.get("name"))
                 .profileImage((String) attributes.get("picture"))
                 .build();
     }
@@ -58,14 +54,12 @@ public class OAuth2UserInfo {
         return OAuth2UserInfo.builder()
                 .providerId((String) attributes.get("id"))
                 .provider("naver")
-                .name((String) attributes.get("name"))
                 .profileImage((String) attributes.get("profile_image"))
                 .build();
     }
 
     public Member toEntity() {
         return Member.builder()
-                .name(getName())
                 .profileImage(getProfileImage())
                 .provider(getProvider())
                 .providerId(getProviderId())

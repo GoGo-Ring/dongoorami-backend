@@ -40,7 +40,6 @@ public class MemberRepositoryTest {
     void success_findByIdAndIsActivatedIsTrue() {
         // given
         Member member = Member.builder()
-                .name("김뫄뫄")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
@@ -61,7 +60,6 @@ public class MemberRepositoryTest {
     void success_findByProviderIdAndIsActivatedIsTrue() {
         // given
         Member member = Member.builder()
-                .name("김뫄뫄")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")

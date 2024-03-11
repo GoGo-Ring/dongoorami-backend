@@ -31,7 +31,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private Member saveOrUpdate(OAuth2UserInfo oAuth2UserInfo) {
         Member member = memberRepository.findByProviderIdAndIsActivatedIsTrue(
                         oAuth2UserInfo.getProviderId())
-                .map(entity -> entity.updateName(oAuth2UserInfo.getName()))
+                .map(entity -> entity.updateProfileImage(oAuth2UserInfo.getProfileImage()))
                 .orElse(oAuth2UserInfo.toEntity());
 
         return memberRepository.save(member);

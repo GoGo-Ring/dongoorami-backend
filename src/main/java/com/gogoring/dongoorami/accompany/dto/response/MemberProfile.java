@@ -12,7 +12,7 @@ public class MemberProfile {
 
     private Long id;
 
-    private String name;
+    private String nickname;
 
     private String profileImage;
 
@@ -29,7 +29,7 @@ public class MemberProfile {
                 .id(member.getId())
                 .age(member.getAge())
                 .introduction(member.getIntroduction())
-                .name(member.getName())
+                .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .currentMember(member.getId() == currentMemberId)
                 .gender(member.getGender()).build();

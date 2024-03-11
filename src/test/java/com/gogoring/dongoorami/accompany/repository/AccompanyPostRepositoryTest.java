@@ -55,7 +55,6 @@ class AccompanyPostRepositoryTest {
     void success_findAllByOrderByIdDesc() {
         // given
         Member member = Member.builder()
-                .name("김뫄뫄")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
@@ -77,7 +76,6 @@ class AccompanyPostRepositoryTest {
     void success_findByIdLessThanOrderByIdDesc() {
         // given
         Member member = Member.builder()
-                .name("김뫄뫄")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
@@ -103,7 +101,6 @@ class AccompanyPostRepositoryTest {
     void success_findByAccompanyPostFilterRequest() {
         // given
         Member member = Member.builder()
-                .name("김뫄뫄")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
@@ -152,7 +149,6 @@ class AccompanyPostRepositoryTest {
     void success_findByAccompanyPostFilterRequest_given_purposes() {
         // given
         Member member = Member.builder()
-                .name("김뫄뫄")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
@@ -204,7 +200,6 @@ class AccompanyPostRepositoryTest {
     void success_findByAccompanyPostFilterRequest_given_ages() {
         // given
         Member member = Member.builder()
-                .name("김뫄뫄")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
