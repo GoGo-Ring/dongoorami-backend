@@ -118,7 +118,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        checkMemberIsWriter(accompanyPost, currentMemberId);
+        checkMemberIsWriter(accompanyPost.getMember().getId(), currentMemberId);
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         List<String> imageUrls = s3ImageUtil.putObjects(images,
@@ -134,7 +134,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        checkMemberIsWriter(accompanyPost, currentMemberId);
+        checkMemberIsWriter(accompanyPost.getMember().getId(), currentMemberId);
         accompanyPost.getAccompanyComments().forEach(BaseEntity::updateIsActivatedFalse);
         accompanyPost.updateIsActivatedFalse();
     }
@@ -147,14 +147,33 @@ public class AccompanyServiceImpl implements AccompanyService {
         return MemberProfile.of(member, currentMemberId);
     }
 
-    private void checkMemberIsWriter(AccompanyPost accompanyPost, Long memberId) {
-        if (!isMemberIsWriter(accompanyPost.getMember().getId(), memberId)) {
-            throw new OnlyWriterCanModifyException(AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND);
-        }
+    @Transactional
+    @Override
+    public void updateAccompanyComment(Long accompanyCommentId,
+            AccompanyCommentRequest accompanyCommentRequest, Long currentMemberId) {
+        AccompanyComment accompanyComment = accompanyCommentRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyCommentId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_COMMENT_NOT_FOUND));
+        checkMemberIsWriter(accompanyComment.getMember().getId(), currentMemberId);
+        accompanyComment.updateContent(accompanyCommentRequest.getContent());
     }
 
-    private boolean isMemberIsWriter(Long writerId, Long memberId) {
-        return writerId == memberId;
+    @Transactional
+    @Override
+    public void deleteAccompanyComment(Long accompanyCommentId, Long currentMemberId) {
+        AccompanyComment accompanyComment = accompanyCommentRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyCommentId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_COMMENT_NOT_FOUND));
+        checkMemberIsWriter(accompanyComment.getMember().getId(), currentMemberId);
+        accompanyComment.updateIsActivatedFalse();
+    }
+
+    private void checkMemberIsWriter(Long writerId, Long memberId) {
+        if (writerId != memberId) {
+            throw new OnlyWriterCanModifyException(AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND);
+        }
     }
 
 }
