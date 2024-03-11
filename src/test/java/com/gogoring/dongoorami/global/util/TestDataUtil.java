@@ -9,7 +9,6 @@ public class TestDataUtil {
 
     public static Member createMember() {
         return Member.builder()
-                .name("김뫄뫄")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
