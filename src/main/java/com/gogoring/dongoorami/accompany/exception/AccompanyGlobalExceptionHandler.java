@@ -58,4 +58,12 @@ public class AccompanyGlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
+
+    @ExceptionHandler(AccompanyPostCommentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> catchAccompanyPostCommentNotFoundException(
+            AccompanyPostCommentNotFoundException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
 }
