@@ -6,6 +6,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -783,6 +784,87 @@ class AccompanyControllerTest {
         // then
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.currentMember").value(Boolean.FALSE));
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("동행 구인글의 댓글 작성자는 댓글을 수정할 수 있다.")
+    void success_updateAccompanyComment() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 1)).get(0);
+        List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
+        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+        accompanyCommentRepository.saveAll(accompanyComments);
+        AccompanyCommentRequest accompanyCommentRequest = new AccompanyCommentRequest(
+                "오는 길만 동행 가능할까요??");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/accompanies/comments/{accompanyPostId}",
+                        accompanyComments.get(0).getId())
+                        .header("Authorization", accessToken)
+                        .content(objectMapper.writeValueAsString(accompanyCommentRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/updateAccompanyComment",
+                        preprocessRequest(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                        ),
+                        requestFields(
+                                fieldWithPath("content").type(JsonFieldType.STRING)
+                                        .description("내용")
+                        )
+                ));
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("동행 구인글의 댓글 작성자는 댓글을 삭제할 수 있다.")
+    void success_deleteAccompanyComment() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 1)).get(0);
+        List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
+        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+        accompanyCommentRepository.saveAll(accompanyComments);
+        AccompanyCommentRequest accompanyCommentRequest = new AccompanyCommentRequest(
+                "오는 길만 동행 가능할까요??");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/v1/accompanies/comments/{accompanyPostId}",
+                        accompanyComments.get(0).getId())
+                        .header("Authorization", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/deleteAccompanyComment",
+                        preprocessRequest(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                        )
+                ));
     }
 
     private List<AccompanyPost> createAccompanyPosts(Member member, int size) throws Exception {
