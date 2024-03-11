@@ -174,10 +174,10 @@ class AccompanyPostRepositoryTest {
                 .endAge(17L)
                 .totalPeople(1L)
                 .concertPlace("KSPO DOME")
-                .purposes(Arrays.asList("관람"))
+                .purposes(List.of("관람"))
                 .build();
         AccompanyPostFilterRequest accompanyPostFilterRequest3 = AccompanyPostFilterRequest.builder()
-                .purposes(Arrays.asList("관람"))
+                .purposes(List.of("관람"))
                 .build();
         accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 3, accompanyPostFilterRequest1));
@@ -226,12 +226,12 @@ class AccompanyPostRepositoryTest {
                 .endAge(17L)
                 .totalPeople(1L)
                 .concertPlace("KSPO DOME")
-                .purposes(Arrays.asList("관람"))
+                .purposes(List.of("관람"))
                 .build();
         AccompanyPostFilterRequest accompanyPostFilterRequest3 = AccompanyPostFilterRequest.builder()
                 .startAge(11L)
                 .endAge(13L)
-                .purposes(Arrays.asList("관람"))
+                .purposes(List.of("관람"))
                 .build();
         accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 3, accompanyPostFilterRequest1));
