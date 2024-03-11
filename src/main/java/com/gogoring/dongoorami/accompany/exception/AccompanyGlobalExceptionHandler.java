@@ -63,7 +63,7 @@ public class AccompanyGlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> catchAccompanyPostCommentNotFoundException(
             AccompanyPostCommentNotFoundException e) {
         log.error(e.getMessage(), e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
 }
