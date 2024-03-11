@@ -6,6 +6,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -183,6 +184,7 @@ class AccompanyControllerTest {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
@@ -279,6 +281,7 @@ class AccompanyControllerTest {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
@@ -377,6 +380,7 @@ class AccompanyControllerTest {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         ReflectionTestUtils.setField(member, "gender", "여자");
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
         ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
@@ -405,8 +409,8 @@ class AccompanyControllerTest {
                                 fieldWithPath("title").type(STRING).description("제목"),
                                 fieldWithPath("memberProfile.id").type(NUMBER)
                                         .description("작성자 id"),
-                                fieldWithPath("memberProfile.name").type(STRING)
-                                        .description("작성자 이름"),
+                                fieldWithPath("memberProfile.nickname").type(STRING)
+                                        .description("작성자 닉네임"),
                                 fieldWithPath("memberProfile.profileImage").type(STRING)
                                         .description("작성자 프로필 이미지 url"),
                                 fieldWithPath("memberProfile.gender").type(STRING)
@@ -493,6 +497,7 @@ class AccompanyControllerTest {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         ReflectionTestUtils.setField(member, "gender", "여자");
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
         ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
@@ -533,8 +538,8 @@ class AccompanyControllerTest {
                                 fieldWithPath("accompanyCommentInfos[].memberProfile.id").type(
                                                 NUMBER)
                                         .description("작성자 id"),
-                                fieldWithPath("accompanyCommentInfos[].memberProfile.name").type(
-                                        STRING).description("작성자 이름"),
+                                fieldWithPath("accompanyCommentInfos[].memberProfile.nickname").type(
+                                        STRING).description("작성자 닉네임"),
                                 fieldWithPath(
                                         "accompanyCommentInfos[].memberProfile.profileImage").type(
                                         STRING).description("작성자 프로필 이미지 url"),
@@ -703,6 +708,7 @@ class AccompanyControllerTest {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         ReflectionTestUtils.setField(member, "gender", "여자");
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
         ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
@@ -728,8 +734,8 @@ class AccompanyControllerTest {
                         responseFields(
                                 fieldWithPath("id").type(NUMBER)
                                         .description("멤버 id"),
-                                fieldWithPath("name").type(
-                                        STRING).description("이름"),
+                                fieldWithPath("nickname").type(
+                                        STRING).description("닉네임"),
                                 fieldWithPath(
                                         "profileImage").type(
                                         STRING).description("프로필 이미지 url"),
@@ -760,11 +766,11 @@ class AccompanyControllerTest {
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
         ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
         Member member2 = Member.builder()
-                .name("김뭐뭐")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("hajkdflajkflajdklag")
                 .build();
+        ReflectionTestUtils.setField(member2, "nickname", "김뭐뭐");
         ReflectionTestUtils.setField(member2, "gender", "여자");
         ReflectionTestUtils.setField(member2, "birthDate", LocalDate.of(2001, 1, 17));
         ReflectionTestUtils.setField(member2, "introduction", "안녕하세요~");
@@ -783,6 +789,87 @@ class AccompanyControllerTest {
         // then
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.currentMember").value(Boolean.FALSE));
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("동행 구인글의 댓글 작성자는 댓글을 수정할 수 있다.")
+    void success_updateAccompanyComment() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 1)).get(0);
+        List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
+        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+        accompanyCommentRepository.saveAll(accompanyComments);
+        AccompanyCommentRequest accompanyCommentRequest = new AccompanyCommentRequest(
+                "오는 길만 동행 가능할까요??");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/accompanies/comments/{accompanyPostId}",
+                        accompanyComments.get(0).getId())
+                        .header("Authorization", accessToken)
+                        .content(objectMapper.writeValueAsString(accompanyCommentRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/updateAccompanyComment",
+                        preprocessRequest(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                        ),
+                        requestFields(
+                                fieldWithPath("content").type(JsonFieldType.STRING)
+                                        .description("내용")
+                        )
+                ));
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("동행 구인글의 댓글 작성자는 댓글을 삭제할 수 있다.")
+    void success_deleteAccompanyComment() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 1)).get(0);
+        List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
+        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+        accompanyCommentRepository.saveAll(accompanyComments);
+        AccompanyCommentRequest accompanyCommentRequest = new AccompanyCommentRequest(
+                "오는 길만 동행 가능할까요??");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/v1/accompanies/comments/{accompanyPostId}",
+                        accompanyComments.get(0).getId())
+                        .header("Authorization", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/deleteAccompanyComment",
+                        preprocessRequest(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                        )
+                ));
     }
 
     private List<AccompanyPost> createAccompanyPosts(Member member, int size) throws Exception {

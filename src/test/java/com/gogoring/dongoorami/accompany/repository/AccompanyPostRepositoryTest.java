@@ -55,7 +55,6 @@ class AccompanyPostRepositoryTest {
     void success_findAllByOrderByIdDesc() {
         // given
         Member member = Member.builder()
-                .name("김뫄뫄")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
@@ -77,7 +76,6 @@ class AccompanyPostRepositoryTest {
     void success_findByIdLessThanOrderByIdDesc() {
         // given
         Member member = Member.builder()
-                .name("김뫄뫄")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
@@ -103,7 +101,6 @@ class AccompanyPostRepositoryTest {
     void success_findByAccompanyPostFilterRequest() {
         // given
         Member member = Member.builder()
-                .name("김뫄뫄")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
@@ -152,7 +149,6 @@ class AccompanyPostRepositoryTest {
     void success_findByAccompanyPostFilterRequest_given_purposes() {
         // given
         Member member = Member.builder()
-                .name("김뫄뫄")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
@@ -174,10 +170,10 @@ class AccompanyPostRepositoryTest {
                 .endAge(17L)
                 .totalPeople(1L)
                 .concertPlace("KSPO DOME")
-                .purposes(Arrays.asList("관람"))
+                .purposes(List.of("관람"))
                 .build();
         AccompanyPostFilterRequest accompanyPostFilterRequest3 = AccompanyPostFilterRequest.builder()
-                .purposes(Arrays.asList("관람"))
+                .purposes(List.of("관람"))
                 .build();
         accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 3, accompanyPostFilterRequest1));
@@ -204,7 +200,6 @@ class AccompanyPostRepositoryTest {
     void success_findByAccompanyPostFilterRequest_given_ages() {
         // given
         Member member = Member.builder()
-                .name("김뫄뫄")
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
@@ -226,12 +221,12 @@ class AccompanyPostRepositoryTest {
                 .endAge(17L)
                 .totalPeople(1L)
                 .concertPlace("KSPO DOME")
-                .purposes(Arrays.asList("관람"))
+                .purposes(List.of("관람"))
                 .build();
         AccompanyPostFilterRequest accompanyPostFilterRequest3 = AccompanyPostFilterRequest.builder()
                 .startAge(11L)
                 .endAge(13L)
-                .purposes(Arrays.asList("관람"))
+                .purposes(List.of("관람"))
                 .build();
         accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 3, accompanyPostFilterRequest1));

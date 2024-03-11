@@ -7,7 +7,7 @@ import lombok.Getter;
 public class MemberUpdateRequest {
 
     @NotBlank(message = "닉네임은 공백일 수 없습니다.")
-    private String name;
+    private String nickname;
 
     @NotBlank(message = "소개는 공백일 수 없습니다.")
     private String introduction;

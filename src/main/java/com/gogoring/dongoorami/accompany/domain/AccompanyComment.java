@@ -35,4 +35,8 @@ public class AccompanyComment extends BaseEntity {
     public void setAccompanyPost(AccompanyPost accompanyPost) {
         this.accompanyPost = accompanyPost;
     }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }

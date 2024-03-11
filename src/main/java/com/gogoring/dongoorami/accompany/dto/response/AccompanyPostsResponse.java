@@ -41,7 +41,7 @@ public class AccompanyPostsResponse {
                     .totalPeople(accompanyPost.getTotalPeople())
                     .createdAt(accompanyPost.getCreatedAt())
                     .updatedAt(accompanyPost.getUpdatedAt())
-                    .writer(accompanyPost.getMember().getName())
+                    .writer(accompanyPost.getMember().getNickname())
                     .viewCount(accompanyPost.getViewCount())
                     .commentCount(0L) // 임시
                     .build();

@@ -266,7 +266,7 @@ public class MemberControllerTest {
                 member.getRoles());
 
         MemberUpdateRequest memberUpdateRequest = new MemberUpdateRequest();
-        ReflectionTestUtils.setField(memberUpdateRequest, "name", "이롸롸");
+        ReflectionTestUtils.setField(memberUpdateRequest, "nickname", "이롸롸");
         ReflectionTestUtils.setField(memberUpdateRequest, "introduction", "안녕하세요~");
 
         // when
@@ -279,7 +279,7 @@ public class MemberControllerTest {
 
         // then
         resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(memberUpdateRequest.getName()))
+                .andExpect(jsonPath("$.nickname").value(memberUpdateRequest.getNickname()))
                 .andExpect(jsonPath("$.profileImage").value(member.getProfileImage()))
                 .andExpect(jsonPath("$.gender").value(member.getGender()))
                 .andExpect(jsonPath("$.age").value(member.getAge()))
@@ -289,14 +289,14 @@ public class MemberControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
-                                fieldWithPath("name").type(JsonFieldType.STRING)
+                                fieldWithPath("nickname").type(JsonFieldType.STRING)
                                         .description("닉네임"),
                                 fieldWithPath("introduction").type(JsonFieldType.STRING)
                                         .description("한줄 소개")
                         ),
                         responseFields(
-                                fieldWithPath("name").type(JsonFieldType.STRING)
-                                        .description("이름"),
+                                fieldWithPath("nickname").type(JsonFieldType.STRING)
+                                        .description("닉네임"),
                                 fieldWithPath("profileImage").type(JsonFieldType.STRING)
                                         .description("프로필 이미지 주소"),
                                 fieldWithPath("gender").type(JsonFieldType.STRING)
@@ -317,6 +317,7 @@ public class MemberControllerTest {
     void success_getMember() throws Exception {
         // given
         Member member = TestDataUtil.createLoginMember();
+        ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         ReflectionTestUtils.setField(member, "gender", "남자");
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2000, 12, 31));
         ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
@@ -333,7 +334,7 @@ public class MemberControllerTest {
 
         // then
         resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(member.getName()))
+                .andExpect(jsonPath("$.nickname").value(member.getNickname()))
                 .andExpect(jsonPath("$.profileImage").value(member.getProfileImage()))
                 .andExpect(jsonPath("$.gender").value(member.getGender()))
                 .andExpect(jsonPath("$.age").value(member.getAge()))
@@ -343,8 +344,8 @@ public class MemberControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(
-                                fieldWithPath("name").type(JsonFieldType.STRING)
-                                        .description("이름"),
+                                fieldWithPath("nickname").type(JsonFieldType.STRING)
+                                        .description("닉네임"),
                                 fieldWithPath("profileImage").type(JsonFieldType.STRING)
                                         .description("프로필 이미지 주소"),
                                 fieldWithPath("gender").type(JsonFieldType.STRING)
