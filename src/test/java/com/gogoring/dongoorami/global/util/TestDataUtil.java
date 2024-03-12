@@ -7,6 +7,7 @@ import com.gogoring.dongoorami.member.domain.Member;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class TestDataUtil {
 
@@ -23,6 +24,16 @@ public class TestDataUtil {
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
+    }
+
+    public static Member createLoginMemberWithNickname() {
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
+
+        return member;
     }
 
     public static Concert createConcert() {
