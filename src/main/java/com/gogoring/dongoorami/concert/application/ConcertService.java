@@ -10,4 +10,7 @@ public interface ConcertService {
 
     ConcertReviewsGetResponse getConcertReviews(Long concertId, Long cursorId, int size,
             Long memberId);
+
+    void updateConcertReview(Long concertReviewId, ConcertReviewRequest concertReviewRequest,
+            Long memberId);
 }
