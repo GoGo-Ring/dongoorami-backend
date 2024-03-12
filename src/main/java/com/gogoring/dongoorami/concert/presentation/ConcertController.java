@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,5 +41,14 @@ public class ConcertController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(concertService.getConcertReviews(concertId, cursorId, size,
                 customUserDetails.getId()));
+    }
+
+    @PatchMapping("/concerts/reviews/{concertReviewId}")
+    public ResponseEntity<Void> updateConcertReview(@PathVariable Long concertReviewId,
+            @Valid @RequestBody ConcertReviewRequest concertReviewRequest,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        concertService.updateConcertReview(concertReviewId, concertReviewRequest,
+                customUserDetails.getId());
+        return ResponseEntity.ok().build();
     }
 }
