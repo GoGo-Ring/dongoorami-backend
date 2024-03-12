@@ -107,7 +107,7 @@ public class KopisService {
                 String startedAt = jsonObject.get("prfpdfrom").toString();
                 String endedAt = jsonObject.get("prfpdto").toString();
                 String place = jsonObject.get("fcltynm").toString();
-                String cast = jsonObject.get("prfcast").toString();
+                String actor = jsonObject.get("prfcast").toString();
                 String crew = jsonObject.get("prfcrew").toString();
                 String runtime = jsonObject.get("prfruntime").toString();
                 String age = jsonObject.get("prfage").toString();
@@ -142,7 +142,7 @@ public class KopisService {
                         .startedAt(startedAt)
                         .endedAt(endedAt)
                         .place(place)
-                        .cast(cast)
+                        .actor(actor)
                         .crew(crew)
                         .runtime(runtime)
                         .age(age)

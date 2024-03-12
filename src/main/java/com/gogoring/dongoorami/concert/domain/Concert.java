@@ -39,7 +39,7 @@ public class Concert extends BaseEntity {
     private String place;
 
     @Column(columnDefinition = "TEXT")
-    private String cast;
+    private String actor;
 
     @Column(columnDefinition = "TEXT")
     private String crew;
@@ -82,7 +82,7 @@ public class Concert extends BaseEntity {
 
     @Builder
     public Concert(String kopisId, String name, String startedAt, String endedAt, String place,
-            String cast, String crew, String runtime, String age, String producer, String agency,
+            String actor, String crew, String runtime, String age, String producer, String agency,
             String host, String management, String cost, String poster, String summary,
             String genre, String status, List<String> introductionImages, String schedule) {
         this.kopisId = kopisId;
@@ -90,7 +90,7 @@ public class Concert extends BaseEntity {
         this.startedAt = startedAt;
         this.endedAt = endedAt;
         this.place = place;
-        this.cast = cast;
+        this.actor = actor;
         this.crew = crew;
         this.runtime = runtime;
         this.age = age;
