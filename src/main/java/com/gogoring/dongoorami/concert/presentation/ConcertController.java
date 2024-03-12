@@ -1,7 +1,7 @@
 package com.gogoring.dongoorami.concert.presentation;
 
 import com.gogoring.dongoorami.concert.application.ConcertService;
-import com.gogoring.dongoorami.concert.dto.request.ConcertReviewCreateRequest;
+import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -26,9 +26,9 @@ public class ConcertController {
 
     @PostMapping("/concerts/reviews/{concertId}")
     public ResponseEntity<Void> createConcertReview(@PathVariable Long concertId,
-            @Valid @RequestBody ConcertReviewCreateRequest concertReviewCreateRequest,
+            @Valid @RequestBody ConcertReviewRequest concertReviewRequest,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        concertService.createConcertReview(concertId, concertReviewCreateRequest,
+        concertService.createConcertReview(concertId, concertReviewRequest,
                 customUserDetails.getId());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

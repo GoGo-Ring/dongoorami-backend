@@ -1,7 +1,7 @@
 package com.gogoring.dongoorami.concert.application;
 
 import com.gogoring.dongoorami.concert.domain.Concert;
-import com.gogoring.dongoorami.concert.dto.request.ConcertReviewCreateRequest;
+import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
 import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
@@ -30,13 +30,13 @@ public class ConcertServiceImpl implements ConcertService {
     @Transactional
     @Override
     public void createConcertReview(Long concertId,
-            ConcertReviewCreateRequest concertReviewCreateRequest, Long memberId) {
+            ConcertReviewRequest concertReviewRequest, Long memberId) {
         Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(concertId).orElseThrow(
                 () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        concertReviewRepository.save(concertReviewCreateRequest.toEntity(concert, member));
+        concertReviewRepository.save(concertReviewRequest.toEntity(concert, member));
     }
 
     @Override

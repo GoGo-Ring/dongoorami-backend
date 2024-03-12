@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
-import com.gogoring.dongoorami.concert.dto.request.ConcertReviewCreateRequest;
+import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
 import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.concert.repository.ConcertReviewRepository;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
@@ -94,17 +94,17 @@ public class ConcertControllerTest {
         Concert concert = TestDataUtil.createConcert();
         concertRepository.save(concert);
 
-        ConcertReviewCreateRequest concertReviewCreateRequest = new ConcertReviewCreateRequest();
-        ReflectionTestUtils.setField(concertReviewCreateRequest, "title", "정말 재미있는 공연");
-        ReflectionTestUtils.setField(concertReviewCreateRequest, "content",
+        ConcertReviewRequest concertReviewRequest = new ConcertReviewRequest();
+        ReflectionTestUtils.setField(concertReviewRequest, "title", "정말 재미있는 공연");
+        ReflectionTestUtils.setField(concertReviewRequest, "content",
                 "돈이 아깝지 않습니다. 다들 꼭 보러가세요!");
-        ReflectionTestUtils.setField(concertReviewCreateRequest, "rating", 3);
+        ReflectionTestUtils.setField(concertReviewRequest, "rating", 3);
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 post("/api/v1/concerts/reviews/{concertId}", concert.getId()).header(
                                 "Authorization", accessToken)
-                        .content(objectMapper.writeValueAsString(concertReviewCreateRequest))
+                        .content(objectMapper.writeValueAsString(concertReviewRequest))
                         .contentType(MediaType.APPLICATION_JSON));
 
         // then
