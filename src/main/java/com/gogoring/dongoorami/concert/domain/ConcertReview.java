@@ -1,5 +1,7 @@
 package com.gogoring.dongoorami.concert.domain;
 
+import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
+import com.gogoring.dongoorami.concert.exception.ConcertReviewModifyDeniedException;
 import com.gogoring.dongoorami.global.common.BaseEntity;
 import com.gogoring.dongoorami.member.domain.Member;
 import jakarta.persistence.Column;
@@ -49,5 +51,20 @@ public class ConcertReview extends BaseEntity {
         this.title = title;
         this.content = content;
         this.rating = rating;
+    }
+
+    public void updateConcertReview(Long memberId, String title, String content, Integer rating) {
+        checkIsWriter(memberId);
+
+        this.title = title;
+        this.content = content;
+        this.rating = rating;
+    }
+
+    private void checkIsWriter(Long memberId) {
+        if (!this.member.getId().equals(memberId)) {
+            throw new ConcertReviewModifyDeniedException(
+                    ConcertErrorCode.CONCERT_REVIEW_MODIFY_DENIED);
+        }
     }
 }
