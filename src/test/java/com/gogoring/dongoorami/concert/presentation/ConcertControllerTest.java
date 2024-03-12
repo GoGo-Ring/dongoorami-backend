@@ -1,6 +1,7 @@
 package com.gogoring.dongoorami.concert.presentation;
 
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -260,6 +261,54 @@ public class ConcertControllerTest {
                                                 STRING)
                                         .description("작성 날짜")
 
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("공연 후기를 수정할 수 있다.")
+    void success_updateConcertReview() throws Exception {
+        // given
+        Member member = TestDataUtil.createLoginMemberWithNickname();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        Concert concert = TestDataUtil.createConcert();
+        concertRepository.save(concert);
+
+        ConcertReview concertReview = TestDataUtil.createConcertReviews(concert, member, 1).get(0);
+        concertReviewRepository.save(concertReview);
+
+        ConcertReviewRequest concertReviewRequest = new ConcertReviewRequest();
+        ReflectionTestUtils.setField(concertReviewRequest, "title", "테스트 제목");
+        ReflectionTestUtils.setField(concertReviewRequest, "content", "테스트 내용");
+        ReflectionTestUtils.setField(concertReviewRequest, "rating", 3);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/concerts/reviews/{concertReviewId}", concertReview.getId()).header(
+                                "Authorization", accessToken)
+                        .content(objectMapper.writeValueAsString(concertReviewRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/updateConcertReview",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("concertReviewId").description("수정할 공연 후기 아이디")
+                        ),
+                        requestFields(
+                                fieldWithPath("title").type(JsonFieldType.STRING)
+                                        .description("제목"),
+                                fieldWithPath("content").type(JsonFieldType.STRING)
+                                        .description("내용"),
+                                fieldWithPath("rating").type(JsonFieldType.NUMBER)
+                                        .description("평점(1~5)")
                         ))
                 );
     }
