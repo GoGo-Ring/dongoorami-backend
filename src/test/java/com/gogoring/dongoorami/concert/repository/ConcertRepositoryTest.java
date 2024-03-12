@@ -7,8 +7,6 @@ import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
 import com.gogoring.dongoorami.concert.exception.ConcertNotFoundException;
 import com.gogoring.dongoorami.global.config.QueryDslConfig;
 import com.gogoring.dongoorami.global.util.TestDataUtil;
-import com.gogoring.dongoorami.member.domain.Member;
-import com.gogoring.dongoorami.member.repository.MemberRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,28 +25,20 @@ public class ConcertRepositoryTest {
     @Autowired
     private ConcertRepository concertRepository;
 
-    @Autowired
-    private MemberRepository memberRepository;
-
     @BeforeEach
     void setUp() {
         concertRepository.deleteAll();
-        memberRepository.deleteAll();
     }
 
     @AfterEach
     void tearDown() {
         concertRepository.deleteAll();
-        memberRepository.deleteAll();
     }
 
     @Test
     @DisplayName("id로 공연을 조회할 수 있다.")
     void success_findByIdAndIsActivatedIsTrue() {
         // given
-        Member member = TestDataUtil.createMember();
-        memberRepository.save(member);
-
         Concert concert = TestDataUtil.createConcert();
         concertRepository.save(concert);
 
@@ -64,9 +54,6 @@ public class ConcertRepositoryTest {
     @DisplayName("kopisId로 공연 존재 여부를 확인할 수 있다.")
     void success_existsByKopisId() {
         // given
-        Member member = TestDataUtil.createMember();
-        memberRepository.save(member);
-
         Concert concert = TestDataUtil.createConcert();
         concertRepository.save(concert);
 
