@@ -85,7 +85,7 @@ public class AccompanyController {
             @Valid @RequestBody AccompanyCommentRequest accompanyCommentRequest,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         accompanyService.createAccompanyComment(accompanyPostId, accompanyCommentRequest,
-                customUserDetails.getId());
+                customUserDetails.getId(), false);
         return ResponseEntity.created(URI.create("/api/v1/accompany/posts/" + accompanyPostId))
                 .build();
     }
