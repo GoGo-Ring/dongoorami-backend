@@ -250,3 +250,12 @@ include::{snippets}/ConcertControllerTest/updateConcertReview/request-fields.ado
 
 .Response
 include::{snippets}/ConcertControllerTest/updateConcertReview/http-response.adoc[]
+
+=== 공연 후기 삭제
+
+.Request
+include::{snippets}/ConcertControllerTest/deleteConcertReview/http-request.adoc[]
+include::{snippets}/ConcertControllerTest/deleteConcertReview/path-parameters.adoc[]
+
+.Response
+include::{snippets}/ConcertControllerTest/deleteConcertReview/http-response.adoc[]
