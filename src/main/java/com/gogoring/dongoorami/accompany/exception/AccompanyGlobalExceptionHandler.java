@@ -82,4 +82,12 @@ public class AccompanyGlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
+
+    @ExceptionHandler(AccompanyApplyNotAllowedForWriterException.class)
+    public ResponseEntity<ErrorResponse> catchAccompanyApplyNotAllowedForWriterException(
+            AccompanyApplyNotAllowedForWriterException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
 }

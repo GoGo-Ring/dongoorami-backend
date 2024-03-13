@@ -12,6 +12,7 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
 import com.gogoring.dongoorami.accompany.exception.AccompanyApplyCommentModificationNotAllowedException;
+import com.gogoring.dongoorami.accompany.exception.AccompanyApplyNotAllowedForWriterException;
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
 import com.gogoring.dongoorami.accompany.exception.AccompanyPostNotFoundException;
 import com.gogoring.dongoorami.accompany.exception.DuplicatedAccompanyApplyException;
@@ -179,15 +180,20 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     @Override
     public Long createAccompanyApplyComment(Long accompanyPostId, Long currentMemberId) {
+        AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyPostId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
+        checkApplicantIsWriter(currentMemberId, accompanyPost.getMember().getId());
         checkDuplicatedAccompanyApply(accompanyPostId, currentMemberId);
         return createAccompanyComment(accompanyPostId,
                 AccompanyCommentRequest.createAccompanyApplyCommentRequest(),
                 currentMemberId, true);
     }
 
-    private void checkMemberIsWriter(Long writerId, Long memberId) {
-        if (writerId != memberId) {
-            throw new OnlyWriterCanModifyException(AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND);
+    private void checkMemberIsWriter(Long memberId, Long writerId) {
+        if (!writerId.equals(memberId)) {
+            throw new OnlyWriterCanModifyException(AccompanyErrorCode.ONLY_WRITER_CAN_MODIFY);
         }
     }
 
@@ -203,6 +209,13 @@ public class AccompanyServiceImpl implements AccompanyService {
         if (Boolean.TRUE.equals(isAccompanyApplyComment)) {
             throw new AccompanyApplyCommentModificationNotAllowedException(
                     AccompanyErrorCode.ACCOMPANY_APPLY_COMMENT_MODIFICATION_NOT_ALLOWED);
+        }
+    }
+
+    private void checkApplicantIsWriter(Long applicantId, Long writerId) {
+        if (applicantId.equals(writerId)) {
+            throw new AccompanyApplyNotAllowedForWriterException(
+                    AccompanyErrorCode.ACCOMPANY_APPLY_NOT_ALLOWED_FOR_WRITER);
         }
     }
 
