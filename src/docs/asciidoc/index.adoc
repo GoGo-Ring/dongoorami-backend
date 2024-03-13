@@ -207,6 +207,15 @@ include::{snippets}/AccompanyControllerTest/getMemberProfile/path-parameters.ado
 include::{snippets}/AccompanyControllerTest/getMemberProfile/http-response.adoc[]
 include::{snippets}/AccompanyControllerTest/getMemberProfile/response-fields.adoc[]
 
+=== 동행 신청
+
+.Request
+include::{snippets}/AccompanyControllerTest/applyAccompany/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/applyAccompany/path-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/applyAccompany/http-response.adoc[]
+
 == 공연 API
 === 공연 후기 작성
 
