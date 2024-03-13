@@ -17,7 +17,10 @@ public class AccompanyCommentRequest {
     @NotBlank(message = "content는 공백일 수 없습니다.")
     private String content;
 
-    public AccompanyComment toEntity(Member member) {
+    public static AccompanyCommentRequest createAccompanyApplyCommentRequest() {
+        return new AccompanyCommentRequest("동행 신청합니다!");
+    }
+
     public AccompanyComment toEntity(Member member, Boolean isAccompanyApplyComment) {
         return AccompanyComment.builder()
                 .member(member)

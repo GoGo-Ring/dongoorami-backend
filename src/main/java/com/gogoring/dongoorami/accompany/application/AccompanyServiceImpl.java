@@ -13,6 +13,7 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.Acc
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
 import com.gogoring.dongoorami.accompany.exception.AccompanyPostNotFoundException;
+import com.gogoring.dongoorami.accompany.exception.DuplicatedAccompanyApplyException;
 import com.gogoring.dongoorami.accompany.exception.OnlyWriterCanModifyException;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
@@ -71,8 +72,9 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
         accompanyPost.increaseViewCount();
+        Long waitingCount = accompanyCommentRepository.countByIsActivatedIsTrueAndIsAccompanyApplyCommentTrue();
 
-        return AccompanyPostResponse.of(accompanyPost,
+        return AccompanyPostResponse.of(accompanyPost, waitingCount,
                 MemberProfile.of(accompanyPost.getMember(), currentMemberId));
     }
 
@@ -172,9 +174,24 @@ public class AccompanyServiceImpl implements AccompanyService {
         accompanyComment.updateIsActivatedFalse();
     }
 
+    @Override
+    public Long createAccompanyApplyComment(Long accompanyPostId, Long currentMemberId) {
+        checkDuplicatedAccompanyApply(currentMemberId);
+        return createAccompanyComment(accompanyPostId,
+                AccompanyCommentRequest.createAccompanyApplyCommentRequest(),
+                currentMemberId, true);
+    }
+
     private void checkMemberIsWriter(Long writerId, Long memberId) {
         if (writerId != memberId) {
             throw new OnlyWriterCanModifyException(AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND);
+        }
+    }
+
+    private void checkDuplicatedAccompanyApply(Long memberId) {
+        if (accompanyCommentRepository.existsByMemberIdAndIsAccompanyApplyCommentTrue(memberId)) {
+            throw new DuplicatedAccompanyApplyException(
+                    AccompanyErrorCode.DUPLICATED_ACCOMPANY_APPLY);
         }
     }
 

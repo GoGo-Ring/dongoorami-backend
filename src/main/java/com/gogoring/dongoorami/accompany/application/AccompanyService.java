@@ -38,4 +38,6 @@ public interface AccompanyService {
             AccompanyCommentRequest accompanyCommentRequest, Long currentMemberId);
 
     void deleteAccompanyComment(Long accompanyCommentId, Long currentMemberId);
+
+    Long createAccompanyApplyComment(Long accompanyPostId, Long currentMemberId);
 }
