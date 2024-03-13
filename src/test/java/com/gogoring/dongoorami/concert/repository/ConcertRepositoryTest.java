@@ -44,7 +44,8 @@ public class ConcertRepositoryTest {
 
         // when
         Concert savedConcert = concertRepository.findByIdAndIsActivatedIsTrue(concert.getId())
-                .orElseThrow(() -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
+                .orElseThrow(
+                        () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
 
         // then
         assertThat(savedConcert.getId()).isEqualTo(concert.getId());

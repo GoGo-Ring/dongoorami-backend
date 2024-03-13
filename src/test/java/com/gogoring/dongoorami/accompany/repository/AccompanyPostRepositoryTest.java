@@ -1,5 +1,6 @@
 package com.gogoring.dongoorami.accompany.repository;
 
+import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyPosts;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;

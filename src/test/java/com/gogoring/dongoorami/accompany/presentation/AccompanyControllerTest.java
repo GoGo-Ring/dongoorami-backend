@@ -528,7 +528,9 @@ class AccompanyControllerTest {
                                         .description("댓글 id"),
                                 fieldWithPath("accompanyCommentInfos[].content").type(STRING)
                                         .description("내용"),
-                                fieldWithPath("accompanyCommentInfos[].isAccompanyApplyComment").type(BOOLEAN)
+                                fieldWithPath(
+                                        "accompanyCommentInfos[].isAccompanyApplyComment").type(
+                                                BOOLEAN)
                                         .description("동행 신청 댓글 여부"),
                                 fieldWithPath("accompanyCommentInfos[].createdAt").type(STRING)
                                         .description("생성 날짜"),
