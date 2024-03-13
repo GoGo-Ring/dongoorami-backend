@@ -72,7 +72,8 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
         accompanyPost.increaseViewCount();
-        Long waitingCount = accompanyCommentRepository.countByIsActivatedIsTrueAndIsAccompanyApplyCommentTrue();
+        Long waitingCount = accompanyCommentRepository.countByAccompanyPostIdAndIsActivatedIsTrueAndIsAccompanyApplyCommentTrue(
+                accompanyPostId);
 
         return AccompanyPostResponse.of(accompanyPost, waitingCount,
                 MemberProfile.of(accompanyPost.getMember(), currentMemberId));
@@ -176,7 +177,7 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     @Override
     public Long createAccompanyApplyComment(Long accompanyPostId, Long currentMemberId) {
-        checkDuplicatedAccompanyApply(currentMemberId);
+        checkDuplicatedAccompanyApply(accompanyPostId, currentMemberId);
         return createAccompanyComment(accompanyPostId,
                 AccompanyCommentRequest.createAccompanyApplyCommentRequest(),
                 currentMemberId, true);
@@ -188,8 +189,9 @@ public class AccompanyServiceImpl implements AccompanyService {
         }
     }
 
-    private void checkDuplicatedAccompanyApply(Long memberId) {
-        if (accompanyCommentRepository.existsByMemberIdAndIsAccompanyApplyCommentTrue(memberId)) {
+    private void checkDuplicatedAccompanyApply(Long accompanyPostId, Long memberId) {
+        if (accompanyCommentRepository.existsByAccompanyPostIdAndMemberIdAndIsAccompanyApplyCommentTrue(
+                accompanyPostId, memberId)) {
             throw new DuplicatedAccompanyApplyException(
                     AccompanyErrorCode.DUPLICATED_ACCOMPANY_APPLY);
         }
