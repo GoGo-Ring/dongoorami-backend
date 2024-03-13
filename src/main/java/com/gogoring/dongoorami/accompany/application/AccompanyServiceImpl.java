@@ -78,14 +78,16 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     @Override
     public Long createAccompanyComment(Long accompanyPostId,
-            AccompanyCommentRequest accompanyCommentRequest, Long currentMemberId) {
+            AccompanyCommentRequest accompanyCommentRequest, Long currentMemberId,
+            Boolean isAccompanyApplyComment) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        AccompanyComment accompanyComment = accompanyCommentRequest.toEntity(member);
+        AccompanyComment accompanyComment = accompanyCommentRequest.toEntity(member,
+                isAccompanyApplyComment);
         accompanyPost.addAccompanyComment(accompanyComment);
         accompanyCommentRepository.save(accompanyComment);
 

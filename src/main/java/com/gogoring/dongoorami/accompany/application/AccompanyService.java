@@ -21,7 +21,8 @@ public interface AccompanyService {
     AccompanyPostResponse getAccompanyPost(Long currentMemberId, Long accompanyPostId);
 
     Long createAccompanyComment(Long accompanyPostId,
-            AccompanyCommentRequest accompanyCommentRequest, Long currentMemberId);
+            AccompanyCommentRequest accompanyCommentRequest, Long currentMemberId,
+            Boolean isAccompanyApplyComment);
 
     AccompanyCommentsResponse getAccompanyComments(Long accompanyPostId, Long currentMemberId);
 

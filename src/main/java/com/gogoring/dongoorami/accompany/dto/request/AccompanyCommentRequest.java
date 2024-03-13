@@ -18,9 +18,11 @@ public class AccompanyCommentRequest {
     private String content;
 
     public AccompanyComment toEntity(Member member) {
+    public AccompanyComment toEntity(Member member, Boolean isAccompanyApplyComment) {
         return AccompanyComment.builder()
                 .member(member)
                 .content(content)
+                .isAccompanyApplyComment(isAccompanyApplyComment)
                 .build();
     }
 }
