@@ -1,5 +1,8 @@
 package com.gogoring.dongoorami.accompany.presentation;
 
+import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyComment;
+import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyPosts;
+import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createMockMultipartFiles;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -42,10 +45,8 @@ import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
-import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -53,7 +54,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -87,9 +87,6 @@ class AccompanyControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Value("${cloud.aws.s3.default-image-url}")
-    private String defaultImageUrl;
 
     @BeforeEach
     void setUp() {
@@ -872,82 +869,7 @@ class AccompanyControllerTest {
                 ));
     }
 
-    private List<AccompanyPost> createAccompanyPosts(Member member, int size) throws Exception {
-        List<AccompanyPost> accompanyPosts = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            accompanyPosts.add(AccompanyPost.builder()
-                    .member(member)
-                    .concertName("2024 SG워너비 콘서트 : 우리의 노래")
-                    .concertPlace("KSPO DOME")
-                    .startDate(LocalDate.of(2024, 3, 22))
-                    .endDate(LocalDate.of(2024, 3, 22))
-                    .title("서울 같이 갈 울싼 사람 구합니다~~")
-                    .gender("여")
-                    .region("수도권(경기, 인천 포함)")
-                    .content("같이 올라갈 사람 구해요~")
-                    .startAge(23L)
-                    .endAge(37L)
-                    .totalPeople(2L)
-                    .images(createImageUrls(2))
-                    .purposes(Arrays.asList(AccompanyPurposeType.ACCOMMODATION,
-                            AccompanyPurposeType.TRANSPORTATION)).build());
-        }
 
-        return accompanyPosts;
-    }
 
-    private List<AccompanyPost> createAccompanyPosts(Member member, int size,
-            AccompanyPostFilterRequest accompanyPostFilterRequest) {
-        List<AccompanyPost> accompanyPosts = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            accompanyPosts.add(AccompanyPost.builder()
-                    .member(member)
-                    .concertName("2024 SG워너비 콘서트 : 우리의 노래")
-                    .concertPlace(accompanyPostFilterRequest.getConcertPlace())
-                    .startDate(LocalDate.of(2024, 3, 22))
-                    .endDate(LocalDate.of(2024, 3, 22))
-                    .title("서울 같이 갈 울싼 사람 구합니다~~")
-                    .gender(accompanyPostFilterRequest.getGender())
-                    .region(accompanyPostFilterRequest.getRegion())
-                    .content("같이 올라갈 사람 구해요~")
-                    .startAge(accompanyPostFilterRequest.getStartAge())
-                    .endAge(accompanyPostFilterRequest.getEndAge())
-                    .totalPeople(accompanyPostFilterRequest.getTotalPeople())
-                    .purposes(accompanyPostFilterRequest.getPurposes().stream().map(
-                            AccompanyPurposeType::getValue).toList()).build());
-        }
-
-        return accompanyPosts;
-    }
-
-    private List<MockMultipartFile> createMockMultipartFiles(int size) throws Exception {
-        List<MockMultipartFile> images = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            images.add(new MockMultipartFile("images", "김영한.JPG",
-                    MediaType.MULTIPART_FORM_DATA_VALUE,
-                    new FileInputStream("src/test/resources/김영한.JPG")));
-        }
-
-        return images;
-    }
-
-    private List<String> createImageUrls(int size) {
-        List<String> imageUrls = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            imageUrls.add(defaultImageUrl);
-        }
-
-        return imageUrls;
-    }
-
-    private List<AccompanyComment> createAccompanyComment(Member member, int size) {
-        List<AccompanyComment> accompanyComments = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            accompanyComments.add(
-                    AccompanyComment.builder().member(member).content("가는 길만 동행해도 괜찮을까요!?")
-                            .build());
-        }
-
-        return accompanyComments;
     }
 }
