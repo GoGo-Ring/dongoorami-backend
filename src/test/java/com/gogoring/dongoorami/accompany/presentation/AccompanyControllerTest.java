@@ -879,15 +879,20 @@ class AccompanyControllerTest {
     @DisplayName("동행 구인 신청을 할 수 있다.")
     void applyAccompany() throws Exception {
         // given
-        Member member = ((CustomUserDetails) SecurityContextHolder
+        Member member1 = ((CustomUserDetails) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal()).getMember();
-        memberRepository.save(member);
-        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
-                member.getRoles());
+        Member member2 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjghjgdslk")
+                .build();
+        memberRepository.saveAll(Arrays.asList(member1, member2));
+        String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
+                member1.getRoles());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 1)).get(0);
+                createAccompanyPosts(member2, 1)).get(0);
 
         // when
         ResultActions resultActions = mockMvc.perform(

@@ -75,7 +75,7 @@ class AccompanyCommentRepositoryTest {
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member1, 1)).get(0);
         List<AccompanyComment> accompanyComments = new ArrayList<>();
-        accompanyComments.addAll(createAccompanyComment(member2, 3));
+        accompanyComments.addAll(createAccompanyComment(member1, 3));
         accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
                 .toEntity(member2, true));
         accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
@@ -95,25 +95,30 @@ class AccompanyCommentRepositoryTest {
     @DisplayName("특정 멤버의 동행 신청 여부를 조회할 수 있다. - 신청한 경우")
     void success_existsByMemberIdAndIsAccompanyApplyCommentTrue_given_appliedMember() {
         // given
-        Member member = Member.builder()
+        Member member1 = Member.builder()
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
                 .build();
-        memberRepository.save(member);
+        Member member2 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        memberRepository.saveAll(Arrays.asList(member1, member2));
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 1)).get(0);
+                createAccompanyPosts(member1, 1)).get(0);
         List<AccompanyComment> accompanyComments = new ArrayList<>();
-        accompanyComments.addAll(createAccompanyComment(member, 3));
+        accompanyComments.addAll(createAccompanyComment(member1, 3));
         accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
-                .toEntity(member, true));
+                .toEntity(member2, true));
         accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
         accompanyCommentRepository.saveAll(accompanyComments);
 
         // when
         boolean isAccompanyApplied = accompanyCommentRepository.existsByAccompanyPostIdAndMemberIdAndIsAccompanyApplyCommentTrue(
                 accompanyPost.getId(),
-                member.getId());
+                member2.getId());
 
         // then
         assertThat(isAccompanyApplied, equalTo(true));
@@ -123,25 +128,30 @@ class AccompanyCommentRepositoryTest {
     @DisplayName("특정 멤버의 동행 신청 여부를 조회할 수 있다. - 신청하지 않은 경우")
     void success_existsByMemberIdAndIsAccompanyApplyCommentTrue_given_notAppliedMember() {
         // given
-        Member member = Member.builder()
+        Member member1 = Member.builder()
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
                 .build();
-        memberRepository.save(member);
+        Member member2 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        memberRepository.saveAll(Arrays.asList(member1, member2));
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 1)).get(0);
+                createAccompanyPosts(member1, 1)).get(0);
         List<AccompanyComment> accompanyComments = new ArrayList<>();
-        accompanyComments.addAll(createAccompanyComment(member, 3));
+        accompanyComments.addAll(createAccompanyComment(member2, 3));
         accompanyComments.add(
-                new AccompanyCommentRequest("가는 길만 동행해도 괜찮을까요!?").toEntity(member, false));
+                new AccompanyCommentRequest("가는 길만 동행해도 괜찮을까요!?").toEntity(member2, false));
         accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
         accompanyCommentRepository.saveAll(accompanyComments);
 
         // when
         boolean isAccompanyApplied = accompanyCommentRepository.existsByAccompanyPostIdAndMemberIdAndIsAccompanyApplyCommentTrue(
                 accompanyPost.getId(),
-                member.getId());
+                member2.getId());
 
         // then
         assertThat(isAccompanyApplied, equalTo(false));
