@@ -12,7 +12,7 @@ public enum AccompanyErrorCode {
     INVALID_REGION_TYPE("유효하지 않은 지역입니다."),
     INVALID_AGE_RANGE("시작 나이는 종료 나이보다 작거나 같아야 합니다."),
     INCOMPLETE_AGE("시작 나이와 종료 나이 값은 함께 필요로 합니다."),
-    ACCOMPANY_POST_COMMENT_NOT_FOUND("게시글에 대한 댓글이 존재하지 않습니다.");
-
+    ACCOMPANY_POST_COMMENT_NOT_FOUND("게시글에 대한 댓글이 존재하지 않습니다."),
+    DUPLICATED_ACCOMPANY_APPLY("이미 신청한 동행 구인글입니다.");
     private final String message;
 }
