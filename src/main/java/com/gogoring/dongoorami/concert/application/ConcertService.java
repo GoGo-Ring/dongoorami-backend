@@ -13,4 +13,6 @@ public interface ConcertService {
 
     void updateConcertReview(Long concertReviewId, ConcertReviewRequest concertReviewRequest,
             Long memberId);
+
+    void deleteConcertReview(Long concertReviewId, Long memberId);
 }

@@ -73,4 +73,16 @@ public class ConcertServiceImpl implements ConcertService {
         concertReview.updateConcertReview(member.getId(), concertReviewRequest.getTitle(),
                 concertReviewRequest.getContent(), concertReviewRequest.getRating());
     }
+
+    @Transactional
+    @Override
+    public void deleteConcertReview(Long concertReviewId, Long memberId) {
+        ConcertReview concertReview = concertReviewRepository.findByIdAndIsActivatedIsTrue(
+                concertReviewId).orElseThrow(() -> new ConcertReviewNotFoundException(
+                ConcertErrorCode.CONCERT_REVIEW_NOT_FOUND));
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        concertReview.updateIsActivatedFalse(member.getId());
+    }
 }

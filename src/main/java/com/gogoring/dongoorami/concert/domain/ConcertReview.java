@@ -61,6 +61,12 @@ public class ConcertReview extends BaseEntity {
         this.rating = rating;
     }
 
+    public void updateIsActivatedFalse(Long memberId) {
+        checkIsWriter(memberId);
+
+        updateIsActivatedFalse();
+    }
+
     private void checkIsWriter(Long memberId) {
         if (!this.member.getId().equals(memberId)) {
             throw new ConcertReviewModifyDeniedException(
