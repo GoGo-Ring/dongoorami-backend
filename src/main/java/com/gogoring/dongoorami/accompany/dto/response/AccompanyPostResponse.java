@@ -38,7 +38,7 @@ public class AccompanyPostResponse {
     private Boolean isWriter;
     private List<String> purposes;
 
-    public static AccompanyPostResponse of(AccompanyPost accompanyPost,
+    public static AccompanyPostResponse of(AccompanyPost accompanyPost, Long waitingCount,
             MemberProfile memberProfile) {
         return AccompanyPostResponse.builder()
                 .id(accompanyPost.getId())
@@ -58,7 +58,7 @@ public class AccompanyPostResponse {
                 .endAge(accompanyPost.getEndAge())
                 .startDate(accompanyPost.getStartDate())
                 .endDate(accompanyPost.getEndDate())
-                .waitingCount(0L) // 임시
+                .waitingCount(waitingCount)
                 .content(accompanyPost.getContent())
                 .images(accompanyPost.getImages())
                 .isWish(true) // 임시
