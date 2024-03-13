@@ -528,6 +528,8 @@ class AccompanyControllerTest {
                                         .description("댓글 id"),
                                 fieldWithPath("accompanyCommentInfos[].content").type(STRING)
                                         .description("내용"),
+                                fieldWithPath("accompanyCommentInfos[].isAccompanyApplyComment").type(BOOLEAN)
+                                        .description("동행 신청 댓글 여부"),
                                 fieldWithPath("accompanyCommentInfos[].createdAt").type(STRING)
                                         .description("생성 날짜"),
                                 fieldWithPath("accompanyCommentInfos[].updatedAt").type(STRING)
@@ -535,7 +537,8 @@ class AccompanyControllerTest {
                                 fieldWithPath("accompanyCommentInfos[].memberProfile.id").type(
                                                 NUMBER)
                                         .description("작성자 id"),
-                                fieldWithPath("accompanyCommentInfos[].memberProfile.nickname").type(
+                                fieldWithPath(
+                                        "accompanyCommentInfos[].memberProfile.nickname").type(
                                         STRING).description("작성자 닉네임"),
                                 fieldWithPath(
                                         "accompanyCommentInfos[].memberProfile.profileImage").type(

@@ -21,6 +21,7 @@ public class AccompanyCommentsResponse {
         private Long id;
         private MemberProfile memberProfile;
         private String content;
+        private Boolean isAccompanyApplyComment;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 
@@ -30,6 +31,7 @@ public class AccompanyCommentsResponse {
                     .id(accompanyComment.getId())
                     .memberProfile(MemberProfile.of(accompanyComment.getMember(), currentMemberId))
                     .content(accompanyComment.getContent())
+                    .isAccompanyApplyComment(accompanyComment.getIsAccompanyApplyComment())
                     .createdAt(accompanyComment.getCreatedAt())
                     .updatedAt(accompanyComment.getUpdatedAt())
                     .build();
