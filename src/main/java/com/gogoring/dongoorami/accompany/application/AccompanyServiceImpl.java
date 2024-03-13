@@ -11,6 +11,7 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
+import com.gogoring.dongoorami.accompany.exception.AccompanyApplyCommentModificationNotAllowedException;
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
 import com.gogoring.dongoorami.accompany.exception.AccompanyPostNotFoundException;
 import com.gogoring.dongoorami.accompany.exception.DuplicatedAccompanyApplyException;
@@ -161,6 +162,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_COMMENT_NOT_FOUND));
         checkMemberIsWriter(accompanyComment.getMember().getId(), currentMemberId);
+        checkIsAccompanyApplyComment(accompanyComment.getIsAccompanyApplyComment());
         accompanyComment.updateContent(accompanyCommentRequest.getContent());
     }
 
@@ -194,6 +196,13 @@ public class AccompanyServiceImpl implements AccompanyService {
                 accompanyPostId, memberId)) {
             throw new DuplicatedAccompanyApplyException(
                     AccompanyErrorCode.DUPLICATED_ACCOMPANY_APPLY);
+        }
+    }
+
+    private void checkIsAccompanyApplyComment(Boolean isAccompanyApplyComment) {
+        if (Boolean.TRUE.equals(isAccompanyApplyComment)) {
+            throw new AccompanyApplyCommentModificationNotAllowedException(
+                    AccompanyErrorCode.ACCOMPANY_APPLY_COMMENT_MODIFICATION_NOT_ALLOWED);
         }
     }
 

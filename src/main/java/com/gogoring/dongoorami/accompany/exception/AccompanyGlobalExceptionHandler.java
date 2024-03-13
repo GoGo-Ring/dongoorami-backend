@@ -74,4 +74,12 @@ public class AccompanyGlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
+
+    @ExceptionHandler(AccompanyApplyCommentModificationNotAllowedException.class)
+    public ResponseEntity<ErrorResponse> catchAccompanyApplyCommentModificationNotAllowedException(
+            AccompanyApplyCommentModificationNotAllowedException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
 }
