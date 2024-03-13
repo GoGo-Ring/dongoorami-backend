@@ -869,7 +869,35 @@ class AccompanyControllerTest {
                 ));
     }
 
+    @Test
+    @WithCustomMockUser
+    @DisplayName("동행 구인 신청을 할 수 있다.")
+    void applyAccompany() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 1)).get(0);
 
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                post("/api/v1/accompanies/{accompanyPostId}", accompanyPost.getId())
+                        .header("Authorization", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
 
+        // then
+        resultActions.andExpect(status().isCreated())
+                .andDo(document("{ClassName}/applyAccompany",
+                        preprocessRequest(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                        )
+                ));
     }
 }
