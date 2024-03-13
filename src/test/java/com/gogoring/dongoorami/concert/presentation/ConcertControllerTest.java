@@ -1,5 +1,6 @@
 package com.gogoring.dongoorami.concert.presentation;
 
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
@@ -309,6 +310,39 @@ public class ConcertControllerTest {
                                         .description("내용"),
                                 fieldWithPath("rating").type(JsonFieldType.NUMBER)
                                         .description("평점(1~5)")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("공연 후기를 삭제할 수 있다.")
+    void success_deleteConcertReview() throws Exception {
+        // given
+        Member member = TestDataUtil.createLoginMemberWithNickname();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        Concert concert = TestDataUtil.createConcert();
+        concertRepository.save(concert);
+
+        ConcertReview concertReview = TestDataUtil.createConcertReviews(concert, member, 1).get(0);
+        concertReviewRepository.save(concertReview);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/v1/concerts/reviews/{concertReviewId}", concertReview.getId()).header(
+                                "Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/deleteConcertReview",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("concertReviewId").description("삭제할 공연 후기 아이디")
                         ))
                 );
     }
