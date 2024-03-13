@@ -152,4 +152,14 @@ public class AccompanyController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{accompanyPostId}")
+    public ResponseEntity<Void> applyAccompany(
+            @PathVariable Long accompanyPostId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        accompanyService.createAccompanyApplyComment(accompanyPostId,
+                customUserDetails.getId());
+        return ResponseEntity.created(URI.create("/api/v1/accompany/posts/" + accompanyPostId))
+                .build();
+    }
+
 }
