@@ -2,11 +2,11 @@ package com.gogoring.dongoorami.concert.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.gogoring.dongoorami.concert.ConcertDataFactory;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
 import com.gogoring.dongoorami.concert.exception.ConcertNotFoundException;
 import com.gogoring.dongoorami.global.config.QueryDslConfig;
-import com.gogoring.dongoorami.global.util.TestDataUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +39,7 @@ public class ConcertRepositoryTest {
     @DisplayName("id로 공연을 조회할 수 있다.")
     void success_findByIdAndIsActivatedIsTrue() {
         // given
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
         // when
@@ -55,7 +55,7 @@ public class ConcertRepositoryTest {
     @DisplayName("kopisId로 공연 존재 여부를 확인할 수 있다.")
     void success_existsByKopisId() {
         // given
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
         // when

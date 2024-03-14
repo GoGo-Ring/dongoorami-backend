@@ -21,6 +21,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.queryPar
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gogoring.dongoorami.concert.ConcertDataFactory;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
@@ -28,7 +29,7 @@ import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.concert.repository.ConcertReviewRepository;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
-import com.gogoring.dongoorami.global.util.TestDataUtil;
+import com.gogoring.dongoorami.member.MemberDataFactory;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.util.List;
@@ -88,12 +89,12 @@ public class ConcertControllerTest {
     @DisplayName("공연 후기를 생성할 수 있다.")
     void success_createConcertReview() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMember();
+        Member member = MemberDataFactory.createLoginMember();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
 
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
         ConcertReviewRequest concertReviewRequest = new ConcertReviewRequest();
@@ -133,16 +134,17 @@ public class ConcertControllerTest {
     @DisplayName("공연 후기 목록을 조회할 수 있다. - 최초 요청")
     void success_getConcertReviewsFirst() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMemberWithNickname();
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
 
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
         int size = 3;
-        List<ConcertReview> concertReviews = TestDataUtil.createConcertReviews(concert, member,
+        List<ConcertReview> concertReviews = ConcertDataFactory.createConcertReviews(concert,
+                member,
                 size);
         concertReviewRepository.saveAll(concertReviews);
 
@@ -199,16 +201,17 @@ public class ConcertControllerTest {
     @DisplayName("공연 후기 목록을 조회할 수 있다. - 이후 요청")
     void getConcertReviewsAfterFirst() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMemberWithNickname();
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
 
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
         int size = 3;
-        List<ConcertReview> concertReviews = TestDataUtil.createConcertReviews(concert, member,
+        List<ConcertReview> concertReviews = ConcertDataFactory.createConcertReviews(concert,
+                member,
                 size);
         concertReviewRepository.saveAll(concertReviews);
         long maxId = -1L;
@@ -271,15 +274,16 @@ public class ConcertControllerTest {
     @DisplayName("공연 후기를 수정할 수 있다.")
     void success_updateConcertReview() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMemberWithNickname();
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
 
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
-        ConcertReview concertReview = TestDataUtil.createConcertReviews(concert, member, 1).get(0);
+        ConcertReview concertReview = ConcertDataFactory.createConcertReviews(concert, member, 1)
+                .get(0);
         concertReviewRepository.save(concertReview);
 
         ConcertReviewRequest concertReviewRequest = new ConcertReviewRequest();
@@ -319,15 +323,16 @@ public class ConcertControllerTest {
     @DisplayName("공연 후기를 삭제할 수 있다.")
     void success_deleteConcertReview() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMemberWithNickname();
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
 
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
-        ConcertReview concertReview = TestDataUtil.createConcertReviews(concert, member, 1).get(0);
+        ConcertReview concertReview = ConcertDataFactory.createConcertReviews(concert, member, 1)
+                .get(0);
         concertReviewRepository.save(concertReview);
 
         // when

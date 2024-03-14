@@ -2,12 +2,13 @@ package com.gogoring.dongoorami.concert.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.gogoring.dongoorami.concert.ConcertDataFactory;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
 import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
 import com.gogoring.dongoorami.concert.exception.ConcertReviewNotFoundException;
 import com.gogoring.dongoorami.global.config.QueryDslConfig;
-import com.gogoring.dongoorami.global.util.TestDataUtil;
+import com.gogoring.dongoorami.member.MemberDataFactory;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.util.List;
@@ -55,14 +56,15 @@ public class ConcertReviewRepositoryTest {
     @DisplayName("id 내림차순으로 특정 공연의 후기를 페이징 조회할 수 있다.")
     void success_findAllByConcertAndIsActivatedIsTrueOrderByIdDesc() {
         // given
-        Member member = TestDataUtil.createMember();
+        Member member = MemberDataFactory.createMember();
         memberRepository.save(member);
 
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
         int size = 10;
-        List<ConcertReview> concertReviews = TestDataUtil.createConcertReviews(concert, member,
+        List<ConcertReview> concertReviews = ConcertDataFactory.createConcertReviews(concert,
+                member,
                 size + 5);
         concertReviewRepository.saveAll(concertReviews);
 
@@ -85,14 +87,15 @@ public class ConcertReviewRepositoryTest {
     @DisplayName("id 내림차순으로 특정 id 값 이하의 특정 공연의 후기를 페이징 조회할 수 있다.")
     void success_findAllByIdLessThanAndConcertAndIsActivatedIsTrueOrderByIdDesc() {
         // given
-        Member member = TestDataUtil.createMember();
+        Member member = MemberDataFactory.createMember();
         memberRepository.save(member);
 
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
         int size = 10;
-        List<ConcertReview> concertReviews = TestDataUtil.createConcertReviews(concert, member,
+        List<ConcertReview> concertReviews = ConcertDataFactory.createConcertReviews(concert,
+                member,
                 size + 5);
         concertReviewRepository.saveAll(concertReviews);
 
@@ -117,13 +120,14 @@ public class ConcertReviewRepositoryTest {
     @DisplayName("id로 공연 후기를 조회할 수 있다.")
     void success_findByIdAndIsActivatedIsTrue() {
         // given
-        Member member = TestDataUtil.createMember();
+        Member member = MemberDataFactory.createMember();
         memberRepository.save(member);
 
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
-        ConcertReview concertReview = TestDataUtil.createConcertReviews(concert, member, 1).get(0);
+        ConcertReview concertReview = ConcertDataFactory.createConcertReviews(concert, member, 1)
+                .get(0);
         concertReviewRepository.save(concertReview);
 
         // when
