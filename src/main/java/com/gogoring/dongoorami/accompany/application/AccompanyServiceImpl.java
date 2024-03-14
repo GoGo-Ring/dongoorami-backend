@@ -11,7 +11,7 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
-import com.gogoring.dongoorami.accompany.exception.AccompanyApplyCommentModificationNotAllowedException;
+import com.gogoring.dongoorami.accompany.exception.AccompanyApplyCommentModifyDeniedException;
 import com.gogoring.dongoorami.accompany.exception.AccompanyApplyNotAllowedForWriterException;
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
 import com.gogoring.dongoorami.accompany.exception.AccompanyPostNotFoundException;
@@ -207,8 +207,8 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     private void checkIsAccompanyApplyComment(Boolean isAccompanyApplyComment) {
         if (Boolean.TRUE.equals(isAccompanyApplyComment)) {
-            throw new AccompanyApplyCommentModificationNotAllowedException(
-                    AccompanyErrorCode.ACCOMPANY_APPLY_COMMENT_MODIFICATION_NOT_ALLOWED);
+            throw new AccompanyApplyCommentModifyDeniedException(
+                    AccompanyErrorCode.ACCOMPANY_APPLY_COMMENT_MODIFY_DENIED);
         }
     }
 

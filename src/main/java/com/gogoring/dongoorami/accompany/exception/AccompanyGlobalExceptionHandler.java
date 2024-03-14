@@ -75,11 +75,11 @@ public class AccompanyGlobalExceptionHandler {
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
 
-    @ExceptionHandler(AccompanyApplyCommentModificationNotAllowedException.class)
-    public ResponseEntity<ErrorResponse> catchAccompanyApplyCommentModificationNotAllowedException(
-            AccompanyApplyCommentModificationNotAllowedException e) {
+    @ExceptionHandler(AccompanyApplyCommentModifyDeniedException.class)
+    public ResponseEntity<ErrorResponse> catchAccompanyApplyCommentModifyDeniedException(
+            AccompanyApplyCommentModifyDeniedException e) {
         log.error(e.getMessage(), e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
 

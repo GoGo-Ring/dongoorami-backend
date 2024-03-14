@@ -14,7 +14,7 @@ public enum AccompanyErrorCode {
     INCOMPLETE_AGE("시작 나이와 종료 나이 값은 함께 필요로 합니다."),
     ACCOMPANY_POST_COMMENT_NOT_FOUND("게시글에 대한 댓글이 존재하지 않습니다."),
     DUPLICATED_ACCOMPANY_APPLY("이미 신청한 동행 구인글입니다."),
-    ACCOMPANY_APPLY_COMMENT_MODIFICATION_NOT_ALLOWED("동행 신청 댓글은 수정이 불가능 합니다."),
+    ACCOMPANY_APPLY_COMMENT_MODIFY_DENIED("동행 신청 댓글은 수정이 불가능 합니다."),
     ACCOMPANY_APPLY_NOT_ALLOWED_FOR_WRITER("작성자는 동행 신청이 불가능 합니다.");
     private final String message;
 }
