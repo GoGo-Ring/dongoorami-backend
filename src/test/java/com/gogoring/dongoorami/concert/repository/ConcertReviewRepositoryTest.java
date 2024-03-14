@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
+import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
+import com.gogoring.dongoorami.concert.exception.ConcertReviewNotFoundException;
 import com.gogoring.dongoorami.global.config.QueryDslConfig;
 import com.gogoring.dongoorami.global.util.TestDataUtil;
 import com.gogoring.dongoorami.member.domain.Member;
@@ -109,5 +111,27 @@ public class ConcertReviewRepositoryTest {
         assertThat(slice.getSize()).isEqualTo(size);
         assertThat(slice.getContent().stream().map(ConcertReview::getId)
                 .toList()).doesNotContain(minId, maxId);
+    }
+
+    @Test
+    @DisplayName("id로 공연 후기를 조회할 수 있다.")
+    void success_findByIdAndIsActivatedIsTrue() {
+        // given
+        Member member = TestDataUtil.createMember();
+        memberRepository.save(member);
+
+        Concert concert = TestDataUtil.createConcert();
+        concertRepository.save(concert);
+
+        ConcertReview concertReview = TestDataUtil.createConcertReviews(concert, member, 1).get(0);
+        concertReviewRepository.save(concertReview);
+
+        // when
+        ConcertReview savedConcertReview = concertReviewRepository.findByIdAndIsActivatedIsTrue(
+                concertReview.getId()).orElseThrow(() -> new ConcertReviewNotFoundException(
+                ConcertErrorCode.CONCERT_REVIEW_NOT_FOUND));
+
+        // then
+        assertThat(savedConcertReview.getId()).isEqualTo(concertReview.getId());
     }
 }

@@ -17,4 +17,20 @@ public class ConcertGlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
+
+    @ExceptionHandler(ConcertReviewNotFoundException.class)
+    public ResponseEntity<ErrorResponse> catchConcertReviewNotFoundException(
+            ConcertReviewNotFoundException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(ConcertReviewModifyDeniedException.class)
+    public ResponseEntity<ErrorResponse> catchConcertReviewModifyDeniedException(
+            ConcertReviewModifyDeniedException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
 }

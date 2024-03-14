@@ -9,7 +9,7 @@ import lombok.Getter;
 import org.hibernate.validator.constraints.Range;
 
 @Getter
-public class ConcertReviewCreateRequest {
+public class ConcertReviewRequest {
 
     @NotBlank(message = "제목은 공백일 수 없습니다.")
     private String title;
