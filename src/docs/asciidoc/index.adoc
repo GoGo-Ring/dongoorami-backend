@@ -268,3 +268,13 @@ include::{snippets}/ConcertControllerTest/deleteConcertReview/path-parameters.ad
 
 .Response
 include::{snippets}/ConcertControllerTest/deleteConcertReview/http-response.adoc[]
+
+=== 공연 단건 조회
+
+.Request
+include::{snippets}/ConcertControllerTest/getConcert/http-request.adoc[]
+include::{snippets}/ConcertControllerTest/getConcert/path-parameters.adoc[]
+
+.Response
+include::{snippets}/ConcertControllerTest/getConcert/http-response.adoc[]
+include::{snippets}/ConcertControllerTest/getConcert/response-fields.adoc[]
