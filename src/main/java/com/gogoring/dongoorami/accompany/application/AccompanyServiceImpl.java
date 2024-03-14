@@ -18,6 +18,10 @@ import com.gogoring.dongoorami.accompany.exception.AccompanyPostNotFoundExceptio
 import com.gogoring.dongoorami.accompany.exception.DuplicatedAccompanyApplyException;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
+import com.gogoring.dongoorami.concert.domain.Concert;
+import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
+import com.gogoring.dongoorami.concert.exception.ConcertNotFoundException;
+import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.global.util.ImageType;
 import com.gogoring.dongoorami.global.util.S3ImageUtil;
 import com.gogoring.dongoorami.member.domain.Member;
