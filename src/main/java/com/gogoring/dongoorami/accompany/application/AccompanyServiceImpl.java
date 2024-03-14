@@ -11,8 +11,11 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
+import com.gogoring.dongoorami.accompany.exception.AccompanyApplyCommentModificationNotAllowedException;
+import com.gogoring.dongoorami.accompany.exception.AccompanyApplyNotAllowedForWriterException;
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
 import com.gogoring.dongoorami.accompany.exception.AccompanyPostNotFoundException;
+import com.gogoring.dongoorami.accompany.exception.DuplicatedAccompanyApplyException;
 import com.gogoring.dongoorami.accompany.exception.OnlyWriterCanModifyException;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
@@ -71,21 +74,25 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
         accompanyPost.increaseViewCount();
+        Long waitingCount = accompanyCommentRepository.countByAccompanyPostIdAndIsActivatedIsTrueAndIsAccompanyApplyCommentTrue(
+                accompanyPostId);
 
-        return AccompanyPostResponse.of(accompanyPost,
+        return AccompanyPostResponse.of(accompanyPost, waitingCount,
                 MemberProfile.of(accompanyPost.getMember(), currentMemberId));
     }
 
     @Override
     public Long createAccompanyComment(Long accompanyPostId,
-            AccompanyCommentRequest accompanyCommentRequest, Long currentMemberId) {
+            AccompanyCommentRequest accompanyCommentRequest, Long currentMemberId,
+            Boolean isAccompanyApplyComment) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        AccompanyComment accompanyComment = accompanyCommentRequest.toEntity(member);
+        AccompanyComment accompanyComment = accompanyCommentRequest.toEntity(member,
+                isAccompanyApplyComment);
         accompanyPost.addAccompanyComment(accompanyComment);
         accompanyCommentRepository.save(accompanyComment);
 
@@ -156,6 +163,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_COMMENT_NOT_FOUND));
         checkMemberIsWriter(accompanyComment.getMember().getId(), currentMemberId);
+        checkIsAccompanyApplyComment(accompanyComment.getIsAccompanyApplyComment());
         accompanyComment.updateContent(accompanyCommentRequest.getContent());
     }
 
@@ -170,9 +178,44 @@ public class AccompanyServiceImpl implements AccompanyService {
         accompanyComment.updateIsActivatedFalse();
     }
 
-    private void checkMemberIsWriter(Long writerId, Long memberId) {
-        if (writerId != memberId) {
-            throw new OnlyWriterCanModifyException(AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND);
+    @Override
+    public Long createAccompanyApplyComment(Long accompanyPostId, Long currentMemberId) {
+        AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyPostId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
+        checkApplicantIsWriter(currentMemberId, accompanyPost.getMember().getId());
+        checkDuplicatedAccompanyApply(accompanyPostId, currentMemberId);
+        return createAccompanyComment(accompanyPostId,
+                AccompanyCommentRequest.createAccompanyApplyCommentRequest(),
+                currentMemberId, true);
+    }
+
+    private void checkMemberIsWriter(Long memberId, Long writerId) {
+        if (!writerId.equals(memberId)) {
+            throw new OnlyWriterCanModifyException(AccompanyErrorCode.ONLY_WRITER_CAN_MODIFY);
+        }
+    }
+
+    private void checkDuplicatedAccompanyApply(Long accompanyPostId, Long memberId) {
+        if (accompanyCommentRepository.existsByAccompanyPostIdAndMemberIdAndIsAccompanyApplyCommentTrue(
+                accompanyPostId, memberId)) {
+            throw new DuplicatedAccompanyApplyException(
+                    AccompanyErrorCode.DUPLICATED_ACCOMPANY_APPLY);
+        }
+    }
+
+    private void checkIsAccompanyApplyComment(Boolean isAccompanyApplyComment) {
+        if (Boolean.TRUE.equals(isAccompanyApplyComment)) {
+            throw new AccompanyApplyCommentModificationNotAllowedException(
+                    AccompanyErrorCode.ACCOMPANY_APPLY_COMMENT_MODIFICATION_NOT_ALLOWED);
+        }
+    }
+
+    private void checkApplicantIsWriter(Long applicantId, Long writerId) {
+        if (applicantId.equals(writerId)) {
+            throw new AccompanyApplyNotAllowedForWriterException(
+                    AccompanyErrorCode.ACCOMPANY_APPLY_NOT_ALLOWED_FOR_WRITER);
         }
     }
 

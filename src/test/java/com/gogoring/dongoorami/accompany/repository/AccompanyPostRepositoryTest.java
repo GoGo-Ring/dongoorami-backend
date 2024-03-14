@@ -1,5 +1,6 @@
 package com.gogoring.dongoorami.accompany.repository;
 
+import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyPosts;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
@@ -11,8 +12,6 @@ import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.global.config.QueryDslConfig;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -246,53 +245,6 @@ class AccompanyPostRepositoryTest {
                         .map(accompanyPost -> isAccompanyPostEqualsAccompanyPostFilterRequest(
                                 accompanyPost, accompanyPostFilterRequest3))
                         .toList(), everyItem(equalTo(true)));
-    }
-
-    private List<AccompanyPost> createAccompanyPosts(Member member, int size) {
-        List<AccompanyPost> accompanyPosts = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            accompanyPosts.add(AccompanyPost.builder()
-                    .member(member)
-                    .concertName("2024 SG워너비 콘서트 : 우리의 노래")
-                    .concertPlace("KSPO DOME")
-                    .startDate(LocalDate.of(2024, 3, 22))
-                    .endDate(LocalDate.of(2024, 3, 22))
-                    .title("서울 같이 갈 울싼 사람 구합니다~~")
-                    .gender("여")
-                    .region("수도권(경기, 인천 포함)")
-                    .content("같이 올라갈 사람 구해요~")
-                    .startAge(23L)
-                    .endAge(37L)
-                    .totalPeople(2L)
-                    .purposes(Arrays.asList(AccompanyPurposeType.ACCOMMODATION,
-                            AccompanyPurposeType.TRANSPORTATION)).build());
-        }
-
-        return accompanyPosts;
-    }
-
-    private List<AccompanyPost> createAccompanyPosts(Member member, int size,
-            AccompanyPostFilterRequest accompanyPostFilterRequest) {
-        List<AccompanyPost> accompanyPosts = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            accompanyPosts.add(AccompanyPost.builder()
-                    .member(member)
-                    .concertName("2024 SG워너비 콘서트 : 우리의 노래")
-                    .concertPlace(accompanyPostFilterRequest.getConcertPlace())
-                    .startDate(LocalDate.of(2024, 3, 22))
-                    .endDate(LocalDate.of(2024, 3, 22))
-                    .title("서울 같이 갈 울싼 사람 구합니다~~")
-                    .gender(accompanyPostFilterRequest.getGender())
-                    .region(accompanyPostFilterRequest.getRegion())
-                    .content("같이 올라갈 사람 구해요~")
-                    .startAge(accompanyPostFilterRequest.getStartAge())
-                    .endAge(accompanyPostFilterRequest.getEndAge())
-                    .totalPeople(accompanyPostFilterRequest.getTotalPeople())
-                    .purposes(accompanyPostFilterRequest.getPurposes().stream().map(
-                            AccompanyPurposeType::getValue).toList()).build());
-        }
-
-        return accompanyPosts;
     }
 
     private boolean isAccompanyPostEqualsAccompanyPostFilterRequest(AccompanyPost accompanyPost,

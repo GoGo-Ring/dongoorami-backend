@@ -1,5 +1,8 @@
 package com.gogoring.dongoorami.accompany.presentation;
 
+import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyComment;
+import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyPosts;
+import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createMockMultipartFiles;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -42,10 +45,8 @@ import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
-import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -53,7 +54,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -87,9 +87,6 @@ class AccompanyControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Value("${cloud.aws.s3.default-image-url}")
-    private String defaultImageUrl;
 
     @BeforeEach
     void setUp() {
@@ -531,6 +528,10 @@ class AccompanyControllerTest {
                                         .description("댓글 id"),
                                 fieldWithPath("accompanyCommentInfos[].content").type(STRING)
                                         .description("내용"),
+                                fieldWithPath(
+                                        "accompanyCommentInfos[].isAccompanyApplyComment").type(
+                                                BOOLEAN)
+                                        .description("동행 신청 댓글 여부"),
                                 fieldWithPath("accompanyCommentInfos[].createdAt").type(STRING)
                                         .description("생성 날짜"),
                                 fieldWithPath("accompanyCommentInfos[].updatedAt").type(STRING)
@@ -538,7 +539,8 @@ class AccompanyControllerTest {
                                 fieldWithPath("accompanyCommentInfos[].memberProfile.id").type(
                                                 NUMBER)
                                         .description("작성자 id"),
-                                fieldWithPath("accompanyCommentInfos[].memberProfile.nickname").type(
+                                fieldWithPath(
+                                        "accompanyCommentInfos[].memberProfile.nickname").type(
                                         STRING).description("작성자 닉네임"),
                                 fieldWithPath(
                                         "accompanyCommentInfos[].memberProfile.profileImage").type(
@@ -872,82 +874,40 @@ class AccompanyControllerTest {
                 ));
     }
 
-    private List<AccompanyPost> createAccompanyPosts(Member member, int size) throws Exception {
-        List<AccompanyPost> accompanyPosts = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            accompanyPosts.add(AccompanyPost.builder()
-                    .member(member)
-                    .concertName("2024 SG워너비 콘서트 : 우리의 노래")
-                    .concertPlace("KSPO DOME")
-                    .startDate(LocalDate.of(2024, 3, 22))
-                    .endDate(LocalDate.of(2024, 3, 22))
-                    .title("서울 같이 갈 울싼 사람 구합니다~~")
-                    .gender("여")
-                    .region("수도권(경기, 인천 포함)")
-                    .content("같이 올라갈 사람 구해요~")
-                    .startAge(23L)
-                    .endAge(37L)
-                    .totalPeople(2L)
-                    .images(createImageUrls(2))
-                    .purposes(Arrays.asList(AccompanyPurposeType.ACCOMMODATION,
-                            AccompanyPurposeType.TRANSPORTATION)).build());
-        }
+    @Test
+    @WithCustomMockUser
+    @DisplayName("동행 구인 신청을 할 수 있다.")
+    void applyAccompany() throws Exception {
+        // given
+        Member member1 = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        Member member2 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjghjgdslk")
+                .build();
+        memberRepository.saveAll(Arrays.asList(member1, member2));
+        String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
+                member1.getRoles());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member2, 1)).get(0);
 
-        return accompanyPosts;
-    }
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                post("/api/v1/accompanies/{accompanyPostId}", accompanyPost.getId())
+                        .header("Authorization", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
 
-    private List<AccompanyPost> createAccompanyPosts(Member member, int size,
-            AccompanyPostFilterRequest accompanyPostFilterRequest) {
-        List<AccompanyPost> accompanyPosts = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            accompanyPosts.add(AccompanyPost.builder()
-                    .member(member)
-                    .concertName("2024 SG워너비 콘서트 : 우리의 노래")
-                    .concertPlace(accompanyPostFilterRequest.getConcertPlace())
-                    .startDate(LocalDate.of(2024, 3, 22))
-                    .endDate(LocalDate.of(2024, 3, 22))
-                    .title("서울 같이 갈 울싼 사람 구합니다~~")
-                    .gender(accompanyPostFilterRequest.getGender())
-                    .region(accompanyPostFilterRequest.getRegion())
-                    .content("같이 올라갈 사람 구해요~")
-                    .startAge(accompanyPostFilterRequest.getStartAge())
-                    .endAge(accompanyPostFilterRequest.getEndAge())
-                    .totalPeople(accompanyPostFilterRequest.getTotalPeople())
-                    .purposes(accompanyPostFilterRequest.getPurposes().stream().map(
-                            AccompanyPurposeType::getValue).toList()).build());
-        }
-
-        return accompanyPosts;
-    }
-
-    private List<MockMultipartFile> createMockMultipartFiles(int size) throws Exception {
-        List<MockMultipartFile> images = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            images.add(new MockMultipartFile("images", "김영한.JPG",
-                    MediaType.MULTIPART_FORM_DATA_VALUE,
-                    new FileInputStream("src/test/resources/김영한.JPG")));
-        }
-
-        return images;
-    }
-
-    private List<String> createImageUrls(int size) {
-        List<String> imageUrls = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            imageUrls.add(defaultImageUrl);
-        }
-
-        return imageUrls;
-    }
-
-    private List<AccompanyComment> createAccompanyComment(Member member, int size) {
-        List<AccompanyComment> accompanyComments = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            accompanyComments.add(
-                    AccompanyComment.builder().member(member).content("가는 길만 동행해도 괜찮을까요!?")
-                            .build());
-        }
-
-        return accompanyComments;
+        // then
+        resultActions.andExpect(status().isCreated())
+                .andDo(document("{ClassName}/applyAccompany",
+                        preprocessRequest(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                        )
+                ));
     }
 }

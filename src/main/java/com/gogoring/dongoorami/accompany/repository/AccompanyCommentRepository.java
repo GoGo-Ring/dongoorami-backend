@@ -7,4 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AccompanyCommentRepository extends JpaRepository<AccompanyComment, Long> {
 
     Optional<AccompanyComment> findByIdAndIsActivatedIsTrue(Long id);
+
+    Long countByAccompanyPostIdAndIsActivatedIsTrueAndIsAccompanyApplyCommentTrue(
+            Long accompanyPostId);
+
+    boolean existsByAccompanyPostIdAndMemberIdAndIsAccompanyApplyCommentTrue(Long accompanyPostId,
+            Long memberId);
 }

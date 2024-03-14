@@ -85,7 +85,7 @@ public class AccompanyController {
             @Valid @RequestBody AccompanyCommentRequest accompanyCommentRequest,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         accompanyService.createAccompanyComment(accompanyPostId, accompanyCommentRequest,
-                customUserDetails.getId());
+                customUserDetails.getId(), false);
         return ResponseEntity.created(URI.create("/api/v1/accompany/posts/" + accompanyPostId))
                 .build();
     }
@@ -150,6 +150,16 @@ public class AccompanyController {
     ) {
         accompanyService.deleteAccompanyComment(accompanyCommentId, customUserDetails.getId());
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{accompanyPostId}")
+    public ResponseEntity<Void> applyAccompany(
+            @PathVariable Long accompanyPostId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        accompanyService.createAccompanyApplyComment(accompanyPostId,
+                customUserDetails.getId());
+        return ResponseEntity.created(URI.create("/api/v1/accompany/posts/" + accompanyPostId))
+                .build();
     }
 
 }

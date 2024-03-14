@@ -25,11 +25,13 @@ public class AccompanyComment extends BaseEntity {
     @ManyToOne
     private Member member;
     private String content;
+    private Boolean isAccompanyApplyComment;
 
     @Builder
-    public AccompanyComment(Member member, String content) {
+    public AccompanyComment(Member member, String content, Boolean isAccompanyApplyComment) {
         this.member = member;
         this.content = content;
+        this.isAccompanyApplyComment = isAccompanyApplyComment;
     }
 
     public void setAccompanyPost(AccompanyPost accompanyPost) {
