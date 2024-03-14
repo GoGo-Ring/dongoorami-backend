@@ -351,4 +351,80 @@ public class ConcertControllerTest {
                         ))
                 );
     }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("공연 단건 상세 조회를 할 수 있다.")
+    void success_getConcert() throws Exception {
+        // given
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        Concert concert = ConcertDataFactory.createConcert();
+        concertRepository.save(concert);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/concerts/{concertId}", concert.getId()).header(
+                                "Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getConcert",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("concertId").description("조회할 공연 아이디")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(NUMBER)
+                                        .description("공연 아이디"),
+                                fieldWithPath("name").type(STRING)
+                                        .description("공연명"),
+                                fieldWithPath("startedAt").type(STRING)
+                                        .description("공연 시작 일자"),
+                                fieldWithPath("endedAt").type(STRING)
+                                        .description("공연 종료 일자"),
+                                fieldWithPath("place").type(STRING)
+                                        .description("공연 장소"),
+                                fieldWithPath("actor").type(STRING)
+                                        .description("출연진"),
+                                fieldWithPath("crew").type(STRING)
+                                        .description("제작진"),
+                                fieldWithPath("runtime").type(STRING)
+                                        .description("공연 런타임"),
+                                fieldWithPath("age").type(STRING)
+                                        .description("공연 관람 연령"),
+                                fieldWithPath("producer").type(STRING)
+                                        .description("제작사"),
+                                fieldWithPath("agency").type(STRING)
+                                        .description("기획사"),
+                                fieldWithPath("host").type(STRING)
+                                        .description("주최"),
+                                fieldWithPath("management").type(STRING)
+                                        .description("주관"),
+                                fieldWithPath("cost").type(STRING)
+                                        .description("티켓 가격"),
+                                fieldWithPath("poster").type(STRING)
+                                        .description("포스터 이미지 url"),
+                                fieldWithPath("summary").type(STRING)
+                                        .description("줄거리"),
+                                fieldWithPath("genre").type(STRING)
+                                        .description("장르"),
+                                fieldWithPath("status").type(STRING)
+                                        .description("공연 상태"),
+                                fieldWithPath("introductionImages").type(ARRAY)
+                                        .description("소개 이미지 url 목록"),
+                                fieldWithPath("schedule").type(STRING)
+                                        .description("공연 시간"),
+                                fieldWithPath("totalAccompanies").type(NUMBER)
+                                        .description("공연 구인글 수"),
+                                fieldWithPath("totalReviews").type(NUMBER)
+                                        .description("관람 후기 수")
+                        ))
+                );
+    }
 }
