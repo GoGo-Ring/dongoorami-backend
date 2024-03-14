@@ -10,6 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -111,5 +113,10 @@ public class Concert extends BaseEntity {
         this.status = status;
         this.introductionImages = introductionImages;
         this.schedule = schedule;
+    }
+
+    public LocalDate getEndLocalDate(){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        return LocalDate.parse(endedAt, formatter);
     }
 }
