@@ -249,3 +249,22 @@ include::{snippets}/ConcertControllerTest/getConcertReviewsAfterFirst/query-para
 .Response
 include::{snippets}/ConcertControllerTest/getConcertReviewsAfterFirst/http-response.adoc[]
 include::{snippets}/ConcertControllerTest/getConcertReviewsAfterFirst/response-fields.adoc[]
+
+=== 공연 후기 수정
+
+.Request
+include::{snippets}/ConcertControllerTest/updateConcertReview/http-request.adoc[]
+include::{snippets}/ConcertControllerTest/updateConcertReview/path-parameters.adoc[]
+include::{snippets}/ConcertControllerTest/updateConcertReview/request-fields.adoc[]
+
+.Response
+include::{snippets}/ConcertControllerTest/updateConcertReview/http-response.adoc[]
+
+=== 공연 후기 삭제
+
+.Request
+include::{snippets}/ConcertControllerTest/deleteConcertReview/http-request.adoc[]
+include::{snippets}/ConcertControllerTest/deleteConcertReview/path-parameters.adoc[]
+
+.Response
+include::{snippets}/ConcertControllerTest/deleteConcertReview/http-response.adoc[]

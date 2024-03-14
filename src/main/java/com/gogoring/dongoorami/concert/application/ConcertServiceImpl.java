@@ -1,11 +1,13 @@
 package com.gogoring.dongoorami.concert.application;
 
 import com.gogoring.dongoorami.concert.domain.Concert;
-import com.gogoring.dongoorami.concert.dto.request.ConcertReviewCreateRequest;
+import com.gogoring.dongoorami.concert.domain.ConcertReview;
+import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
 import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
 import com.gogoring.dongoorami.concert.exception.ConcertNotFoundException;
+import com.gogoring.dongoorami.concert.exception.ConcertReviewNotFoundException;
 import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.concert.repository.ConcertReviewRepository;
 import com.gogoring.dongoorami.member.domain.Member;
@@ -30,13 +32,13 @@ public class ConcertServiceImpl implements ConcertService {
     @Transactional
     @Override
     public void createConcertReview(Long concertId,
-            ConcertReviewCreateRequest concertReviewCreateRequest, Long memberId) {
+            ConcertReviewRequest concertReviewRequest, Long memberId) {
         Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(concertId).orElseThrow(
                 () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        concertReviewRepository.save(concertReviewCreateRequest.toEntity(concert, member));
+        concertReviewRepository.save(concertReviewRequest.toEntity(concert, member));
     }
 
     @Override
@@ -56,5 +58,31 @@ public class ConcertServiceImpl implements ConcertService {
 
         return ConcertReviewsGetResponse.of(concertReviewGetResponses.hasNext(),
                 concertReviewGetResponses.getContent());
+    }
+
+    @Transactional
+    @Override
+    public void updateConcertReview(Long concertReviewId, ConcertReviewRequest concertReviewRequest,
+            Long memberId) {
+        ConcertReview concertReview = concertReviewRepository.findByIdAndIsActivatedIsTrue(
+                concertReviewId).orElseThrow(() -> new ConcertReviewNotFoundException(
+                ConcertErrorCode.CONCERT_REVIEW_NOT_FOUND));
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        concertReview.updateConcertReview(member.getId(), concertReviewRequest.getTitle(),
+                concertReviewRequest.getContent(), concertReviewRequest.getRating());
+    }
+
+    @Transactional
+    @Override
+    public void deleteConcertReview(Long concertReviewId, Long memberId) {
+        ConcertReview concertReview = concertReviewRepository.findByIdAndIsActivatedIsTrue(
+                concertReviewId).orElseThrow(() -> new ConcertReviewNotFoundException(
+                ConcertErrorCode.CONCERT_REVIEW_NOT_FOUND));
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        concertReview.updateIsActivatedFalse(member.getId());
     }
 }

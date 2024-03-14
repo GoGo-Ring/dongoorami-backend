@@ -1,8 +1,9 @@
 package com.gogoring.dongoorami.concert.presentation;
 
-
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -22,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
-import com.gogoring.dongoorami.concert.dto.request.ConcertReviewCreateRequest;
+import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
 import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.concert.repository.ConcertReviewRepository;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
@@ -95,17 +96,17 @@ public class ConcertControllerTest {
         Concert concert = TestDataUtil.createConcert();
         concertRepository.save(concert);
 
-        ConcertReviewCreateRequest concertReviewCreateRequest = new ConcertReviewCreateRequest();
-        ReflectionTestUtils.setField(concertReviewCreateRequest, "title", "정말 재미있는 공연");
-        ReflectionTestUtils.setField(concertReviewCreateRequest, "content",
+        ConcertReviewRequest concertReviewRequest = new ConcertReviewRequest();
+        ReflectionTestUtils.setField(concertReviewRequest, "title", "정말 재미있는 공연");
+        ReflectionTestUtils.setField(concertReviewRequest, "content",
                 "돈이 아깝지 않습니다. 다들 꼭 보러가세요!");
-        ReflectionTestUtils.setField(concertReviewCreateRequest, "rating", 3);
+        ReflectionTestUtils.setField(concertReviewRequest, "rating", 3);
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 post("/api/v1/concerts/reviews/{concertId}", concert.getId()).header(
                                 "Authorization", accessToken)
-                        .content(objectMapper.writeValueAsString(concertReviewCreateRequest))
+                        .content(objectMapper.writeValueAsString(concertReviewRequest))
                         .contentType(MediaType.APPLICATION_JSON));
 
         // then
@@ -261,6 +262,87 @@ public class ConcertControllerTest {
                                                 STRING)
                                         .description("작성 날짜")
 
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("공연 후기를 수정할 수 있다.")
+    void success_updateConcertReview() throws Exception {
+        // given
+        Member member = TestDataUtil.createLoginMemberWithNickname();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        Concert concert = TestDataUtil.createConcert();
+        concertRepository.save(concert);
+
+        ConcertReview concertReview = TestDataUtil.createConcertReviews(concert, member, 1).get(0);
+        concertReviewRepository.save(concertReview);
+
+        ConcertReviewRequest concertReviewRequest = new ConcertReviewRequest();
+        ReflectionTestUtils.setField(concertReviewRequest, "title", "테스트 제목");
+        ReflectionTestUtils.setField(concertReviewRequest, "content", "테스트 내용");
+        ReflectionTestUtils.setField(concertReviewRequest, "rating", 3);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/concerts/reviews/{concertReviewId}", concertReview.getId()).header(
+                                "Authorization", accessToken)
+                        .content(objectMapper.writeValueAsString(concertReviewRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/updateConcertReview",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("concertReviewId").description("수정할 공연 후기 아이디")
+                        ),
+                        requestFields(
+                                fieldWithPath("title").type(JsonFieldType.STRING)
+                                        .description("제목"),
+                                fieldWithPath("content").type(JsonFieldType.STRING)
+                                        .description("내용"),
+                                fieldWithPath("rating").type(JsonFieldType.NUMBER)
+                                        .description("평점(1~5)")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("공연 후기를 삭제할 수 있다.")
+    void success_deleteConcertReview() throws Exception {
+        // given
+        Member member = TestDataUtil.createLoginMemberWithNickname();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        Concert concert = TestDataUtil.createConcert();
+        concertRepository.save(concert);
+
+        ConcertReview concertReview = TestDataUtil.createConcertReviews(concert, member, 1).get(0);
+        concertReviewRepository.save(concertReview);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/v1/concerts/reviews/{concertReviewId}", concertReview.getId()).header(
+                                "Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/deleteConcertReview",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("concertReviewId").description("삭제할 공연 후기 아이디")
                         ))
                 );
     }
