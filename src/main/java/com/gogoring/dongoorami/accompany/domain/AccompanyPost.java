@@ -3,6 +3,7 @@ package com.gogoring.dongoorami.accompany.domain;
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
 import com.gogoring.dongoorami.accompany.exception.InvalidAccompanyPurposeTypeException;
 import com.gogoring.dongoorami.accompany.exception.InvalidAccompanyRegionTypeException;
+import com.gogoring.dongoorami.accompany.exception.OnlyWriterCanModifyException;
 import com.gogoring.dongoorami.global.common.BaseEntity;
 import com.gogoring.dongoorami.member.domain.Member;
 import jakarta.persistence.ElementCollection;
@@ -86,7 +87,8 @@ public class AccompanyPost extends BaseEntity {
         accompanyComment.setAccompanyPost(this);
     }
 
-    public void update(AccompanyPost accompanyPost) {
+    public void update(AccompanyPost accompanyPost, Long memberId) {
+        checkIsWriter(memberId);
         this.title = accompanyPost.title;
         this.concertName = accompanyPost.concertName;
         this.concertPlace = accompanyPost.concertPlace;
@@ -100,6 +102,13 @@ public class AccompanyPost extends BaseEntity {
         this.content = accompanyPost.content;
         this.images = accompanyPost.images;
         this.purposes = accompanyPost.purposes;
+    }
+
+    private void checkIsWriter(Long memberId) {
+        if (!this.member.getId().equals(memberId)) {
+            throw new OnlyWriterCanModifyException(AccompanyErrorCode.ONLY_WRITER_CAN_MODIFY);
+
+        }
     }
 
     public enum RecruitmentStatusType {

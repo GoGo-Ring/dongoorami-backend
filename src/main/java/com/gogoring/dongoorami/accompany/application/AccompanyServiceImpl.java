@@ -16,10 +16,8 @@ import com.gogoring.dongoorami.accompany.exception.AccompanyApplyNotAllowedForWr
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
 import com.gogoring.dongoorami.accompany.exception.AccompanyPostNotFoundException;
 import com.gogoring.dongoorami.accompany.exception.DuplicatedAccompanyApplyException;
-import com.gogoring.dongoorami.accompany.exception.OnlyWriterCanModifyException;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
-import com.gogoring.dongoorami.global.common.BaseEntity;
 import com.gogoring.dongoorami.global.util.ImageType;
 import com.gogoring.dongoorami.global.util.S3ImageUtil;
 import com.gogoring.dongoorami.member.domain.Member;
@@ -125,13 +123,12 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        checkMemberIsWriter(accompanyPost.getMember().getId(), currentMemberId);
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         List<String> imageUrls = s3ImageUtil.putObjects(images,
                 ImageType.ACCOMPANY_POST);
+        accompanyPost.update(accompanyPostRequest.toEntity(member, imageUrls), currentMemberId);
         s3ImageUtil.deleteObjects(accompanyPost.getImages(), ImageType.ACCOMPANY_POST);
-        accompanyPost.update(accompanyPostRequest.toEntity(member, imageUrls));
     }
 
     @Transactional
@@ -141,8 +138,8 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        checkMemberIsWriter(accompanyPost.getMember().getId(), currentMemberId);
-        accompanyPost.getAccompanyComments().forEach(BaseEntity::updateIsActivatedFalse);
+        accompanyPost.getAccompanyComments().forEach(
+                accompanyComment -> accompanyComment.updateIsActivatedFalse(currentMemberId));
         accompanyPost.updateIsActivatedFalse();
     }
 
@@ -162,9 +159,8 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyCommentId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_COMMENT_NOT_FOUND));
-        checkMemberIsWriter(accompanyComment.getMember().getId(), currentMemberId);
         checkIsAccompanyApplyComment(accompanyComment.getIsAccompanyApplyComment());
-        accompanyComment.updateContent(accompanyCommentRequest.getContent());
+        accompanyComment.updateContent(accompanyCommentRequest.getContent(), currentMemberId);
     }
 
     @Transactional
@@ -174,8 +170,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyCommentId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_COMMENT_NOT_FOUND));
-        checkMemberIsWriter(accompanyComment.getMember().getId(), currentMemberId);
-        accompanyComment.updateIsActivatedFalse();
+        accompanyComment.updateIsActivatedFalse(currentMemberId);
     }
 
     @Override
@@ -189,12 +184,6 @@ public class AccompanyServiceImpl implements AccompanyService {
         return createAccompanyComment(accompanyPostId,
                 AccompanyCommentRequest.createAccompanyApplyCommentRequest(),
                 currentMemberId, true);
-    }
-
-    private void checkMemberIsWriter(Long memberId, Long writerId) {
-        if (!writerId.equals(memberId)) {
-            throw new OnlyWriterCanModifyException(AccompanyErrorCode.ONLY_WRITER_CAN_MODIFY);
-        }
     }
 
     private void checkDuplicatedAccompanyApply(Long accompanyPostId, Long memberId) {
@@ -218,5 +207,4 @@ public class AccompanyServiceImpl implements AccompanyService {
                     AccompanyErrorCode.ACCOMPANY_APPLY_NOT_ALLOWED_FOR_WRITER);
         }
     }
-
 }
