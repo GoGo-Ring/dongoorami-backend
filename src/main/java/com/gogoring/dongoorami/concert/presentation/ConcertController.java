@@ -2,6 +2,7 @@ package com.gogoring.dongoorami.concert.presentation;
 
 import com.gogoring.dongoorami.concert.application.ConcertService;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
+import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -58,5 +59,10 @@ public class ConcertController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         concertService.deleteConcertReview(concertReviewId, customUserDetails.getId());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/concerts/{concertId}")
+    public ResponseEntity<ConcertGetResponse> getConcert(@PathVariable Long concertId) {
+        return ResponseEntity.ok(concertService.getConcert(concertId));
     }
 }
