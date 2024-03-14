@@ -36,7 +36,7 @@ public class AccompanyPostsResponse {
                     .id(accompanyPost.getId())
                     .title(accompanyPost.getTitle())
                     .gender(accompanyPost.getGender())
-                    .concertName(accompanyPost.getConcertName())
+                    .concertName(accompanyPost.getConcert().getName())
                     .status(accompanyPost.getStatus().getName())
                     .totalPeople(accompanyPost.getTotalPeople())
                     .createdAt(accompanyPost.getCreatedAt())

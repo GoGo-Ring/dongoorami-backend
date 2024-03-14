@@ -38,6 +38,7 @@ public class AccompanyServiceImpl implements AccompanyService {
     private final AccompanyPostRepository accompanyPostRepository;
     private final AccompanyCommentRepository accompanyCommentRepository;
     private final MemberRepository memberRepository;
+    private final ConcertRepository concertRepository;
     private final S3ImageUtil s3ImageUtil;
 
     @Override
@@ -47,8 +48,12 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         List<String> imageUrls = s3ImageUtil.putObjects(images,
                 ImageType.ACCOMPANY_POST);
+        Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(
+                accompanyPostRequest.getConcertId()).orElseThrow(
+                () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
 
-        return accompanyPostRepository.save(accompanyPostRequest.toEntity(member, imageUrls))
+        return accompanyPostRepository.save(
+                        accompanyPostRequest.toEntity(concert, member, imageUrls))
                 .getId();
     }
 
@@ -127,7 +132,11 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         List<String> imageUrls = s3ImageUtil.putObjects(images,
                 ImageType.ACCOMPANY_POST);
-        accompanyPost.update(accompanyPostRequest.toEntity(member, imageUrls), currentMemberId);
+        Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(
+                accompanyPostRequest.getConcertId()).orElseThrow(
+                () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
+        accompanyPost.update(accompanyPostRequest.toEntity(concert, member, imageUrls),
+                currentMemberId);
         s3ImageUtil.deleteObjects(accompanyPost.getImages(), ImageType.ACCOMPANY_POST);
     }
 

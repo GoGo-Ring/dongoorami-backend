@@ -44,7 +44,7 @@ public class AccompanyPostResponse {
                 .id(accompanyPost.getId())
                 .title(accompanyPost.getTitle())
                 .gender(accompanyPost.getGender())
-                .concertName(accompanyPost.getConcertName())
+                .concertName(accompanyPost.getConcert().getName())
                 .status(accompanyPost.getStatus().getName())
                 .totalPeople(accompanyPost.getTotalPeople())
                 .createdAt(accompanyPost.getCreatedAt())
@@ -52,7 +52,7 @@ public class AccompanyPostResponse {
                 .viewCount(accompanyPost.getViewCount())
                 .commentCount(0L) // 임시
                 .memberProfile(memberProfile)
-                .concertPlace(accompanyPost.getConcertPlace())
+                .concertPlace(accompanyPost.getConcert().getPlace())
                 .region(accompanyPost.getRegion().getName())
                 .startAge(accompanyPost.getStartAge())
                 .endAge(accompanyPost.getEndAge())
