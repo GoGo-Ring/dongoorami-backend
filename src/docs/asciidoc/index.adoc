@@ -268,3 +268,13 @@ include::{snippets}/ConcertControllerTest/deleteConcertReview/path-parameters.ad
 
 .Response
 include::{snippets}/ConcertControllerTest/deleteConcertReview/http-response.adoc[]
+
+=== 공연 목록 키워드로 조회(동행 구인글 작성 중 공연 목록 검색 시 사용)
+
+.Request
+include::{snippets}/ConcertControllerTest/getConcertsByKeyword/http-request.adoc[]
+include::{snippets}/ConcertControllerTest/getConcertsByKeyword/query-parameters.adoc[]
+
+.Response
+include::{snippets}/ConcertControllerTest/getConcertsByKeyword/http-response.adoc[]
+include::{snippets}/ConcertControllerTest/getConcertsByKeyword/response-fields.adoc[]
