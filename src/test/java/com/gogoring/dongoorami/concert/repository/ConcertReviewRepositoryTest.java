@@ -138,4 +138,26 @@ public class ConcertReviewRepositoryTest {
         // then
         assertThat(savedConcertReview.getId()).isEqualTo(concertReview.getId());
     }
+
+    @Test
+    @DisplayName("특정 공연에 대한 후기의 수를 조회할 수 있다.")
+    void success_countByConcertAndIsActivatedIsTrue() {
+        // given
+        Member member = MemberDataFactory.createMember();
+        memberRepository.save(member);
+
+        Concert concert = ConcertDataFactory.createConcert();
+        concertRepository.save(concert);
+
+        int size = 3;
+        List<ConcertReview> concertReviews = ConcertDataFactory.createConcertReviews(concert,
+                member, size);
+        concertReviewRepository.saveAll(concertReviews);
+
+        // when
+        Integer totalReviews = concertReviewRepository.countByConcertAndIsActivatedIsTrue(concert);
+
+        // then
+        assertThat(totalReviews).isEqualTo(size);
+    }
 }
