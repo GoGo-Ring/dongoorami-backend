@@ -1,6 +1,7 @@
 package com.gogoring.dongoorami.concert.application;
 
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
+import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
 
 public interface ConcertService {
@@ -15,4 +16,6 @@ public interface ConcertService {
             Long memberId);
 
     void deleteConcertReview(Long concertReviewId, Long memberId);
+
+    ConcertGetResponse getConcert(Long concertId);
 }

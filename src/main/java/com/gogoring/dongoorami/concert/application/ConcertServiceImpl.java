@@ -3,6 +3,7 @@ package com.gogoring.dongoorami.concert.application;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
+import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
 import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
@@ -84,5 +85,16 @@ public class ConcertServiceImpl implements ConcertService {
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         concertReview.updateIsActivatedFalse(member.getId());
+    }
+
+    @Override
+    public ConcertGetResponse getConcert(Long concertId) {
+        Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(concertId).orElseThrow(
+                () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
+
+        Integer totalAccompanies = 0; // TODO: AccompanyPost와 Concert 연결 후 로직 수정
+        Integer totalReviews = concertReviewRepository.countByConcertAndIsActivatedIsTrue(concert);
+
+        return ConcertGetResponse.of(concert, totalAccompanies, totalReviews);
     }
 }

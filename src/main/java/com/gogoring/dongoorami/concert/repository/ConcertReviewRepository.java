@@ -18,4 +18,6 @@ public interface ConcertReviewRepository extends JpaRepository<ConcertReview, Lo
             Concert concert, Pageable pageable);
 
     Optional<ConcertReview> findByIdAndIsActivatedIsTrue(Long id);
+
+    Integer countByConcertAndIsActivatedIsTrue(Concert concert);
 }
