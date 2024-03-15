@@ -543,6 +543,10 @@ class AccompanyControllerTest {
                                         "accompanyCommentInfos[].isAccompanyApplyComment").type(
                                                 BOOLEAN)
                                         .description("동행 신청 댓글 여부"),
+                                fieldWithPath(
+                                        "accompanyCommentInfos[].isAccompanyConfirmedComment").type(
+                                                BOOLEAN)
+                                        .description("동행 신청 댓글인 경우 동행 확정 여부"),
                                 fieldWithPath("accompanyCommentInfos[].createdAt").type(STRING)
                                         .description("생성 날짜"),
                                 fieldWithPath("accompanyCommentInfos[].updatedAt").type(STRING)

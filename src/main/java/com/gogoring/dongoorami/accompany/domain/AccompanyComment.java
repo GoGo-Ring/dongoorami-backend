@@ -28,6 +28,7 @@ public class AccompanyComment extends BaseEntity {
     private Member member;
     private String content;
     private Boolean isAccompanyApplyComment;
+    private Boolean isAccompanyConfirmedComment = false;
 
     @Builder
     public AccompanyComment(Member member, String content, Boolean isAccompanyApplyComment) {
@@ -48,6 +49,10 @@ public class AccompanyComment extends BaseEntity {
     public void updateIsActivatedFalse(Long memberId) {
         checkIsWriter(memberId);
         updateIsActivatedFalse();
+    }
+
+    public void updateIsAccompanyConfirmedComment(Boolean isAccompanyConfirmedComment) {
+        this.isAccompanyConfirmedComment = isAccompanyConfirmedComment;
     }
 
     private void checkIsWriter(Long memberId) {
