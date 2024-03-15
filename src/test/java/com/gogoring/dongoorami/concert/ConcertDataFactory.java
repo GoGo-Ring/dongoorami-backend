@@ -50,6 +50,23 @@ public class ConcertDataFactory {
                 .build();
     }
 
+    public static List<Concert> createConcerts(int size) {
+        List<Concert> concerts = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            concerts.add(Concert.builder()
+                    .name("고고링 백걸즈의 스프링 탐방기")
+                    .startedAt("2024.03.12")
+                    .endedAt("2024.05.12")
+                    .place("예술의전당 [서울] (리사이틀홀)")
+                    .poster("http://www.kopis.or.kr/upload/pfmPoster/PF_PF236579_240304_151739.gif")
+                    .genre("서양음악(클래식)")
+                    .status("공연중")
+                    .build());
+        }
+
+        return concerts;
+    }
+
     public static List<ConcertReview> createConcertReviews(Concert concert, Member member,
             int size) {
         List<ConcertReview> concertReviews = new ArrayList<>();

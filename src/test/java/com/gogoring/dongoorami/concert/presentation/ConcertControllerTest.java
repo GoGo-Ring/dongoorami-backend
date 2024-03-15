@@ -338,7 +338,7 @@ public class ConcertControllerTest {
         // when
         ResultActions resultActions = mockMvc.perform(
                 delete("/api/v1/concerts/reviews/{concertReviewId}", concertReview.getId()).header(
-                                "Authorization", accessToken)
+                        "Authorization", accessToken)
         );
 
         // then
@@ -368,7 +368,7 @@ public class ConcertControllerTest {
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/v1/concerts/{concertId}", concert.getId()).header(
-                                "Authorization", accessToken)
+                        "Authorization", accessToken)
         );
 
         // then
@@ -424,6 +424,146 @@ public class ConcertControllerTest {
                                         .description("공연 구인글 수"),
                                 fieldWithPath("totalReviews").type(NUMBER)
                                         .description("관람 후기 수")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("공연 목록을 조회할 수 있다. - 최초 요청")
+    void success_getConcertsFirst() throws Exception {
+        // given
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        int size = 3;
+        List<Concert> concerts = ConcertDataFactory.createConcerts(size);
+        concertRepository.saveAll(concerts);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/concerts").header(
+                                "Authorization", accessToken)
+                        .param("size", String.valueOf(size))
+                        .param("keyword", concerts.get(0).getName()
+                                .substring(0, concerts.get(0).getName().length() / 2))
+                        .param("genres", concerts.get(0).getGenre())
+                        .param("genres", "복합")
+                        .param("statuses", concerts.get(0).getStatus())
+                        .param("statuses", "공연종료")
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getConcertsFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("size").description(
+                                        "조회할 공연 개수, 값 넣지 않으면 기본 6개").optional(),
+                                parameterWithName("keyword").description(
+                                        "조회할 공연명, 값 넣지 않으면 전체 검색").optional(),
+                                parameterWithName("genres").description(
+                                        "조회할 장르, 값 넣지 않으면 전체 검색").optional(),
+                                parameterWithName("statuses").description(
+                                        "조회할 공연 상태, 값 넣지 않으면 전체 검색").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNext").type(BOOLEAN)
+                                        .description("다음 공연 존재 여부"),
+                                fieldWithPath("concertGetShortResponses").type(ARRAY)
+                                        .description("공연 목록"),
+                                fieldWithPath("concertGetShortResponses[].id").type(NUMBER)
+                                        .description("공연 아이디"),
+                                fieldWithPath("concertGetShortResponses[].name").type(STRING)
+                                        .description("공연명"),
+                                fieldWithPath("concertGetShortResponses[].place").type(STRING)
+                                        .description("공연장소"),
+                                fieldWithPath("concertGetShortResponses[].genre").type(STRING)
+                                        .description("장르"),
+                                fieldWithPath("concertGetShortResponses[].startedAt").type(STRING)
+                                        .description("공연 시작 일자"),
+                                fieldWithPath("concertGetShortResponses[].endedAt").type(STRING)
+                                        .description("공연 종료 일자"),
+                                fieldWithPath("concertGetShortResponses[].poster").type(STRING)
+                                        .description("포스터 이미지 url"),
+                                fieldWithPath("concertGetShortResponses[].status").type(STRING)
+                                        .description("공연 상태")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("공연 목록을 조회할 수 있다. - 이후 요청")
+    void success_getConcertsAfterFirst() throws Exception {
+        // given
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        int size = 3;
+        List<Concert> concerts = ConcertDataFactory.createConcerts(size);
+        concertRepository.saveAll(concerts);
+        long maxId = -1L;
+        for (Concert concert : concerts) {
+            maxId = Math.max(maxId, concert.getId());
+        }
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/concerts").header(
+                                "Authorization", accessToken)
+                        .param("cursorId", String.valueOf(maxId))
+                        .param("size", String.valueOf(size))
+                        .param("keyword", concerts.get(0).getName()
+                                .substring(0, concerts.get(0).getName().length() / 2))
+                        .param("genres", concerts.get(0).getGenre())
+                        .param("genres", "복합")
+                        .param("statuses", concerts.get(0).getStatus())
+                        .param("statuses", "공연종료")
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getConcertsAfterFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("cursorId").description("마지막으로 받은 공연 아이디"),
+                                parameterWithName("size").description(
+                                        "조회할 공연 개수, 값 넣지 않으면 기본 6개").optional(),
+                                parameterWithName("keyword").description(
+                                        "조회할 공연명, 값 넣지 않으면 전체 검색").optional(),
+                                parameterWithName("genres").description(
+                                        "조회할 장르, 값 넣지 않으면 전체 검색").optional(),
+                                parameterWithName("statuses").description(
+                                        "조회할 공연 상태, 값 넣지 않으면 전체 검색").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNext").type(BOOLEAN)
+                                        .description("다음 공연 존재 여부"),
+                                fieldWithPath("concertGetShortResponses").type(ARRAY)
+                                        .description("공연 목록"),
+                                fieldWithPath("concertGetShortResponses[].id").type(NUMBER)
+                                        .description("공연 아이디"),
+                                fieldWithPath("concertGetShortResponses[].name").type(STRING)
+                                        .description("공연명"),
+                                fieldWithPath("concertGetShortResponses[].place").type(STRING)
+                                        .description("공연장소"),
+                                fieldWithPath("concertGetShortResponses[].genre").type(STRING)
+                                        .description("장르"),
+                                fieldWithPath("concertGetShortResponses[].startedAt").type(STRING)
+                                        .description("공연 시작 일자"),
+                                fieldWithPath("concertGetShortResponses[].endedAt").type(STRING)
+                                        .description("공연 종료 일자"),
+                                fieldWithPath("concertGetShortResponses[].poster").type(STRING)
+                                        .description("포스터 이미지 url"),
+                                fieldWithPath("concertGetShortResponses[].status").type(STRING)
+                                        .description("공연 상태")
                         ))
                 );
     }
