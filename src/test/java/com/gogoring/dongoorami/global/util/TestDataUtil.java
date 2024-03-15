@@ -6,7 +6,6 @@ import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import com.gogoring.dongoorami.member.domain.Member;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -39,11 +38,8 @@ public class TestDataUtil {
 
     public static Concert createConcert() {
         return Concert.builder()
-                .kopisId(UUID.randomUUID().toString())
+                .kopisId("abcefg")
                 .name("고고링 백걸즈의 스프링 탐방기")
-                .place("게더")
-                .startedAt("2029.02.01")
-                .endedAt("2029.02.09")
                 .build();
     }
 

@@ -7,7 +7,6 @@ import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
 import com.gogoring.dongoorami.concert.exception.ConcertNotFoundException;
 import com.gogoring.dongoorami.global.config.QueryDslConfig;
 import com.gogoring.dongoorami.global.util.TestDataUtil;
-import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -65,21 +64,4 @@ public class ConcertRepositoryTest {
         // then
         assertThat(isExist).isEqualTo(true);
     }
-
-    @Test
-    @DisplayName("키워드로 공연 목록을 조회할 수 있다.")
-    void success_findAllByNameContaining() {
-        // given
-        for (int i = 0; i < 7; i++) {
-            concertRepository.save(TestDataUtil.createConcert());
-        }
-
-        // when
-        List<Concert> concerts = concertRepository.findAllByNameContaining("고고링");
-
-        // then
-        assertThat(concerts.size()).isEqualTo(7);
-    }
-
-
 }

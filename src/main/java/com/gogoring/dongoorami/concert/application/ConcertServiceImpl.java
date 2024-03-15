@@ -3,7 +3,6 @@ package com.gogoring.dongoorami.concert.application;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
-import com.gogoring.dongoorami.concert.dto.response.ConcertInfoResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
 import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
@@ -15,8 +14,6 @@ import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.exception.MemberErrorCode;
 import com.gogoring.dongoorami.member.exception.MemberNotFoundException;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
-import java.time.LocalDate;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -87,13 +84,5 @@ public class ConcertServiceImpl implements ConcertService {
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         concertReview.updateIsActivatedFalse(member.getId());
-    }
-
-    @Override
-    public List<ConcertInfoResponse> getConcertsByKeyword(String keyword) {
-        List<Concert> concerts = concertRepository.findAllByNameContaining(
-                keyword).stream().filter(concert -> concert.getEndLocalDate().isAfter(LocalDate.now())).toList();
-
-        return concerts.stream().map(ConcertInfoResponse::of).toList();
     }
 }
