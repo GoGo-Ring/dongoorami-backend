@@ -40,4 +40,6 @@ public interface AccompanyService {
     void deleteAccompanyComment(Long accompanyCommentId, Long currentMemberId);
 
     Long createAccompanyApplyComment(Long accompanyPostId, Long currentMemberId);
+
+    void confirmAccompany(Long accompanyCommentId, Long currentMemberId);
 }
