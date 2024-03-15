@@ -115,4 +115,11 @@ public class AccompanyGlobalExceptionHandler {
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
 
+    @ExceptionHandler(OnlyWriterCanConfirmApplyException.class)
+    public ResponseEntity<ErrorResponse> catchOnlyWriterCanConfirmApplyException(
+            OnlyWriterCanConfirmApplyException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
 }

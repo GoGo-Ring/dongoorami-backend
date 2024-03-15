@@ -19,6 +19,7 @@ public enum AccompanyErrorCode {
     ALREADY_ENDED_CONCERT("이미 종료된 공연입니다."),
     ACCOMPANY_COMMENT_APPLY_CONFIRM_DENIED("동행 신청 댓글을 통해 동행 확정이 가능합니다."),
     ALREADY_APPLY_CONFIRMED_ACCOMPANY_COMMENT("이미 동행 확정된 동행 신청 댓글입니다."),
+    ONLY_WRITER_CAN_CONFIRM_APPLY("작성자만이 동행을 확정할 수 있습니다.");
 
     private final String message;
 }
