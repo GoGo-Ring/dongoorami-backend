@@ -115,8 +115,12 @@ public class Concert extends BaseEntity {
         this.schedule = schedule;
     }
 
-    public LocalDate getEndLocalDate(){
+    public LocalDate getEndLocalDate() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         return LocalDate.parse(endedAt, formatter);
+    }
+
+    public void addAccompanyPost(AccompanyPost accompanyPost) {
+        accompanyPosts.add(accompanyPost);
     }
 }

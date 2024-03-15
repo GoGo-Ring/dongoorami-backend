@@ -92,6 +92,7 @@ public class AccompanyPost extends BaseEntity {
     public void update(AccompanyPost accompanyPost, Long memberId) {
         checkIsWriter(memberId);
         this.title = accompanyPost.title;
+        accompanyPost.getConcert().addAccompanyPost(accompanyPost);
         this.concert = accompanyPost.concert;
         this.region = accompanyPost.region;
         this.startAge = accompanyPost.startAge;
