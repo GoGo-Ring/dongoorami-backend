@@ -45,6 +45,7 @@ public class AccompanyServiceImpl implements AccompanyService {
     private final ConcertRepository concertRepository;
     private final S3ImageUtil s3ImageUtil;
 
+    @Transactional
     @Override
     public Long createAccompanyPost(AccompanyPostRequest accompanyPostRequest,
             List<MultipartFile> images, Long currentMemberId) {
