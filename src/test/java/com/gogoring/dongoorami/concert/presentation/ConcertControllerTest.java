@@ -333,7 +333,7 @@ public class ConcertControllerTest {
         // when
         ResultActions resultActions = mockMvc.perform(
                 delete("/api/v1/concerts/reviews/{concertReviewId}", concertReview.getId()).header(
-                                "Authorization", accessToken)
+                        "Authorization", accessToken)
         );
 
         // then
@@ -343,6 +343,48 @@ public class ConcertControllerTest {
                         preprocessResponse(prettyPrint()),
                         pathParameters(
                                 parameterWithName("concertReviewId").description("삭제할 공연 후기 아이디")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("키워드로 공연 목록을 조회할 수 있다.")
+    void success_getConcertsByKeyword() throws Exception {
+        // given
+        Member member = TestDataUtil.createLoginMemberWithNickname();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        for (int i = 0; i < 7; i++) {
+            concertRepository.save(TestDataUtil.createConcert());
+        }
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/concerts").header(
+                                "Authorization", accessToken)
+                        .param("keyword", "고고링")
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getConcertsByKeyword",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("keyword").description("공연 검색 키워드")
+                        ),
+                        responseFields(
+                                fieldWithPath("[]").type(ARRAY)
+                                        .description("공연 정보 목록"),
+                                fieldWithPath("[].id").type(NUMBER)
+                                        .description("공연 아이디"),
+                                fieldWithPath("[].name").type(STRING)
+                                        .description("공연 이름"),
+                                fieldWithPath("[].place").type(STRING)
+                                        .description("공연 장소")
                         ))
                 );
     }

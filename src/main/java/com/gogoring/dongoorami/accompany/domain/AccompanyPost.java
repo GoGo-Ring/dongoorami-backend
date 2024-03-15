@@ -3,6 +3,8 @@ package com.gogoring.dongoorami.accompany.domain;
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
 import com.gogoring.dongoorami.accompany.exception.InvalidAccompanyPurposeTypeException;
 import com.gogoring.dongoorami.accompany.exception.InvalidAccompanyRegionTypeException;
+import com.gogoring.dongoorami.accompany.exception.OnlyWriterCanModifyException;
+import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.global.common.BaseEntity;
 import com.gogoring.dongoorami.member.domain.Member;
 import jakarta.persistence.ElementCollection;
@@ -12,6 +14,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
@@ -39,8 +42,9 @@ public class AccompanyPost extends BaseEntity {
     @ManyToOne
     private Member member;
     private String title;
-    private String concertName;
-    private String concertPlace;
+    @ManyToOne
+    @JoinColumn(name = "concert_id")
+    private Concert concert;
     @Enumerated(EnumType.STRING)
     private AccompanyRegionType region;
     private Long startAge;
@@ -57,14 +61,13 @@ public class AccompanyPost extends BaseEntity {
     private List<AccompanyPurposeType> purposes;
 
     @Builder
-    public AccompanyPost(Member member, String title, String concertName, String concertPlace,
+    public AccompanyPost(Member member, String title, Concert concert,
             String region, Long startAge, Long endAge, Long totalPeople, String gender,
             LocalDate startDate, LocalDate endDate, String content, List<String> images,
             List<AccompanyPurposeType> purposes) {
         this.member = member;
         this.title = title;
-        this.concertName = concertName;
-        this.concertPlace = concertPlace;
+        this.concert = concert;
         this.region = AccompanyRegionType.getValue(region);
         this.startAge = startAge;
         this.endAge = endAge;
@@ -86,10 +89,11 @@ public class AccompanyPost extends BaseEntity {
         accompanyComment.setAccompanyPost(this);
     }
 
-    public void update(AccompanyPost accompanyPost) {
+    public void update(AccompanyPost accompanyPost, Long memberId) {
+        checkIsWriter(memberId);
         this.title = accompanyPost.title;
-        this.concertName = accompanyPost.concertName;
-        this.concertPlace = accompanyPost.concertPlace;
+        accompanyPost.getConcert().addAccompanyPost(accompanyPost);
+        this.concert = accompanyPost.concert;
         this.region = accompanyPost.region;
         this.startAge = accompanyPost.startAge;
         this.endAge = accompanyPost.endAge;
@@ -100,6 +104,13 @@ public class AccompanyPost extends BaseEntity {
         this.content = accompanyPost.content;
         this.images = accompanyPost.images;
         this.purposes = accompanyPost.purposes;
+    }
+
+    private void checkIsWriter(Long memberId) {
+        if (!this.member.getId().equals(memberId)) {
+            throw new OnlyWriterCanModifyException(AccompanyErrorCode.ONLY_WRITER_CAN_MODIFY);
+
+        }
     }
 
     public enum RecruitmentStatusType {

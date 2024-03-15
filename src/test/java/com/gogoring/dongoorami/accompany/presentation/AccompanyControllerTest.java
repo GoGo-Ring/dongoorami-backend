@@ -3,6 +3,7 @@ package com.gogoring.dongoorami.accompany.presentation;
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyComment;
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyPosts;
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createMockMultipartFiles;
+import static com.gogoring.dongoorami.global.util.TestDataUtil.createConcert;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -40,6 +41,8 @@ import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
+import com.gogoring.dongoorami.concert.domain.Concert;
+import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
@@ -80,6 +83,9 @@ class AccompanyControllerTest {
     private AccompanyCommentRepository accompanyCommentRepository;
 
     @Autowired
+    private ConcertRepository concertRepository;
+
+    @Autowired
     private TokenProvider tokenProvider;
 
     @Autowired
@@ -92,6 +98,7 @@ class AccompanyControllerTest {
     void setUp() {
         accompanyCommentRepository.deleteAll();
         accompanyPostRepository.deleteAll();
+        concertRepository.deleteAll();
         memberRepository.deleteAll();
     }
 
@@ -99,6 +106,7 @@ class AccompanyControllerTest {
     void tearDown() {
         accompanyCommentRepository.deleteAll();
         accompanyPostRepository.deleteAll();
+        concertRepository.deleteAll();
         memberRepository.deleteAll();
     }
 
@@ -115,9 +123,9 @@ class AccompanyControllerTest {
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
         List<MockMultipartFile> images = createMockMultipartFiles(2);
+        Concert concert = concertRepository.save(createConcert());
         AccompanyPostRequest accompanyPostRequest = AccompanyPostRequest.builder()
-                .concertName("2024 SG워너비 콘서트 : 우리의 노래")
-                .concertPlace("KSPO DOME")
+                .concertId(concert.getId())
                 .startDate(LocalDate.of(2024, 3, 22))
                 .endDate(LocalDate.of(2024, 3, 22))
                 .title("서울 같이 갈 울싼 사람 구합니다~~")
@@ -127,7 +135,6 @@ class AccompanyControllerTest {
                 .startAge(13L)
                 .endAge(17L)
                 .totalPeople(1L)
-                .concertPlace("2024 SG워너비 콘서트 : 우리의 노래")
                 .purposes(Arrays.asList("관람", "숙박"))
                 .build();
         MockMultipartFile request = new MockMultipartFile("accompanyPostRequest", null,
@@ -155,8 +162,7 @@ class AccompanyControllerTest {
                                         partWithName("accompanyPostRequest").description("동행 게시글 정보")
                                 ),
                                 requestPartFields("accompanyPostRequest",
-                                        fieldWithPath("concertName").description("공연명"),
-                                        fieldWithPath("concertPlace").description("공연 장소"),
+                                        fieldWithPath("concertId").description("공연 id"),
                                         fieldWithPath("startDate").description("시작 날짜"),
                                         fieldWithPath("endDate").description("종료 날짜"),
                                         fieldWithPath("gender").description("성별"),
@@ -183,6 +189,7 @@ class AccompanyControllerTest {
                 .getPrincipal()).getMember();
         ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         memberRepository.save(member);
+        Concert concert = concertRepository.save(createConcert());
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
         String size = "3";
@@ -192,11 +199,11 @@ class AccompanyControllerTest {
                 .startAge(13L)
                 .endAge(17L)
                 .totalPeople(1L)
-                .concertPlace("KSPO DOME")
+                .concertPlace(concert.getPlace())
                 .purposes(Arrays.asList("관람", "숙박"))
                 .build();
         accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 3, accompanyPostFilterRequest1));
+                createAccompanyPosts(member, 3, accompanyPostFilterRequest1, concert));
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -280,6 +287,7 @@ class AccompanyControllerTest {
                 .getPrincipal()).getMember();
         ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         memberRepository.save(member);
+        Concert concert = concertRepository.save(createConcert());
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
         String cursorId = "17", size = "3";
@@ -289,11 +297,11 @@ class AccompanyControllerTest {
                 .startAge(13L)
                 .endAge(17L)
                 .totalPeople(1L)
-                .concertPlace("KSPO DOME")
+                .concertPlace(concert.getPlace())
                 .purposes(Arrays.asList("관람", "숙박"))
                 .build();
         accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 3, accompanyPostFilterRequest1));
+                createAccompanyPosts(member, 3, accompanyPostFilterRequest1, concert));
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -384,8 +392,9 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
+        Concert concert = concertRepository.save(createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 1)).get(0);
+                createAccompanyPosts(member, 1, concert)).get(0);
         Long beforeViewCount = accompanyPost.getViewCount();
 
         // when
@@ -458,8 +467,9 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
+        Concert concert = concertRepository.save(createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 1)).get(0);
+                createAccompanyPosts(member, 1, concert)).get(0);
         AccompanyCommentRequest accompanyCommentRequest = new AccompanyCommentRequest(
                 "가는 길만 동행해도 괜찮을까요!?");
 
@@ -501,8 +511,9 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
+        Concert concert = concertRepository.save(createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 1)).get(0);
+                createAccompanyPosts(member, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
         accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
         accompanyCommentRepository.saveAll(accompanyComments);
@@ -572,12 +583,12 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
+        Concert concert = concertRepository.save(createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 1)).get(0);
+                createAccompanyPosts(member, 1, concert)).get(0);
         List<MockMultipartFile> images = createMockMultipartFiles(2);
         AccompanyPostRequest accompanyPostRequest = AccompanyPostRequest.builder()
-                .concertName("2024 SG워너비 콘서트 : 우리의 노래")
-                .concertPlace("KSPO DOME")
+                .concertId(concert.getId())
                 .startDate(LocalDate.of(2024, 3, 22))
                 .endDate(LocalDate.of(2024, 3, 22))
                 .title("서울 같이 갈 울싼 사람 구합니다~~")
@@ -618,8 +629,7 @@ class AccompanyControllerTest {
                                         partWithName("accompanyPostRequest").description("동행 게시글 정보")
                                 ),
                                 requestPartFields("accompanyPostRequest",
-                                        fieldWithPath("concertName").description("공연명"),
-                                        fieldWithPath("concertPlace").description("공연 장소"),
+                                        fieldWithPath("concertId").description("공연 id"),
                                         fieldWithPath("startDate").description("시작 날짜"),
                                         fieldWithPath("endDate").description("종료 날짜"),
                                         fieldWithPath("gender").description("성별"),
@@ -647,8 +657,9 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
+        Concert concert = concertRepository.save(createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 1)).get(0);
+                createAccompanyPosts(member, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
         accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
         accompanyCommentRepository.saveAll(accompanyComments);
@@ -805,8 +816,9 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
+        Concert concert = concertRepository.save(createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 1)).get(0);
+                createAccompanyPosts(member, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
         accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
         accompanyCommentRepository.saveAll(accompanyComments);
@@ -848,8 +860,9 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
+        Concert concert = concertRepository.save(createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 1)).get(0);
+                createAccompanyPosts(member, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
         accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
         accompanyCommentRepository.saveAll(accompanyComments);
@@ -891,8 +904,9 @@ class AccompanyControllerTest {
         memberRepository.saveAll(Arrays.asList(member1, member2));
         String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
                 member1.getRoles());
+        Concert concert = concertRepository.save(createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member2, 1)).get(0);
+                createAccompanyPosts(member2, 1, concert)).get(0);
 
         // when
         ResultActions resultActions = mockMvc.perform(

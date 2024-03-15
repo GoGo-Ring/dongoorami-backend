@@ -3,8 +3,10 @@ package com.gogoring.dongoorami.concert.presentation;
 import com.gogoring.dongoorami.concert.application.ConcertService;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
+import com.gogoring.dongoorami.concert.dto.response.ConcertInfoResponse;
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,5 +60,10 @@ public class ConcertController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         concertService.deleteConcertReview(concertReviewId, customUserDetails.getId());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/concerts")
+    public ResponseEntity<List<ConcertInfoResponse>> getConcertsByKeyword(@RequestParam String keyword){
+        return ResponseEntity.ok(concertService.getConcertsByKeyword(keyword));
     }
 }

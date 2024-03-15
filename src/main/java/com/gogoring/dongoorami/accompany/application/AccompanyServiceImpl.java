@@ -11,15 +11,17 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
-import com.gogoring.dongoorami.accompany.exception.AccompanyApplyCommentModificationNotAllowedException;
+import com.gogoring.dongoorami.accompany.exception.AccompanyApplyCommentModifyDeniedException;
 import com.gogoring.dongoorami.accompany.exception.AccompanyApplyNotAllowedForWriterException;
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
 import com.gogoring.dongoorami.accompany.exception.AccompanyPostNotFoundException;
 import com.gogoring.dongoorami.accompany.exception.DuplicatedAccompanyApplyException;
-import com.gogoring.dongoorami.accompany.exception.OnlyWriterCanModifyException;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
-import com.gogoring.dongoorami.global.common.BaseEntity;
+import com.gogoring.dongoorami.concert.domain.Concert;
+import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
+import com.gogoring.dongoorami.concert.exception.ConcertNotFoundException;
+import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.global.util.ImageType;
 import com.gogoring.dongoorami.global.util.S3ImageUtil;
 import com.gogoring.dongoorami.member.domain.Member;
@@ -40,6 +42,7 @@ public class AccompanyServiceImpl implements AccompanyService {
     private final AccompanyPostRepository accompanyPostRepository;
     private final AccompanyCommentRepository accompanyCommentRepository;
     private final MemberRepository memberRepository;
+    private final ConcertRepository concertRepository;
     private final S3ImageUtil s3ImageUtil;
 
     @Override
@@ -49,8 +52,12 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         List<String> imageUrls = s3ImageUtil.putObjects(images,
                 ImageType.ACCOMPANY_POST);
+        Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(
+                accompanyPostRequest.getConcertId()).orElseThrow(
+                () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
 
-        return accompanyPostRepository.save(accompanyPostRequest.toEntity(member, imageUrls))
+        return accompanyPostRepository.save(
+                        accompanyPostRequest.toEntity(concert, member, imageUrls))
                 .getId();
     }
 
@@ -125,13 +132,16 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        checkMemberIsWriter(accompanyPost.getMember().getId(), currentMemberId);
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         List<String> imageUrls = s3ImageUtil.putObjects(images,
                 ImageType.ACCOMPANY_POST);
+        Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(
+                accompanyPostRequest.getConcertId()).orElseThrow(
+                () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
+        accompanyPost.update(accompanyPostRequest.toEntity(concert, member, imageUrls),
+                currentMemberId);
         s3ImageUtil.deleteObjects(accompanyPost.getImages(), ImageType.ACCOMPANY_POST);
-        accompanyPost.update(accompanyPostRequest.toEntity(member, imageUrls));
     }
 
     @Transactional
@@ -141,8 +151,8 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        checkMemberIsWriter(accompanyPost.getMember().getId(), currentMemberId);
-        accompanyPost.getAccompanyComments().forEach(BaseEntity::updateIsActivatedFalse);
+        accompanyPost.getAccompanyComments().forEach(
+                accompanyComment -> accompanyComment.updateIsActivatedFalse(currentMemberId));
         accompanyPost.updateIsActivatedFalse();
     }
 
@@ -162,9 +172,8 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyCommentId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_COMMENT_NOT_FOUND));
-        checkMemberIsWriter(accompanyComment.getMember().getId(), currentMemberId);
         checkIsAccompanyApplyComment(accompanyComment.getIsAccompanyApplyComment());
-        accompanyComment.updateContent(accompanyCommentRequest.getContent());
+        accompanyComment.updateContent(accompanyCommentRequest.getContent(), currentMemberId);
     }
 
     @Transactional
@@ -174,8 +183,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyCommentId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_COMMENT_NOT_FOUND));
-        checkMemberIsWriter(accompanyComment.getMember().getId(), currentMemberId);
-        accompanyComment.updateIsActivatedFalse();
+        accompanyComment.updateIsActivatedFalse(currentMemberId);
     }
 
     @Override
@@ -191,12 +199,6 @@ public class AccompanyServiceImpl implements AccompanyService {
                 currentMemberId, true);
     }
 
-    private void checkMemberIsWriter(Long memberId, Long writerId) {
-        if (!writerId.equals(memberId)) {
-            throw new OnlyWriterCanModifyException(AccompanyErrorCode.ONLY_WRITER_CAN_MODIFY);
-        }
-    }
-
     private void checkDuplicatedAccompanyApply(Long accompanyPostId, Long memberId) {
         if (accompanyCommentRepository.existsByAccompanyPostIdAndMemberIdAndIsAccompanyApplyCommentTrue(
                 accompanyPostId, memberId)) {
@@ -207,8 +209,8 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     private void checkIsAccompanyApplyComment(Boolean isAccompanyApplyComment) {
         if (Boolean.TRUE.equals(isAccompanyApplyComment)) {
-            throw new AccompanyApplyCommentModificationNotAllowedException(
-                    AccompanyErrorCode.ACCOMPANY_APPLY_COMMENT_MODIFICATION_NOT_ALLOWED);
+            throw new AccompanyApplyCommentModifyDeniedException(
+                    AccompanyErrorCode.ACCOMPANY_APPLY_COMMENT_MODIFY_DENIED);
         }
     }
 
@@ -218,5 +220,4 @@ public class AccompanyServiceImpl implements AccompanyService {
                     AccompanyErrorCode.ACCOMPANY_APPLY_NOT_ALLOWED_FOR_WRITER);
         }
     }
-
 }
