@@ -119,4 +119,19 @@ public class ConcertRepositoryTest {
         assertThat(slice5.getContent().stream().map(Concert::getName).toList())
                 .doesNotContain("제목");
     }
+
+    @Test
+    @DisplayName("공연종료가 아닌 상태의 공연 목록을 조회할 수 있다.")
+    void success_findAllByStatusIsNotAndIsActivatedIsTrue() {
+        // given
+        int size = 3;
+        List<Concert> concerts = ConcertDataFactory.createConcerts(size);
+        concertRepository.saveAll(concerts);
+
+        // when
+        List<Concert> savedConcerts = concertRepository.findAllByStatusIsNotAndIsActivatedIsTrue("공연종료");
+
+        // then
+        assertThat(savedConcerts.size()).isEqualTo(size);
+    }
 }
