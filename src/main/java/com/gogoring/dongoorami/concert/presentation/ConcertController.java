@@ -4,8 +4,10 @@ import com.gogoring.dongoorami.concert.application.ConcertService;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
+import com.gogoring.dongoorami.concert.dto.response.ConcertsGetShortResponse;
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,5 +66,16 @@ public class ConcertController {
     @GetMapping("/concerts/{concertId}")
     public ResponseEntity<ConcertGetResponse> getConcert(@PathVariable Long concertId) {
         return ResponseEntity.ok(concertService.getConcert(concertId));
+    }
+
+    @GetMapping("/concerts")
+    public ResponseEntity<ConcertsGetShortResponse> getConcerts(
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(required = false, defaultValue = "6") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) List<String> genres,
+            @RequestParam(required = false) List<String> statuses) {
+        return ResponseEntity.ok(
+                concertService.getConcerts(cursorId, size, keyword, genres, statuses));
     }
 }
