@@ -3,9 +3,12 @@ package com.gogoring.dongoorami.concert.application;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
+import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
+import com.gogoring.dongoorami.concert.dto.response.ConcertGetShortResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertInfoResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
+import com.gogoring.dongoorami.concert.dto.response.ConcertsGetShortResponse;
 import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
 import com.gogoring.dongoorami.concert.exception.ConcertNotFoundException;
 import com.gogoring.dongoorami.concert.exception.ConcertReviewNotFoundException;
@@ -20,6 +23,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,10 +94,41 @@ public class ConcertServiceImpl implements ConcertService {
     }
 
     @Override
+    public ConcertGetResponse getConcert(Long concertId) {
+        Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(concertId).orElseThrow(
+                () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
+
+        Integer totalAccompanies = concert.getAccompanyPosts().size();
+        // TODO: Concert와 ConcertReview 양방향 매핑 후 로직 수정
+        Integer totalReviews = concertReviewRepository.countByConcertAndIsActivatedIsTrue(concert);
+
+        return ConcertGetResponse.of(concert, totalAccompanies, totalReviews);
+    }
+
+    @Override
+    public ConcertsGetShortResponse getConcerts(Long cursorId, int size, String keyword,
+            List<String> genres, List<String> statuses) {
+        Slice<Concert> concerts = concertRepository.findAllByGenreAndStatus(cursorId, size, keyword,
+                genres, statuses);
+        List<ConcertGetShortResponse> concertGetShortResponses = concerts.stream()
+                .map(ConcertGetShortResponse::of)
+                .toList();
+
+        return ConcertsGetShortResponse.of(concerts.hasNext(), concertGetShortResponses);
+    }
+
+    @Override
     public List<ConcertInfoResponse> getConcertsByKeyword(String keyword) {
         List<Concert> concerts = concertRepository.findAllByNameContaining(
                 keyword).stream().filter(concert -> concert.getEndLocalDate().isAfter(LocalDate.now())).toList();
 
         return concerts.stream().map(ConcertInfoResponse::of).toList();
+    }
+
+    @Scheduled(cron = "0 30 15 * * *", zone = "Asia/Seoul")
+    @Transactional
+    public void updateConcertStatus() {
+        concertRepository.findAllByStatusIsNotAndIsActivatedIsTrue("공연종료")
+                .forEach(Concert::updateStatus);
     }
 }

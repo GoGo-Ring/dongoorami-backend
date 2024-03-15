@@ -1,7 +1,6 @@
 package com.gogoring.dongoorami.accompany.repository;
 
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyPosts;
-import static com.gogoring.dongoorami.global.util.TestDataUtil.createConcert;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
@@ -10,6 +9,7 @@ import static org.hamcrest.Matchers.lessThan;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
+import com.gogoring.dongoorami.concert.ConcertDataFactory;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.global.config.QueryDslConfig;
@@ -65,7 +65,7 @@ class AccompanyPostRepositoryTest {
                 .providerId("alsjkghlaskdjgh")
                 .build();
         memberRepository.save(member);
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 30, concert));
         int size = 10;
@@ -88,7 +88,7 @@ class AccompanyPostRepositoryTest {
                 .providerId("alsjkghlaskdjgh")
                 .build();
         memberRepository.save(member);
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 30, concert));
         Long cursorId = 1000000000L;
@@ -115,7 +115,7 @@ class AccompanyPostRepositoryTest {
                 .providerId("alsjkghlaskdjgh")
                 .build();
         memberRepository.save(member);
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPostFilterRequest accompanyPostFilterRequest1 = AccompanyPostFilterRequest.builder()
                 .gender("남")
                 .region("수도권(경기, 인천 포함)")
@@ -185,7 +185,7 @@ class AccompanyPostRepositoryTest {
         AccompanyPostFilterRequest accompanyPostFilterRequest3 = AccompanyPostFilterRequest.builder()
                 .purposes(List.of("관람"))
                 .build();
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 3, accompanyPostFilterRequest1, concert));
         accompanyPostRepository.saveAll(
@@ -239,7 +239,7 @@ class AccompanyPostRepositoryTest {
                 .endAge(13L)
                 .purposes(List.of("관람"))
                 .build();
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 3, accompanyPostFilterRequest1, concert));
         accompanyPostRepository.saveAll(
