@@ -40,7 +40,8 @@ public class AccompanyPost extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    private Member member;
+    @JoinColumn(name = "writer_id")
+    private Member writer;
     private String title;
     @ManyToOne
     @JoinColumn(name = "concert_id")
@@ -61,11 +62,11 @@ public class AccompanyPost extends BaseEntity {
     private List<AccompanyPurposeType> purposes;
 
     @Builder
-    public AccompanyPost(Member member, String title, Concert concert,
+    public AccompanyPost(Member writer, String title, Concert concert,
             String region, Long startAge, Long endAge, Long totalPeople, String gender,
             LocalDate startDate, LocalDate endDate, String content, List<String> images,
             List<AccompanyPurposeType> purposes) {
-        this.member = member;
+        this.writer = writer;
         this.title = title;
         this.concert = concert;
         this.region = AccompanyRegionType.getValue(region);
@@ -108,7 +109,7 @@ public class AccompanyPost extends BaseEntity {
     }
 
     private void checkIsWriter(Long memberId) {
-        if (!this.member.getId().equals(memberId)) {
+        if (!this.writer.getId().equals(memberId)) {
             throw new OnlyWriterCanModifyException(AccompanyErrorCode.ONLY_WRITER_CAN_MODIFY);
 
         }

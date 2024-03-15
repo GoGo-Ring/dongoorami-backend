@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +53,9 @@ public class Member extends BaseEntity {
 
     @Column(nullable = false)
     private Integer manner;
+
+    @OneToMany(mappedBy = "writer")
+    private final List<AccompanyPost> accompanyPosts = new ArrayList<>();
 
     @Builder
     public Member(String profileImage, String provider, String providerId) {

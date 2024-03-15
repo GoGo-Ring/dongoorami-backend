@@ -57,7 +57,7 @@ public class AccompanyDataFactory {
         List<AccompanyPost> accompanyPosts = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             accompanyPosts.add(AccompanyPost.builder()
-                    .member(member)
+                    .writer(member)
                     .concert(concert)
                     .startDate(LocalDate.of(2024, 3, 22))
                     .endDate(LocalDate.of(2024, 3, 22))
@@ -80,7 +80,7 @@ public class AccompanyDataFactory {
         List<AccompanyPost> accompanyPosts = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             accompanyPosts.add(AccompanyPost.builder()
-                    .member(member)
+                    .writer(member)
                     .concert(concert)
                     .startDate(LocalDate.of(2024, 3, 22))
                     .endDate(LocalDate.of(2024, 3, 22))
