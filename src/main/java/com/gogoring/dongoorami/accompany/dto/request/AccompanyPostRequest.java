@@ -2,9 +2,6 @@ package com.gogoring.dongoorami.accompany.dto.request;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
-import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
-import com.gogoring.dongoorami.accompany.exception.AlreadyEndedConcertException;
-import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.member.domain.Member;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,9 +22,11 @@ public class AccompanyPostRequest {
     @NotBlank(message = "title은 공백일 수 없습니다.")
     private String title;
 
-    @NotNull(message = "concertId은 공백일 수 없습니다.")
-    @Positive(message = "concertId은 양수만 가능합니다.")
-    private Long concertId;
+    @NotBlank(message = "concertName은 공백일 수 없습니다.")
+    private String concertName;
+
+    @NotBlank(message = "concertPlace은 공백일 수 없습니다.")
+    private String concertPlace;
 
     @NotBlank(message = "region은 공백일 수 없습니다.")
     private String region;
@@ -60,12 +59,11 @@ public class AccompanyPostRequest {
     @Size(min = 1, message = "purposes는 1개 이상 필요합니다.")
     private List<String> purposes;
 
-    public AccompanyPost toEntity(Concert concert, Member member, List<String> images) {
-        checkAlreadyEndedConcert(concert.getEndLocalDate());
-
+    public AccompanyPost toEntity(Member member, List<String> images) {
         return AccompanyPost.builder()
-                .concert(concert)
+                .concertName(concertName)
                 .gender(gender)
+                .concertPlace(concertPlace)
                 .content(content)
                 .endAge(endAge)
                 .endDate(endDate)
@@ -78,11 +76,5 @@ public class AccompanyPostRequest {
                 .images(images)
                 .purposes(purposes.stream().map(AccompanyPurposeType::getValue).toList())
                 .build();
-    }
-
-    private void checkAlreadyEndedConcert(LocalDate concertEndDate) {
-        if (concertEndDate.isBefore(LocalDate.now())) {
-            throw new AlreadyEndedConcertException(AccompanyErrorCode.ALREADY_ENDED_CONCERT);
-        }
     }
 }
