@@ -4,8 +4,10 @@ import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
+import com.gogoring.dongoorami.concert.dto.response.ConcertGetShortResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
+import com.gogoring.dongoorami.concert.dto.response.ConcertsGetShortResponse;
 import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
 import com.gogoring.dongoorami.concert.exception.ConcertNotFoundException;
 import com.gogoring.dongoorami.concert.exception.ConcertReviewNotFoundException;
@@ -15,6 +17,7 @@ import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.exception.MemberErrorCode;
 import com.gogoring.dongoorami.member.exception.MemberNotFoundException;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -96,5 +99,17 @@ public class ConcertServiceImpl implements ConcertService {
         Integer totalReviews = concertReviewRepository.countByConcertAndIsActivatedIsTrue(concert);
 
         return ConcertGetResponse.of(concert, totalAccompanies, totalReviews);
+    }
+
+    @Override
+    public ConcertsGetShortResponse getConcerts(Long cursorId, int size, String keyword,
+            List<String> genres, List<String> statuses) {
+        Slice<Concert> concerts = concertRepository.findAllByGenreAndStatus(cursorId, size, keyword,
+                genres, statuses);
+        List<ConcertGetShortResponse> concertGetShortResponses = concerts.stream()
+                .map(ConcertGetShortResponse::of)
+                .toList();
+
+        return ConcertsGetShortResponse.of(concerts.hasNext(), concertGetShortResponses);
     }
 }

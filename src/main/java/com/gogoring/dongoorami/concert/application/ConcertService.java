@@ -3,6 +3,8 @@ package com.gogoring.dongoorami.concert.application;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
+import com.gogoring.dongoorami.concert.dto.response.ConcertsGetShortResponse;
+import java.util.List;
 
 public interface ConcertService {
 
@@ -18,4 +20,7 @@ public interface ConcertService {
     void deleteConcertReview(Long concertReviewId, Long memberId);
 
     ConcertGetResponse getConcert(Long concertId);
+
+    ConcertsGetShortResponse getConcerts(Long cursorId, int size, String keyword, List<String> genres,
+            List<String> statuses);
 }
