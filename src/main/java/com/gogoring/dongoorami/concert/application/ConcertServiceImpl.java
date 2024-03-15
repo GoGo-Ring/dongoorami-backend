@@ -21,6 +21,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -111,5 +112,12 @@ public class ConcertServiceImpl implements ConcertService {
                 .toList();
 
         return ConcertsGetShortResponse.of(concerts.hasNext(), concertGetShortResponses);
+    }
+
+    @Scheduled(cron = "0 30 15 * * *", zone = "Asia/Seoul")
+    @Transactional
+    public void updateConcertStatus() {
+        concertRepository.findAllByStatusIsNotAndIsActivatedIsTrue("공연종료")
+                .forEach(Concert::updateStatus);
     }
 }
