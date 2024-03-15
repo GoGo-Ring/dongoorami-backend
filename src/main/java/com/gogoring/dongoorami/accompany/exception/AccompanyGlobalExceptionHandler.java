@@ -107,4 +107,12 @@ public class AccompanyGlobalExceptionHandler {
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
 
+    @ExceptionHandler(AlreadyApplyConfirmedAccompanyCommentException.class)
+    public ResponseEntity<ErrorResponse> catchAlreadyApplyConfirmedAccompanyCommentException(
+            AlreadyApplyConfirmedAccompanyCommentException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
+
 }
