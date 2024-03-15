@@ -5,6 +5,7 @@ import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertsGetShortResponse;
+import com.gogoring.dongoorami.concert.dto.response.ConcertInfoResponse;
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -77,5 +78,10 @@ public class ConcertController {
             @RequestParam(required = false) List<String> statuses) {
         return ResponseEntity.ok(
                 concertService.getConcerts(cursorId, size, keyword, genres, statuses));
+    }
+
+    @GetMapping("/concerts/keywords")
+    public ResponseEntity<List<ConcertInfoResponse>> getConcertsByKeyword(@RequestParam String keyword){
+        return ResponseEntity.ok(concertService.getConcertsByKeyword(keyword));
     }
 }

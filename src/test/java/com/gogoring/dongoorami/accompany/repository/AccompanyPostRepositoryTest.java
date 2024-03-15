@@ -9,6 +9,9 @@ import static org.hamcrest.Matchers.lessThan;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
+import com.gogoring.dongoorami.concert.ConcertDataFactory;
+import com.gogoring.dongoorami.concert.domain.Concert;
+import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.global.config.QueryDslConfig;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
@@ -37,6 +40,9 @@ class AccompanyPostRepositoryTest {
     @Autowired
     private AccompanyPostRepository accompanyPostRepository;
 
+    @Autowired
+    private ConcertRepository concertRepository;
+
     @BeforeEach
     void setUp() {
         accompanyPostRepository.deleteAll();
@@ -59,7 +65,9 @@ class AccompanyPostRepositoryTest {
                 .providerId("alsjkghlaskdjgh")
                 .build();
         memberRepository.save(member);
-        accompanyPostRepository.saveAll(createAccompanyPosts(member, 30));
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+        accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 30, concert));
         int size = 10;
 
         // when
@@ -80,8 +88,10 @@ class AccompanyPostRepositoryTest {
                 .providerId("alsjkghlaskdjgh")
                 .build();
         memberRepository.save(member);
-        accompanyPostRepository.saveAll(createAccompanyPosts(member, 30));
-        Long cursorId = 1000000L;
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+        accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 30, concert));
+        Long cursorId = 1000000000L;
         int size = 10;
 
         // when
@@ -105,13 +115,14 @@ class AccompanyPostRepositoryTest {
                 .providerId("alsjkghlaskdjgh")
                 .build();
         memberRepository.save(member);
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPostFilterRequest accompanyPostFilterRequest1 = AccompanyPostFilterRequest.builder()
                 .gender("남")
                 .region("수도권(경기, 인천 포함)")
                 .startAge(13L)
                 .endAge(17L)
                 .totalPeople(1L)
-                .concertPlace("KSPO DOME")
+                .concertPlace(concert.getPlace())
                 .purposes(Arrays.asList("관람", "숙박", "이동"))
                 .build();
         AccompanyPostFilterRequest accompanyPostFilterRequest2 = AccompanyPostFilterRequest.builder()
@@ -120,14 +131,14 @@ class AccompanyPostRepositoryTest {
                 .startAge(13L)
                 .endAge(17L)
                 .totalPeople(1L)
-                .concertPlace("KSPO DOME")
+                .concertPlace(concert.getPlace())
                 .purposes(Arrays.asList("관람", "숙박"))
                 .build();
         accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 30, accompanyPostFilterRequest1));
+                createAccompanyPosts(member, 30, accompanyPostFilterRequest1, concert));
         accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 30, accompanyPostFilterRequest2));
-        Long cursorId = 1000000L;
+                createAccompanyPosts(member, 30, accompanyPostFilterRequest2, concert));
+        Long cursorId = 1000000000L;
         int size = 10;
 
         // when
@@ -174,11 +185,12 @@ class AccompanyPostRepositoryTest {
         AccompanyPostFilterRequest accompanyPostFilterRequest3 = AccompanyPostFilterRequest.builder()
                 .purposes(List.of("관람"))
                 .build();
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 3, accompanyPostFilterRequest1));
+                createAccompanyPosts(member, 3, accompanyPostFilterRequest1, concert));
         accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 3, accompanyPostFilterRequest2));
-        Long cursorId = 1000000L;
+                createAccompanyPosts(member, 3, accompanyPostFilterRequest2, concert));
+        Long cursorId = 1000000000L;
         int size = 10;
 
         // when
@@ -227,11 +239,12 @@ class AccompanyPostRepositoryTest {
                 .endAge(13L)
                 .purposes(List.of("관람"))
                 .build();
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 3, accompanyPostFilterRequest1));
+                createAccompanyPosts(member, 3, accompanyPostFilterRequest1, concert));
         accompanyPostRepository.saveAll(
-                createAccompanyPosts(member, 3, accompanyPostFilterRequest2));
-        Long cursorId = 1000000L;
+                createAccompanyPosts(member, 3, accompanyPostFilterRequest2, concert));
+        Long cursorId = 1000000000L;
         int size = 10;
 
         // when
@@ -263,7 +276,7 @@ class AccompanyPostRepositoryTest {
                                         || accompanyPost.getTotalPeople()
                                         .equals(accompanyPostFilterRequest.getTotalPeople())) &&
                                 (accompanyPostFilterRequest.getConcertPlace() == null
-                                        || accompanyPost.getConcertPlace()
+                                        || accompanyPost.getConcert().getPlace()
                                         .equals(accompanyPostFilterRequest.getConcertPlace())) &&
                                 (accompanyPostFilterRequest.getPurposes() == null
                                         || accompanyPostFilterRequest.getPurposes().isEmpty() ||

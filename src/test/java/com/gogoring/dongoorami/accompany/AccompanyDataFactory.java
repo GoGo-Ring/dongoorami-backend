@@ -4,6 +4,7 @@ import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
+import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.member.domain.Member;
 import java.io.FileInputStream;
 import java.time.LocalDate;
@@ -51,13 +52,13 @@ public class AccompanyDataFactory {
         return accompanyComments;
     }
 
-    static public List<AccompanyPost> createAccompanyPosts(Member member, int size) {
+    static public List<AccompanyPost> createAccompanyPosts(Member member, int size,
+            Concert concert) {
         List<AccompanyPost> accompanyPosts = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             accompanyPosts.add(AccompanyPost.builder()
                     .member(member)
-                    .concertName("2024 SG워너비 콘서트 : 우리의 노래")
-                    .concertPlace("KSPO DOME")
+                    .concert(concert)
                     .startDate(LocalDate.of(2024, 3, 22))
                     .endDate(LocalDate.of(2024, 3, 22))
                     .title("서울 같이 갈 울싼 사람 구합니다~~")
@@ -75,13 +76,12 @@ public class AccompanyDataFactory {
     }
 
     static public List<AccompanyPost> createAccompanyPosts(Member member, int size,
-            AccompanyPostFilterRequest accompanyPostFilterRequest) {
+            AccompanyPostFilterRequest accompanyPostFilterRequest, Concert concert) {
         List<AccompanyPost> accompanyPosts = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             accompanyPosts.add(AccompanyPost.builder()
                     .member(member)
-                    .concertName("2024 SG워너비 콘서트 : 우리의 노래")
-                    .concertPlace(accompanyPostFilterRequest.getConcertPlace())
+                    .concert(concert)
                     .startDate(LocalDate.of(2024, 3, 22))
                     .endDate(LocalDate.of(2024, 3, 22))
                     .title("서울 같이 갈 울싼 사람 구합니다~~")

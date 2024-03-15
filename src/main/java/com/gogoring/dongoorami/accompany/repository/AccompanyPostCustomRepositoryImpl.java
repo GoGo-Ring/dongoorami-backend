@@ -66,7 +66,7 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
     }
 
     private BooleanExpression concertPlaceEquals(String concertPlace) {
-        return concertPlace != null ? accompanyPost.concertPlace.eq(concertPlace) : null;
+        return concertPlace != null ? accompanyPost.concert.place.eq(concertPlace) : null;
     }
 
     private BooleanExpression purposesEquals(List<String> purposes) {

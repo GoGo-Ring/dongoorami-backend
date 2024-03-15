@@ -8,6 +8,9 @@ import static org.hamcrest.Matchers.equalTo;
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
+import com.gogoring.dongoorami.concert.ConcertDataFactory;
+import com.gogoring.dongoorami.concert.domain.Concert;
+import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.global.config.QueryDslConfig;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
@@ -37,6 +40,9 @@ class AccompanyCommentRepositoryTest {
 
     @Autowired
     private AccompanyPostRepository accompanyPostRepository;
+
+    @Autowired
+    private ConcertRepository concertRepository;
 
     @BeforeEach
     void setUp() {
@@ -72,8 +78,9 @@ class AccompanyCommentRepositoryTest {
                 .providerId("alsjkghlaskdjgh")
                 .build();
         memberRepository.saveAll(Arrays.asList(member1, member2, member3));
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member1, 1)).get(0);
+                createAccompanyPosts(member1, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = new ArrayList<>();
         accompanyComments.addAll(createAccompanyComment(member1, 3));
         accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
@@ -106,8 +113,9 @@ class AccompanyCommentRepositoryTest {
                 .providerId("alsjkghlaskdjgh")
                 .build();
         memberRepository.saveAll(Arrays.asList(member1, member2));
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member1, 1)).get(0);
+                createAccompanyPosts(member1, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = new ArrayList<>();
         accompanyComments.addAll(createAccompanyComment(member1, 3));
         accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
@@ -139,8 +147,9 @@ class AccompanyCommentRepositoryTest {
                 .providerId("alsjkghlaskdjgh")
                 .build();
         memberRepository.saveAll(Arrays.asList(member1, member2));
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member1, 1)).get(0);
+                createAccompanyPosts(member1, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = new ArrayList<>();
         accompanyComments.addAll(createAccompanyComment(member2, 3));
         accompanyComments.add(

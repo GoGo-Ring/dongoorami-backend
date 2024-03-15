@@ -5,6 +5,7 @@ import com.gogoring.dongoorami.concert.domain.ConcertReview;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetShortResponse;
+import com.gogoring.dongoorami.concert.dto.response.ConcertInfoResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertsGetShortResponse;
@@ -17,6 +18,7 @@ import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.exception.MemberErrorCode;
 import com.gogoring.dongoorami.member.exception.MemberNotFoundException;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -96,7 +98,8 @@ public class ConcertServiceImpl implements ConcertService {
         Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(concertId).orElseThrow(
                 () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
 
-        Integer totalAccompanies = 0; // TODO: AccompanyPost와 Concert 연결 후 로직 수정
+        Integer totalAccompanies = concert.getAccompanyPosts().size();
+        // TODO: Concert와 ConcertReview 양방향 매핑 후 로직 수정
         Integer totalReviews = concertReviewRepository.countByConcertAndIsActivatedIsTrue(concert);
 
         return ConcertGetResponse.of(concert, totalAccompanies, totalReviews);
@@ -112,6 +115,14 @@ public class ConcertServiceImpl implements ConcertService {
                 .toList();
 
         return ConcertsGetShortResponse.of(concerts.hasNext(), concertGetShortResponses);
+    }
+
+    @Override
+    public List<ConcertInfoResponse> getConcertsByKeyword(String keyword) {
+        List<Concert> concerts = concertRepository.findAllByNameContaining(
+                keyword).stream().filter(concert -> concert.getEndLocalDate().isAfter(LocalDate.now())).toList();
+
+        return concerts.stream().map(ConcertInfoResponse::of).toList();
     }
 
     @Scheduled(cron = "0 30 15 * * *", zone = "Asia/Seoul")

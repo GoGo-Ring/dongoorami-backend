@@ -134,4 +134,21 @@ public class ConcertRepositoryTest {
         // then
         assertThat(savedConcerts.size()).isEqualTo(size);
     }
+
+    @Test
+    @DisplayName("키워드로 공연 목록을 조회할 수 있다.")
+    void success_findAllByNameContaining() {
+        // given
+        int size = 7;
+        List<Concert> concerts = ConcertDataFactory.createConcerts(size);
+        concertRepository.saveAll(concerts);
+
+        // when
+        List<Concert> savedConcerts = concertRepository.findAllByNameContaining("고고링");
+
+        // then
+        assertThat(savedConcerts.size()).isEqualTo(size);
+    }
+
+
 }

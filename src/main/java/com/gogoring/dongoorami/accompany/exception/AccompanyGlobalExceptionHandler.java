@@ -75,17 +75,25 @@ public class AccompanyGlobalExceptionHandler {
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
 
-    @ExceptionHandler(AccompanyApplyCommentModificationNotAllowedException.class)
-    public ResponseEntity<ErrorResponse> catchAccompanyApplyCommentModificationNotAllowedException(
-            AccompanyApplyCommentModificationNotAllowedException e) {
+    @ExceptionHandler(AccompanyApplyCommentModifyDeniedException.class)
+    public ResponseEntity<ErrorResponse> catchAccompanyApplyCommentModifyDeniedException(
+            AccompanyApplyCommentModifyDeniedException e) {
         log.error(e.getMessage(), e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
 
     @ExceptionHandler(AccompanyApplyNotAllowedForWriterException.class)
     public ResponseEntity<ErrorResponse> catchAccompanyApplyNotAllowedForWriterException(
             AccompanyApplyNotAllowedForWriterException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(AlreadyEndedConcertException.class)
+    public ResponseEntity<ErrorResponse> catchAlreadyEndedConcertException(
+            AlreadyEndedConcertException e) {
         log.error(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));

@@ -300,3 +300,13 @@ include::{snippets}/ConcertControllerTest/getConcertsAfterFirst/query-parameters
 .Response
 include::{snippets}/ConcertControllerTest/getConcertsAfterFirst/http-response.adoc[]
 include::{snippets}/ConcertControllerTest/getConcertsAfterFirst/response-fields.adoc[]
+
+=== 공연 목록 키워드로 조회(동행 구인글 작성 중 공연 목록 검색 시 사용)
+
+.Request
+include::{snippets}/ConcertControllerTest/getConcertsByKeyword/http-request.adoc[]
+include::{snippets}/ConcertControllerTest/getConcertsByKeyword/query-parameters.adoc[]
+
+.Response
+include::{snippets}/ConcertControllerTest/getConcertsByKeyword/http-response.adoc[]
+include::{snippets}/ConcertControllerTest/getConcertsByKeyword/response-fields.adoc[]

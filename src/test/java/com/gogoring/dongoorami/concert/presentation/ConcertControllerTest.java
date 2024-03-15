@@ -567,4 +567,46 @@ public class ConcertControllerTest {
                         ))
                 );
     }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("키워드로 공연 목록을 조회할 수 있다.")
+    void success_getConcertsByKeyword() throws Exception {
+        // given
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        int size = 7;
+        List<Concert> concerts = ConcertDataFactory.createConcerts(size);
+        concertRepository.saveAll(concerts);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/concerts/keywords").header(
+                                "Authorization", accessToken)
+                        .param("keyword", "고고링")
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getConcertsByKeyword",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("keyword").description("공연 검색 키워드")
+                        ),
+                        responseFields(
+                                fieldWithPath("[]").type(ARRAY)
+                                        .description("공연 정보 목록"),
+                                fieldWithPath("[].id").type(NUMBER)
+                                        .description("공연 아이디"),
+                                fieldWithPath("[].name").type(STRING)
+                                        .description("공연 이름"),
+                                fieldWithPath("[].place").type(STRING)
+                                        .description("공연 장소")
+                        ))
+                );
+    }
 }

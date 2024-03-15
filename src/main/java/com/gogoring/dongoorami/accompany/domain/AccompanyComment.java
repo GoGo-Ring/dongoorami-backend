@@ -1,5 +1,7 @@
 package com.gogoring.dongoorami.accompany.domain;
 
+import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
+import com.gogoring.dongoorami.accompany.exception.OnlyWriterCanModifyException;
 import com.gogoring.dongoorami.global.common.BaseEntity;
 import com.gogoring.dongoorami.member.domain.Member;
 import jakarta.persistence.Entity;
@@ -38,7 +40,19 @@ public class AccompanyComment extends BaseEntity {
         this.accompanyPost = accompanyPost;
     }
 
-    public void updateContent(String content) {
+    public void updateContent(String content, Long memberId) {
+        checkIsWriter(memberId);
         this.content = content;
+    }
+
+    public void updateIsActivatedFalse(Long memberId) {
+        checkIsWriter(memberId);
+        updateIsActivatedFalse();
+    }
+
+    private void checkIsWriter(Long memberId) {
+        if (!this.member.getId().equals(memberId)) {
+            throw new OnlyWriterCanModifyException(AccompanyErrorCode.ONLY_WRITER_CAN_MODIFY);
+        }
     }
 }
