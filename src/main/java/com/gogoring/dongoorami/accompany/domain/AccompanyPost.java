@@ -80,6 +80,7 @@ public class AccompanyPost extends BaseEntity {
         this.images = images;
         this.purposes = purposes;
         concert.addAccompanyPost(this);
+        writer.addAccompanyPost(this);
     }
 
     public void increaseViewCount() {

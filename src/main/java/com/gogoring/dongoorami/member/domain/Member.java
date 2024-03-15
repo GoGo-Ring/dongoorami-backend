@@ -115,6 +115,10 @@ public class Member extends BaseEntity {
         reviewsForReceive.add(accompanyReview);
     }
 
+    public void addAccompanyPost(AccompanyPost accompanyPost) {
+        accompanyPosts.add(accompanyPost);
+    }
+
     private void checkIsNull() {
         if (this.nickname != null || this.gender != null || this.birthDate != null) {
             throw new AlreadySignUpException(MemberErrorCode.ALREADY_SIGN_UP);
