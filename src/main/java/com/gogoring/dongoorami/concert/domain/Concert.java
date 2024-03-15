@@ -8,6 +8,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -105,5 +106,17 @@ public class Concert extends BaseEntity {
         this.status = status;
         this.introductionImages = introductionImages;
         this.schedule = schedule;
+    }
+
+    public void updateStatus() {
+        LocalDate startedAt = LocalDate.parse(this.startedAt);
+        LocalDate endedAt = LocalDate.parse(this.endedAt);
+
+        if ((startedAt.isBefore(LocalDate.now()) || startedAt.isEqual(LocalDate.now()))
+                && (endedAt.isAfter(LocalDate.now()) || endedAt.isEqual(LocalDate.now()))) {
+            this.status = "공연중";
+        } else if (endedAt.isBefore(LocalDate.now())) {
+            this.status = "공연종료";
+        }
     }
 }
