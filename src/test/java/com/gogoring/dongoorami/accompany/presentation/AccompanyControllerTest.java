@@ -41,6 +41,7 @@ import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
+import com.gogoring.dongoorami.accompany.repository.AccompanyReviewRepository;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
@@ -83,6 +84,9 @@ class AccompanyControllerTest {
     private AccompanyCommentRepository accompanyCommentRepository;
 
     @Autowired
+    private AccompanyReviewRepository accompanyReviewRepository;
+
+    @Autowired
     private ConcertRepository concertRepository;
 
     @Autowired
@@ -96,6 +100,7 @@ class AccompanyControllerTest {
 
     @BeforeEach
     void setUp() {
+        accompanyReviewRepository.deleteAll();
         accompanyCommentRepository.deleteAll();
         accompanyPostRepository.deleteAll();
         concertRepository.deleteAll();
@@ -104,6 +109,7 @@ class AccompanyControllerTest {
 
     @AfterEach
     void tearDown() {
+        accompanyReviewRepository.deleteAll();
         accompanyCommentRepository.deleteAll();
         accompanyPostRepository.deleteAll();
         concertRepository.deleteAll();
@@ -831,7 +837,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/v1/accompanies/comments/{accompanyPostId}",
+                patch("/api/v1/accompanies/comments/{accompanyCommentId}",
                         accompanyComments.get(0).getId())
                         .header("Authorization", accessToken)
                         .content(objectMapper.writeValueAsString(accompanyCommentRequest))
@@ -843,7 +849,7 @@ class AccompanyControllerTest {
                 .andDo(document("{ClassName}/updateAccompanyComment",
                         preprocessRequest(prettyPrint()),
                         pathParameters(
-                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                                parameterWithName("accompanyCommentId").description("동행 구인글 댓글 id")
                         ),
                         requestFields(
                                 fieldWithPath("content").type(JsonFieldType.STRING)
@@ -870,12 +876,10 @@ class AccompanyControllerTest {
         List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
         accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
         accompanyCommentRepository.saveAll(accompanyComments);
-        AccompanyCommentRequest accompanyCommentRequest = new AccompanyCommentRequest(
-                "오는 길만 동행 가능할까요??");
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/v1/accompanies/comments/{accompanyPostId}",
+                delete("/api/v1/accompanies/comments/{accompanyCommentId}",
                         accompanyComments.get(0).getId())
                         .header("Authorization", accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -886,7 +890,7 @@ class AccompanyControllerTest {
                 .andDo(document("{ClassName}/deleteAccompanyComment",
                         preprocessRequest(prettyPrint()),
                         pathParameters(
-                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                                parameterWithName("accompanyCommentId").description("동행 구인글 댓글 id")
                         )
                 ));
     }
@@ -925,6 +929,49 @@ class AccompanyControllerTest {
                         preprocessRequest(prettyPrint()),
                         pathParameters(
                                 parameterWithName("accompanyPostId").description("동행 구인글 id")
+                        )
+                ));
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("동행 구인 신청 댓글을 통해 동행 신청을 확정할 수 있다.")
+    void confirmAccompany() throws Exception {
+        // given
+        Member member1 = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        Member member2 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjghjgdslk")
+                .build();
+        memberRepository.saveAll(Arrays.asList(member1, member2));
+        String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
+                member1.getRoles());
+        Concert concert = concertRepository.save(createConcert());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member1, 1, concert)).get(0);
+        AccompanyComment accompanyComment = AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(member2, true);
+        accompanyComment.setAccompanyPost(accompanyPost);
+        accompanyComment.getAccompanyPost().addAccompanyComment(accompanyComment);
+        accompanyComment = accompanyCommentRepository.save(accompanyComment);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/accompanies/{accompanyCommentId}", accompanyComment.getId())
+                        .header("Authorization", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/confirmAccompany",
+                        preprocessRequest(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("accompanyCommentId").description("동행 구인글 댓글 id(신청 댓글만 가능)")
                         )
                 ));
     }
