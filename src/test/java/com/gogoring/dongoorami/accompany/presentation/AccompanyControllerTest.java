@@ -827,7 +827,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/v1/accompanies/comments/{accompanyPostId}",
+                patch("/api/v1/accompanies/comments/{accompanyCommentId}",
                         accompanyComments.get(0).getId())
                         .header("Authorization", accessToken)
                         .content(objectMapper.writeValueAsString(accompanyCommentRequest))
@@ -839,7 +839,7 @@ class AccompanyControllerTest {
                 .andDo(document("{ClassName}/updateAccompanyComment",
                         preprocessRequest(prettyPrint()),
                         pathParameters(
-                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                                parameterWithName("accompanyCommentId").description("동행 구인 댓글 id")
                         ),
                         requestFields(
                                 fieldWithPath("content").type(JsonFieldType.STRING)
@@ -871,7 +871,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/v1/accompanies/comments/{accompanyPostId}",
+                delete("/api/v1/accompanies/comments/{accompanyCommentId}",
                         accompanyComments.get(0).getId())
                         .header("Authorization", accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -882,7 +882,7 @@ class AccompanyControllerTest {
                 .andDo(document("{ClassName}/deleteAccompanyComment",
                         preprocessRequest(prettyPrint()),
                         pathParameters(
-                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                                parameterWithName("accompanyCommentId").description("동행 구인 댓글 id")
                         )
                 ));
     }
