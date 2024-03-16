@@ -3,7 +3,7 @@ package com.gogoring.dongoorami.member.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.gogoring.dongoorami.global.config.QueryDslConfig;
-import com.gogoring.dongoorami.global.util.TestDataUtil;
+import com.gogoring.dongoorami.member.MemberDataFactory;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.exception.MemberErrorCode;
 import com.gogoring.dongoorami.member.exception.MemberNotFoundException;
@@ -40,7 +40,7 @@ public class MemberRepositoryTest {
     @DisplayName("id로 회원을 조회할 수 있다.")
     void success_findByIdAndIsActivatedIsTrue() {
         // given
-        Member member = TestDataUtil.createMember();
+        Member member = MemberDataFactory.createMember();
         ReflectionTestUtils.setField(member, "id", 1L);
         memberRepository.save(member);
 
@@ -56,7 +56,7 @@ public class MemberRepositoryTest {
     @DisplayName("providerId로 회원을 조회할 수 있다.")
     void success_findByProviderIdAndIsActivatedIsTrue() {
         // given
-        Member member = TestDataUtil.createMember();
+        Member member = MemberDataFactory.createMember();
         memberRepository.save(member);
 
         // when

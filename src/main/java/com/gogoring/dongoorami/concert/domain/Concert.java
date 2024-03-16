@@ -79,7 +79,7 @@ public class Concert extends BaseEntity {
 
     private String status;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     private List<String> introductionImages;
 
     @Column(columnDefinition = "TEXT")
@@ -113,6 +113,19 @@ public class Concert extends BaseEntity {
         this.status = status;
         this.introductionImages = introductionImages;
         this.schedule = schedule;
+    }
+
+    public void updateStatus() {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        LocalDate startedAt = LocalDate.parse(this.startedAt, dateTimeFormatter);
+        LocalDate endedAt = LocalDate.parse(this.endedAt, dateTimeFormatter);
+
+        if ((startedAt.isBefore(LocalDate.now()) || startedAt.isEqual(LocalDate.now()))
+                && (endedAt.isAfter(LocalDate.now()) || endedAt.isEqual(LocalDate.now()))) {
+            this.status = "공연중";
+        } else if (endedAt.isBefore(LocalDate.now())) {
+            this.status = "공연종료";
+        }
     }
 
     public LocalDate getEndLocalDate() {

@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
-import com.gogoring.dongoorami.global.util.TestDataUtil;
+import com.gogoring.dongoorami.member.MemberDataFactory;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.dto.request.MemberLogoutAndQuitRequest;
 import com.gogoring.dongoorami.member.dto.request.MemberReissueRequest;
@@ -72,7 +72,7 @@ public class MemberControllerTest {
     @DisplayName("토큰을 재발급할 수 있다.")
     void success_reissueToken() throws Exception {
         // given
-        Member member = TestDataUtil.createMember();
+        Member member = MemberDataFactory.createMember();
         memberRepository.save(member);
 
         String refreshToken = tokenProvider.createRefreshToken(member.getProviderId());
@@ -111,7 +111,7 @@ public class MemberControllerTest {
     @DisplayName("최초 회원가입 시 기본 정보를 저장할 수 있다.")
     void success_signUp() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMember();
+        Member member = MemberDataFactory.createLoginMember();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
@@ -150,7 +150,7 @@ public class MemberControllerTest {
     @DisplayName("로그아웃을 할 수 있다.")
     void success_logout() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMember();
+        Member member = MemberDataFactory.createLoginMember();
         memberRepository.save(member);
 
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
@@ -187,7 +187,7 @@ public class MemberControllerTest {
     @DisplayName("회원 탈퇴를 할 수 있다.")
     void success_quit() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMember();
+        Member member = MemberDataFactory.createLoginMember();
         memberRepository.save(member);
 
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
@@ -224,7 +224,7 @@ public class MemberControllerTest {
     @DisplayName("프로필 이미지를 수정할 수 있다.")
     void success_updateProfileImage() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMember();
+        Member member = MemberDataFactory.createLoginMember();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
@@ -258,7 +258,7 @@ public class MemberControllerTest {
     @DisplayName("프로필 정보를 수정할 수 있다.")
     void success_updateMember() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMember();
+        Member member = MemberDataFactory.createLoginMember();
         ReflectionTestUtils.setField(member, "gender", "남자");
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2000, 12, 31));
         memberRepository.save(member);
@@ -316,7 +316,7 @@ public class MemberControllerTest {
     @DisplayName("프로필 정보를 조회할 수 있다.")
     void success_getMember() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMember();
+        Member member = MemberDataFactory.createLoginMember();
         ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         ReflectionTestUtils.setField(member, "gender", "남자");
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2000, 12, 31));

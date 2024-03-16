@@ -3,7 +3,6 @@ package com.gogoring.dongoorami.accompany.presentation;
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyComment;
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyPosts;
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createMockMultipartFiles;
-import static com.gogoring.dongoorami.global.util.TestDataUtil.createConcert;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -42,6 +41,7 @@ import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyReviewRepository;
+import com.gogoring.dongoorami.concert.ConcertDataFactory;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
@@ -129,7 +129,7 @@ class AccompanyControllerTest {
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
         List<MockMultipartFile> images = createMockMultipartFiles(2);
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPostRequest accompanyPostRequest = AccompanyPostRequest.builder()
                 .concertId(concert.getId())
                 .startDate(LocalDate.of(2024, 3, 22))
@@ -195,7 +195,7 @@ class AccompanyControllerTest {
                 .getPrincipal()).getMember();
         ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         memberRepository.save(member);
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
         String size = "3";
@@ -293,7 +293,7 @@ class AccompanyControllerTest {
                 .getPrincipal()).getMember();
         ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         memberRepository.save(member);
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
         String cursorId = "17", size = "3";
@@ -398,7 +398,7 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1, concert)).get(0);
         Long beforeViewCount = accompanyPost.getViewCount();
@@ -473,7 +473,7 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1, concert)).get(0);
         AccompanyCommentRequest accompanyCommentRequest = new AccompanyCommentRequest(
@@ -517,7 +517,7 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
@@ -593,7 +593,7 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1, concert)).get(0);
         List<MockMultipartFile> images = createMockMultipartFiles(2);
@@ -667,7 +667,7 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
@@ -826,7 +826,7 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
@@ -849,7 +849,7 @@ class AccompanyControllerTest {
                 .andDo(document("{ClassName}/updateAccompanyComment",
                         preprocessRequest(prettyPrint()),
                         pathParameters(
-                                parameterWithName("accompanyCommentId").description("동행 구인글 댓글 id")
+                                parameterWithName("accompanyCommentId").description("동행 구인 댓글 id")
                         ),
                         requestFields(
                                 fieldWithPath("content").type(JsonFieldType.STRING)
@@ -870,7 +870,7 @@ class AccompanyControllerTest {
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
@@ -890,7 +890,7 @@ class AccompanyControllerTest {
                 .andDo(document("{ClassName}/deleteAccompanyComment",
                         preprocessRequest(prettyPrint()),
                         pathParameters(
-                                parameterWithName("accompanyCommentId").description("동행 구인글 댓글 id")
+                                parameterWithName("accompanyCommentId").description("동행 구인 댓글 id")
                         )
                 ));
     }
@@ -912,7 +912,7 @@ class AccompanyControllerTest {
         memberRepository.saveAll(Arrays.asList(member1, member2));
         String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
                 member1.getRoles());
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member2, 1, concert)).get(0);
 

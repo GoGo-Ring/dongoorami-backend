@@ -21,6 +21,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.queryPar
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gogoring.dongoorami.concert.ConcertDataFactory;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
@@ -28,7 +29,7 @@ import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.concert.repository.ConcertReviewRepository;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
-import com.gogoring.dongoorami.global.util.TestDataUtil;
+import com.gogoring.dongoorami.member.MemberDataFactory;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.util.List;
@@ -88,12 +89,12 @@ public class ConcertControllerTest {
     @DisplayName("공연 후기를 생성할 수 있다.")
     void success_createConcertReview() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMember();
+        Member member = MemberDataFactory.createLoginMember();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
 
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
         ConcertReviewRequest concertReviewRequest = new ConcertReviewRequest();
@@ -133,16 +134,17 @@ public class ConcertControllerTest {
     @DisplayName("공연 후기 목록을 조회할 수 있다. - 최초 요청")
     void success_getConcertReviewsFirst() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMemberWithNickname();
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
 
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
         int size = 3;
-        List<ConcertReview> concertReviews = TestDataUtil.createConcertReviews(concert, member,
+        List<ConcertReview> concertReviews = ConcertDataFactory.createConcertReviews(concert,
+                member,
                 size);
         concertReviewRepository.saveAll(concertReviews);
 
@@ -199,16 +201,17 @@ public class ConcertControllerTest {
     @DisplayName("공연 후기 목록을 조회할 수 있다. - 이후 요청")
     void getConcertReviewsAfterFirst() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMemberWithNickname();
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
 
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
         int size = 3;
-        List<ConcertReview> concertReviews = TestDataUtil.createConcertReviews(concert, member,
+        List<ConcertReview> concertReviews = ConcertDataFactory.createConcertReviews(concert,
+                member,
                 size);
         concertReviewRepository.saveAll(concertReviews);
         long maxId = -1L;
@@ -271,15 +274,16 @@ public class ConcertControllerTest {
     @DisplayName("공연 후기를 수정할 수 있다.")
     void success_updateConcertReview() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMemberWithNickname();
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
 
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
-        ConcertReview concertReview = TestDataUtil.createConcertReviews(concert, member, 1).get(0);
+        ConcertReview concertReview = ConcertDataFactory.createConcertReviews(concert, member, 1)
+                .get(0);
         concertReviewRepository.save(concertReview);
 
         ConcertReviewRequest concertReviewRequest = new ConcertReviewRequest();
@@ -319,15 +323,16 @@ public class ConcertControllerTest {
     @DisplayName("공연 후기를 삭제할 수 있다.")
     void success_deleteConcertReview() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMemberWithNickname();
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
 
-        Concert concert = TestDataUtil.createConcert();
+        Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
-        ConcertReview concertReview = TestDataUtil.createConcertReviews(concert, member, 1).get(0);
+        ConcertReview concertReview = ConcertDataFactory.createConcertReviews(concert, member, 1)
+                .get(0);
         concertReviewRepository.save(concertReview);
 
         // when
@@ -349,21 +354,237 @@ public class ConcertControllerTest {
 
     @Test
     @WithCustomMockUser
-    @DisplayName("키워드로 공연 목록을 조회할 수 있다.")
-    void success_getConcertsByKeyword() throws Exception {
+    @DisplayName("공연 단건 상세 조회를 할 수 있다.")
+    void success_getConcert() throws Exception {
         // given
-        Member member = TestDataUtil.createLoginMemberWithNickname();
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
         memberRepository.save(member);
         String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
                 member.getRoles());
 
-        for (int i = 0; i < 7; i++) {
-            concertRepository.save(TestDataUtil.createConcert());
+        Concert concert = ConcertDataFactory.createConcert();
+        concertRepository.save(concert);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/concerts/{concertId}", concert.getId()).header(
+                        "Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getConcert",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("concertId").description("조회할 공연 아이디")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(NUMBER)
+                                        .description("공연 아이디"),
+                                fieldWithPath("name").type(STRING)
+                                        .description("공연명"),
+                                fieldWithPath("startedAt").type(STRING)
+                                        .description("공연 시작 일자"),
+                                fieldWithPath("endedAt").type(STRING)
+                                        .description("공연 종료 일자"),
+                                fieldWithPath("place").type(STRING)
+                                        .description("공연 장소"),
+                                fieldWithPath("actor").type(STRING)
+                                        .description("출연진"),
+                                fieldWithPath("crew").type(STRING)
+                                        .description("제작진"),
+                                fieldWithPath("runtime").type(STRING)
+                                        .description("공연 런타임"),
+                                fieldWithPath("age").type(STRING)
+                                        .description("공연 관람 연령"),
+                                fieldWithPath("producer").type(STRING)
+                                        .description("제작사"),
+                                fieldWithPath("agency").type(STRING)
+                                        .description("기획사"),
+                                fieldWithPath("host").type(STRING)
+                                        .description("주최"),
+                                fieldWithPath("management").type(STRING)
+                                        .description("주관"),
+                                fieldWithPath("cost").type(STRING)
+                                        .description("티켓 가격"),
+                                fieldWithPath("poster").type(STRING)
+                                        .description("포스터 이미지 url"),
+                                fieldWithPath("summary").type(STRING)
+                                        .description("줄거리"),
+                                fieldWithPath("genre").type(STRING)
+                                        .description("장르"),
+                                fieldWithPath("status").type(STRING)
+                                        .description("공연 상태"),
+                                fieldWithPath("introductionImages").type(ARRAY)
+                                        .description("소개 이미지 url 목록"),
+                                fieldWithPath("schedule").type(STRING)
+                                        .description("공연 시간"),
+                                fieldWithPath("totalAccompanies").type(NUMBER)
+                                        .description("공연 구인글 수"),
+                                fieldWithPath("totalReviews").type(NUMBER)
+                                        .description("관람 후기 수")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("공연 목록을 조회할 수 있다. - 최초 요청")
+    void success_getConcertsFirst() throws Exception {
+        // given
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        int size = 3;
+        List<Concert> concerts = ConcertDataFactory.createConcerts(size);
+        concertRepository.saveAll(concerts);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/concerts").header(
+                                "Authorization", accessToken)
+                        .param("size", String.valueOf(size))
+                        .param("keyword", concerts.get(0).getName()
+                                .substring(0, concerts.get(0).getName().length() / 2))
+                        .param("genres", concerts.get(0).getGenre())
+                        .param("genres", "복합")
+                        .param("statuses", concerts.get(0).getStatus())
+                        .param("statuses", "공연종료")
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getConcertsFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("size").description(
+                                        "조회할 공연 개수, 값 넣지 않으면 기본 6개").optional(),
+                                parameterWithName("keyword").description(
+                                        "조회할 공연명, 값 넣지 않으면 전체 검색").optional(),
+                                parameterWithName("genres").description(
+                                        "조회할 장르, 값 넣지 않으면 전체 검색").optional(),
+                                parameterWithName("statuses").description(
+                                        "조회할 공연 상태, 값 넣지 않으면 전체 검색").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNext").type(BOOLEAN)
+                                        .description("다음 공연 존재 여부"),
+                                fieldWithPath("concertGetShortResponses").type(ARRAY)
+                                        .description("공연 목록"),
+                                fieldWithPath("concertGetShortResponses[].id").type(NUMBER)
+                                        .description("공연 아이디"),
+                                fieldWithPath("concertGetShortResponses[].name").type(STRING)
+                                        .description("공연명"),
+                                fieldWithPath("concertGetShortResponses[].place").type(STRING)
+                                        .description("공연장소"),
+                                fieldWithPath("concertGetShortResponses[].genre").type(STRING)
+                                        .description("장르"),
+                                fieldWithPath("concertGetShortResponses[].startedAt").type(STRING)
+                                        .description("공연 시작 일자"),
+                                fieldWithPath("concertGetShortResponses[].endedAt").type(STRING)
+                                        .description("공연 종료 일자"),
+                                fieldWithPath("concertGetShortResponses[].poster").type(STRING)
+                                        .description("포스터 이미지 url"),
+                                fieldWithPath("concertGetShortResponses[].status").type(STRING)
+                                        .description("공연 상태")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("공연 목록을 조회할 수 있다. - 이후 요청")
+    void success_getConcertsAfterFirst() throws Exception {
+        // given
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        int size = 3;
+        List<Concert> concerts = ConcertDataFactory.createConcerts(size);
+        concertRepository.saveAll(concerts);
+        long maxId = -1L;
+        for (Concert concert : concerts) {
+            maxId = Math.max(maxId, concert.getId());
         }
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/v1/concerts").header(
+                                "Authorization", accessToken)
+                        .param("cursorId", String.valueOf(maxId))
+                        .param("size", String.valueOf(size))
+                        .param("keyword", concerts.get(0).getName()
+                                .substring(0, concerts.get(0).getName().length() / 2))
+                        .param("genres", concerts.get(0).getGenre())
+                        .param("genres", "복합")
+                        .param("statuses", concerts.get(0).getStatus())
+                        .param("statuses", "공연종료")
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getConcertsAfterFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("cursorId").description("마지막으로 받은 공연 아이디"),
+                                parameterWithName("size").description(
+                                        "조회할 공연 개수, 값 넣지 않으면 기본 6개").optional(),
+                                parameterWithName("keyword").description(
+                                        "조회할 공연명, 값 넣지 않으면 전체 검색").optional(),
+                                parameterWithName("genres").description(
+                                        "조회할 장르, 값 넣지 않으면 전체 검색").optional(),
+                                parameterWithName("statuses").description(
+                                        "조회할 공연 상태, 값 넣지 않으면 전체 검색").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNext").type(BOOLEAN)
+                                        .description("다음 공연 존재 여부"),
+                                fieldWithPath("concertGetShortResponses").type(ARRAY)
+                                        .description("공연 목록"),
+                                fieldWithPath("concertGetShortResponses[].id").type(NUMBER)
+                                        .description("공연 아이디"),
+                                fieldWithPath("concertGetShortResponses[].name").type(STRING)
+                                        .description("공연명"),
+                                fieldWithPath("concertGetShortResponses[].place").type(STRING)
+                                        .description("공연장소"),
+                                fieldWithPath("concertGetShortResponses[].genre").type(STRING)
+                                        .description("장르"),
+                                fieldWithPath("concertGetShortResponses[].startedAt").type(STRING)
+                                        .description("공연 시작 일자"),
+                                fieldWithPath("concertGetShortResponses[].endedAt").type(STRING)
+                                        .description("공연 종료 일자"),
+                                fieldWithPath("concertGetShortResponses[].poster").type(STRING)
+                                        .description("포스터 이미지 url"),
+                                fieldWithPath("concertGetShortResponses[].status").type(STRING)
+                                        .description("공연 상태")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("키워드로 공연 목록을 조회할 수 있다.")
+    void success_getConcertsByKeyword() throws Exception {
+        // given
+        Member member = MemberDataFactory.createLoginMemberWithNickname();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        int size = 7;
+        List<Concert> concerts = ConcertDataFactory.createConcerts(size);
+        concertRepository.saveAll(concerts);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/concerts/keywords").header(
                                 "Authorization", accessToken)
                         .param("keyword", "고고링")
         );
