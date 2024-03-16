@@ -20,7 +20,6 @@ import lombok.NoArgsConstructor;
 @Entity
 public class AccompanyReview extends BaseEntity {
 
-    private final Boolean isReviewed = false;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
