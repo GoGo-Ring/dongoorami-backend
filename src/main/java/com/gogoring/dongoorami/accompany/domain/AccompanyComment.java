@@ -51,8 +51,8 @@ public class AccompanyComment extends BaseEntity {
         updateIsActivatedFalse();
     }
 
-    public void updateIsAccompanyConfirmedComment(Boolean isAccompanyConfirmedComment) {
-        this.isAccompanyConfirmedComment = isAccompanyConfirmedComment;
+    public void updateIsAccompanyConfirmedComment() {
+        this.isAccompanyConfirmedComment = true;
     }
 
     private void checkIsWriter(Long memberId) {

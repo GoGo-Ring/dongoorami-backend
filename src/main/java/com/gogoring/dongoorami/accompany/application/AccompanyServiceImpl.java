@@ -220,7 +220,7 @@ public class AccompanyServiceImpl implements AccompanyService {
         checkAlreadyConfirmedAccompanyApplyComment(accompanyComment);
         createAccompanyReview(accompanyPost,
                 getAccompanyConfirmedMembers(accompanyPost, accompanyComment.getMember()));
-        accompanyComment.updateIsAccompanyConfirmedComment(true);
+        accompanyComment.updateIsAccompanyConfirmedComment();
     }
 
     private List<Member> getAccompanyConfirmedMembers(AccompanyPost accompanyPost,
