@@ -950,7 +950,7 @@ class AccompanyControllerTest {
         memberRepository.saveAll(Arrays.asList(member1, member2));
         String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
                 member1.getRoles());
-        Concert concert = concertRepository.save(createConcert());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member1, 1, concert)).get(0);
         AccompanyComment accompanyComment = AccompanyCommentRequest.createAccompanyApplyCommentRequest()
@@ -971,7 +971,8 @@ class AccompanyControllerTest {
                 .andDo(document("{ClassName}/confirmAccompany",
                         preprocessRequest(prettyPrint()),
                         pathParameters(
-                                parameterWithName("accompanyCommentId").description("동행 구인글 댓글 id(신청 댓글만 가능)")
+                                parameterWithName("accompanyCommentId").description(
+                                        "동행 구인글 댓글 id(신청 댓글만 가능)")
                         )
                 ));
     }

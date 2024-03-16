@@ -56,8 +56,9 @@ public class AccompanyReview extends BaseEntity {
     }
 
     public enum AccompanyReviewStatusType {
-        BEFORE_ACCOMPANY("동행 전"), AFTER_ACCOMPANY_AND_WRITTEN(
-                "작성 완료"), AFTER_ACCOMPANY_AND_NOT_WRITTEN("작성 필요");
+        BEFORE_ACCOMPANY("동행 전"),
+        AFTER_ACCOMPANY_AND_WRITTEN("작성 완료"),
+        AFTER_ACCOMPANY_AND_NOT_WRITTEN("작성 필요");
 
         String name;
 
