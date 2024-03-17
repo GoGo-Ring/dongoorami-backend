@@ -11,6 +11,8 @@ public interface AccompanyCommentRepository extends JpaRepository<AccompanyComme
 
     List<AccompanyComment> findAllByAccompanyPostId(Long accompanyPostId);
 
+    long countByAccompanyPostId(Long accompanyPostId);
+
     Long countByAccompanyPostIdAndIsActivatedIsTrueAndIsAccompanyApplyCommentTrue(
             Long accompanyPostId);
 

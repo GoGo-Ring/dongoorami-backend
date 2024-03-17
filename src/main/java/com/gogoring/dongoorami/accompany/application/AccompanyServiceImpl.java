@@ -79,9 +79,8 @@ public class AccompanyServiceImpl implements AccompanyService {
                 accompanyPosts.hasNext(),
                 accompanyPosts.getContent().stream().map(
                         accompanyPost -> {
-                            int commentCount = accompanyCommentRepository.findAllByAccompanyPostId(
-                                    accompanyPost.getId()).size();
-                            return AccompanyPostInfo.of(accompanyPost, (long) commentCount);
+                            long commentCount = accompanyCommentRepository.countByAccompanyPostId(accompanyPost.getId());
+                            return AccompanyPostInfo.of(accompanyPost, commentCount);
                         }).toList());
     }
 
