@@ -319,3 +319,14 @@ include::{snippets}/ConcertControllerTest/getConcertsByKeyword/query-parameters.
 .Response
 include::{snippets}/ConcertControllerTest/getConcertsByKeyword/http-response.adoc[]
 include::{snippets}/ConcertControllerTest/getConcertsByKeyword/response-fields.adoc[]
+
+== 찜 API
+=== 찜 정보 저장
+
+.Request
+include::{snippets}/WishControllerTest/createWish/http-request.adoc[]
+include::{snippets}/WishControllerTest/createWish/path-parameters.adoc[]
+
+.Response
+include::{snippets}/WishControllerTest/createWish/http-response.adoc[]
+
