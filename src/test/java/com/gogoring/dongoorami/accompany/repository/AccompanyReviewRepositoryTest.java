@@ -4,6 +4,7 @@ import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccom
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyPosts;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
@@ -163,5 +164,54 @@ class AccompanyReviewRepositoryTest {
         assertThat(isMember1Member2AccompanyReviewExist, equalTo(true));
         assertThat(isMember2Member1AccompanyReviewExist, equalTo(true));
         assertThat(isMember1Member3AccompanyReviewExist, equalTo(false));
+    }
+
+    @Test
+    @DisplayName("리뷰 작성자 id, 리뷰 대상자 id, 동행구인글 id로 동행 리뷰를 조회할 수 있다.")
+    void success_findAccompanyReviewByReviewerIdAndRevieweeIdAndAccompanyPostId() {
+        // given
+        Member member1 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        Member member2 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        Member member3 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        memberRepository.saveAll(Arrays.asList(member1, member2));
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member1, 1, concert)).get(0);
+        List<AccompanyComment> accompanyComments = new ArrayList<>();
+        accompanyComments.addAll(createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+        List<AccompanyReview> accompanyReviews = new ArrayList<>();
+        accompanyReviews.add(AccompanyReview.builder()
+                .reviewer(member1)
+                .reviewee(member2)
+                .accompanyPost(accompanyPost)
+                .build());
+        accompanyReviews.add(AccompanyReview.builder()
+                .reviewer(member2)
+                .reviewee(member1)
+                .accompanyPost(accompanyPost)
+                .build());
+        accompanyReviewRepository.saveAll(accompanyReviews);
+
+        // when
+        AccompanyReview accompanyReview = accompanyReviewRepository.findAccompanyReviewByReviewerIdAndRevieweeIdAndAccompanyPostId(
+                member1.getId(), member2.getId(), accompanyPost.getId());
+
+        // then
+        assertThat(accompanyReview, notNullValue());
     }
 }
