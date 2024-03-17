@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,14 +24,17 @@ public class AccompanyComment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
+    @JoinColumn(name = "accompany_post_id")
     private AccompanyPost accompanyPost;
     @ManyToOne
     private Member member;
     private String content;
     private Boolean isAccompanyApplyComment;
+    private Boolean isAccompanyConfirmedComment = false;
 
     @Builder
-    public AccompanyComment(Member member, String content, Boolean isAccompanyApplyComment) {
+    public AccompanyComment(AccompanyPost accompanyPost, Member member, String content, Boolean isAccompanyApplyComment) {
+        this.accompanyPost = accompanyPost;
         this.member = member;
         this.content = content;
         this.isAccompanyApplyComment = isAccompanyApplyComment;
@@ -48,6 +52,10 @@ public class AccompanyComment extends BaseEntity {
     public void updateIsActivatedFalse(Long memberId) {
         checkIsWriter(memberId);
         updateIsActivatedFalse();
+    }
+
+    public void updateIsAccompanyConfirmedComment() {
+        this.isAccompanyConfirmedComment = true;
     }
 
     private void checkIsWriter(Long memberId) {

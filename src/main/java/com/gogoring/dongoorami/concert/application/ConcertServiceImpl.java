@@ -1,5 +1,6 @@
 package com.gogoring.dongoorami.concert.application;
 
+import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
@@ -34,6 +35,7 @@ public class ConcertServiceImpl implements ConcertService {
 
     private final ConcertRepository concertRepository;
     private final ConcertReviewRepository concertReviewRepository;
+    private final AccompanyPostRepository accompanyPostRepository;
     private final MemberRepository memberRepository;
 
     @Transactional
@@ -97,9 +99,7 @@ public class ConcertServiceImpl implements ConcertService {
     public ConcertGetResponse getConcert(Long concertId) {
         Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(concertId).orElseThrow(
                 () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
-
-        Integer totalAccompanies = concert.getAccompanyPosts().size();
-        // TODO: Concert와 ConcertReview 양방향 매핑 후 로직 수정
+        Integer totalAccompanies = accompanyPostRepository.findAllByConcertId(concertId).size();
         Integer totalReviews = concertReviewRepository.countByConcertAndIsActivatedIsTrue(concert);
 
         return ConcertGetResponse.of(concert, totalAccompanies, totalReviews);

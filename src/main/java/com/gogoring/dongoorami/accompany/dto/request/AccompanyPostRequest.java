@@ -74,7 +74,7 @@ public class AccompanyPostRequest {
                 .startDate(startDate)
                 .totalPeople(totalPeople)
                 .startAge(startAge)
-                .member(member)
+                .writer(member)
                 .images(images)
                 .purposes(purposes.stream().map(AccompanyPurposeType::getValue).toList())
                 .build();

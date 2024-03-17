@@ -1,6 +1,5 @@
 package com.gogoring.dongoorami.concert.domain;
 
-import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.global.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -9,10 +8,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -85,9 +82,6 @@ public class Concert extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String schedule;
 
-    @OneToMany(mappedBy = "concert")
-    private final List<AccompanyPost> accompanyPosts = new ArrayList<>();
-
     @Builder
     public Concert(String kopisId, String name, String startedAt, String endedAt, String place,
             String actor, String crew, String runtime, String age, String producer, String agency,
@@ -133,7 +127,4 @@ public class Concert extends BaseEntity {
         return LocalDate.parse(endedAt, formatter);
     }
 
-    public void addAccompanyPost(AccompanyPost accompanyPost) {
-        accompanyPosts.add(accompanyPost);
-    }
 }

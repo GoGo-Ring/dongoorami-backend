@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.concert.ConcertDataFactory;
 import com.gogoring.dongoorami.concert.domain.Concert;
@@ -30,7 +31,7 @@ import org.springframework.context.annotation.Import;
 @Import(QueryDslConfig.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
-class AccompanyCommentRepositoryTest {
+class AccompanyReviewRepositoryTest {
 
     @Autowired
     private MemberRepository memberRepository;
@@ -43,9 +44,12 @@ class AccompanyCommentRepositoryTest {
 
     @Autowired
     private ConcertRepository concertRepository;
+    @Autowired
+    private AccompanyReviewRepository accompanyReviewRepository;
 
     @BeforeEach
     void setUp() {
+        accompanyReviewRepository.deleteAll();
         accompanyCommentRepository.deleteAll();
         accompanyPostRepository.deleteAll();
         memberRepository.deleteAll();
@@ -53,40 +57,59 @@ class AccompanyCommentRepositoryTest {
 
     @AfterEach
     void tearDown() {
+        accompanyReviewRepository.deleteAll();
         accompanyCommentRepository.deleteAll();
         accompanyPostRepository.deleteAll();
         memberRepository.deleteAll();
     }
 
     @Test
-    @DisplayName("특정 동행 구인글의 댓글 수를 조회할 수 있다.")
-    void success_countByAccompanyPostId() {
+    @DisplayName("현재까지 특정 동행 구인글에 대해 동행을 확정한 회원 목록을 조회할 수 있다.")
+    void success_findDistinctReviewerAndRevieweeByAccompanyPostId() {
         // given
         Member member1 = Member.builder()
                 .profileImage("image.png")
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
                 .build();
-        memberRepository.save(member1);
+        Member member2 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        memberRepository.saveAll(Arrays.asList(member1, member2));
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member1, 1, concert)).get(0);
-        int size = 3;
         List<AccompanyComment> accompanyComments = new ArrayList<>();
-        accompanyComments.addAll(createAccompanyComment(accompanyPost, member1, size));
+        accompanyComments.addAll(createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
         accompanyCommentRepository.saveAll(accompanyComments);
+        List<AccompanyReview> accompanyReviews = new ArrayList<>();
+        accompanyReviews.add(AccompanyReview.builder()
+                .reviewer(member1)
+                .reviewee(member2)
+                .accompanyPost(accompanyPost)
+                .build());
+        accompanyReviews.add(AccompanyReview.builder()
+                .reviewer(member2)
+                .reviewee(member1)
+                .accompanyPost(accompanyPost)
+                .build());
+        accompanyReviewRepository.saveAll(accompanyReviews);
 
         // when
-        long commentCount = accompanyCommentRepository.countByAccompanyPostIdAndIsActivatedIsTrue(
+        List<Long> companionIds = accompanyReviewRepository.findDistinctReviewerAndRevieweeByAccompanyPostId(
                 accompanyPost.getId());
 
         // then
-        assertThat(commentCount, equalTo((long) size));
+        assertThat(companionIds.size(), equalTo(2));
     }
 
     @Test
-    @DisplayName("동행 댓글 신청 수를 조회할 수 있다.")
-    void success_countByIsActivatedIsTrueAndIsAccompanyApplyCommentTrue() {
+    @DisplayName("특정 동행 구인글에 대해 동행자 A, 동행자 B 간의 동행 리뷰가 생성되어 있는지 확인할 수 있다.")
+    void success_existsByCompanionsAndAccompanyPostId() {
         // given
         Member member1 = Member.builder()
                 .profileImage("image.png")
@@ -103,40 +126,6 @@ class AccompanyCommentRepositoryTest {
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
                 .build();
-        memberRepository.saveAll(Arrays.asList(member1, member2, member3));
-        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
-        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member1, 1, concert)).get(0);
-        List<AccompanyComment> accompanyComments = new ArrayList<>();
-        accompanyComments.addAll(createAccompanyComment(accompanyPost, member1, 3));
-        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
-                .toEntity(accompanyPost, member2, true));
-        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
-                .toEntity(accompanyPost, member3, true));
-        accompanyCommentRepository.saveAll(accompanyComments);
-
-        // when
-        Long waitingCount = accompanyCommentRepository.countByAccompanyPostIdAndIsActivatedIsTrueAndIsAccompanyApplyCommentTrue(
-                accompanyPost.getId());
-
-        // then
-        assertThat(waitingCount, equalTo(2L));
-    }
-
-    @Test
-    @DisplayName("특정 멤버의 동행 신청 여부를 조회할 수 있다. - 신청한 경우")
-    void success_existsByMemberIdAndIsAccompanyApplyCommentTrue_given_appliedMember() {
-        // given
-        Member member1 = Member.builder()
-                .profileImage("image.png")
-                .provider("kakao")
-                .providerId("alsjkghlaskdjgh")
-                .build();
-        Member member2 = Member.builder()
-                .profileImage("image.png")
-                .provider("kakao")
-                .providerId("alsjkghlaskdjgh")
-                .build();
         memberRepository.saveAll(Arrays.asList(member1, member2));
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
@@ -146,47 +135,33 @@ class AccompanyCommentRepositoryTest {
         accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
                 .toEntity(accompanyPost, member2, true));
         accompanyCommentRepository.saveAll(accompanyComments);
+        List<AccompanyReview> accompanyReviews = new ArrayList<>();
+        accompanyReviews.add(AccompanyReview.builder()
+                .reviewer(member1)
+                .reviewee(member2)
+                .accompanyPost(accompanyPost)
+                .build());
+        accompanyReviews.add(AccompanyReview.builder()
+                .reviewer(member2)
+                .reviewee(member1)
+                .accompanyPost(accompanyPost)
+                .build());
+        accompanyReviewRepository.saveAll(accompanyReviews);
 
         // when
-        boolean isAccompanyApplied = accompanyCommentRepository.existsByAccompanyPostIdAndMemberIdAndIsAccompanyApplyCommentTrue(
-                accompanyPost.getId(),
-                member2.getId());
+        boolean isMember1Member2AccompanyReviewExist = accompanyReviewRepository.existsByCompanionsAndAccompanyPostId(
+                member1.getId(),
+                member2.getId(), accompanyPost.getId());
+        boolean isMember2Member1AccompanyReviewExist = accompanyReviewRepository.existsByCompanionsAndAccompanyPostId(
+                member2.getId(),
+                member1.getId(), accompanyPost.getId());
+        boolean isMember1Member3AccompanyReviewExist = accompanyReviewRepository.existsByCompanionsAndAccompanyPostId(
+                member1.getId(),
+                member3.getId(), accompanyPost.getId());
 
         // then
-        assertThat(isAccompanyApplied, equalTo(true));
-    }
-
-    @Test
-    @DisplayName("특정 멤버의 동행 신청 여부를 조회할 수 있다. - 신청하지 않은 경우")
-    void success_existsByMemberIdAndIsAccompanyApplyCommentTrue_given_notAppliedMember() {
-        // given
-        Member member1 = Member.builder()
-                .profileImage("image.png")
-                .provider("kakao")
-                .providerId("alsjkghlaskdjgh")
-                .build();
-        Member member2 = Member.builder()
-                .profileImage("image.png")
-                .provider("kakao")
-                .providerId("alsjkghlaskdjgh")
-                .build();
-        memberRepository.saveAll(Arrays.asList(member1, member2));
-        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
-        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
-                createAccompanyPosts(member1, 1, concert)).get(0);
-        List<AccompanyComment> accompanyComments = new ArrayList<>();
-        accompanyComments.addAll(createAccompanyComment(accompanyPost, member2, 3));
-        accompanyComments.add(
-                new AccompanyCommentRequest("가는 길만 동행해도 괜찮을까요!?").toEntity(accompanyPost, member2,
-                        false));
-        accompanyCommentRepository.saveAll(accompanyComments);
-
-        // when
-        boolean isAccompanyApplied = accompanyCommentRepository.existsByAccompanyPostIdAndMemberIdAndIsAccompanyApplyCommentTrue(
-                accompanyPost.getId(),
-                member2.getId());
-
-        // then
-        assertThat(isAccompanyApplied, equalTo(false));
+        assertThat(isMember1Member2AccompanyReviewExist, equalTo(true));
+        assertThat(isMember2Member1AccompanyReviewExist, equalTo(true));
+        assertThat(isMember1Member3AccompanyReviewExist, equalTo(false));
     }
 }

@@ -2,6 +2,7 @@ package com.gogoring.dongoorami.accompany.application;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
@@ -13,11 +14,15 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.Acc
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
 import com.gogoring.dongoorami.accompany.exception.AccompanyApplyCommentModifyDeniedException;
 import com.gogoring.dongoorami.accompany.exception.AccompanyApplyNotAllowedForWriterException;
+import com.gogoring.dongoorami.accompany.exception.AccompanyCommentApplyConfirmDeniedException;
 import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
 import com.gogoring.dongoorami.accompany.exception.AccompanyPostNotFoundException;
+import com.gogoring.dongoorami.accompany.exception.AlreadyApplyConfirmedAccompanyCommentException;
 import com.gogoring.dongoorami.accompany.exception.DuplicatedAccompanyApplyException;
+import com.gogoring.dongoorami.accompany.exception.OnlyWriterCanConfirmApplyException;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
+import com.gogoring.dongoorami.accompany.repository.AccompanyReviewRepository;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
 import com.gogoring.dongoorami.concert.exception.ConcertNotFoundException;
@@ -28,6 +33,7 @@ import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.exception.MemberErrorCode;
 import com.gogoring.dongoorami.member.exception.MemberNotFoundException;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
@@ -41,6 +47,7 @@ public class AccompanyServiceImpl implements AccompanyService {
 
     private final AccompanyPostRepository accompanyPostRepository;
     private final AccompanyCommentRepository accompanyCommentRepository;
+    private final AccompanyReviewRepository accompanyReviewRepository;
     private final MemberRepository memberRepository;
     private final ConcertRepository concertRepository;
     private final S3ImageUtil s3ImageUtil;
@@ -71,7 +78,10 @@ public class AccompanyServiceImpl implements AccompanyService {
         return new AccompanyPostsResponse(
                 accompanyPosts.hasNext(),
                 accompanyPosts.getContent().stream().map(
-                        AccompanyPostInfo::of).toList());
+                        accompanyPost -> {
+                            long commentCount = accompanyCommentRepository.countByAccompanyPostIdAndIsActivatedIsTrue(accompanyPost.getId());
+                            return AccompanyPostInfo.of(accompanyPost, commentCount);
+                        }).toList());
     }
 
     @Transactional
@@ -86,7 +96,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                 accompanyPostId);
 
         return AccompanyPostResponse.of(accompanyPost, waitingCount,
-                MemberProfile.of(accompanyPost.getMember(), currentMemberId));
+                MemberProfile.of(accompanyPost.getWriter(), currentMemberId));
     }
 
     @Override
@@ -99,9 +109,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        AccompanyComment accompanyComment = accompanyCommentRequest.toEntity(member,
-                isAccompanyApplyComment);
-        accompanyPost.addAccompanyComment(accompanyComment);
+        AccompanyComment accompanyComment = accompanyCommentRequest.toEntity(accompanyPost, member, isAccompanyApplyComment);
         accompanyCommentRepository.save(accompanyComment);
 
         return accompanyPost.getId();
@@ -114,7 +122,8 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        List<AccompanyCommentInfo> accompanyCommentInfos = accompanyPost.getAccompanyComments()
+        List<AccompanyCommentInfo> accompanyCommentInfos = accompanyCommentRepository.findAllByAccompanyPostId(
+                        accompanyPostId)
                 .stream()
                 .filter(AccompanyComment::isActivated)
                 .map((AccompanyComment accompanyComment) -> AccompanyCommentInfo.of(
@@ -152,7 +161,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        accompanyPost.getAccompanyComments().forEach(
+        accompanyCommentRepository.findAllByAccompanyPostId(accompanyPostId).forEach(
                 accompanyComment -> accompanyComment.updateIsActivatedFalse(currentMemberId));
         accompanyPost.updateIsActivatedFalse();
     }
@@ -193,11 +202,68 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        checkApplicantIsWriter(currentMemberId, accompanyPost.getMember().getId());
+        checkApplicantIsWriter(currentMemberId, accompanyPost.getWriter().getId());
         checkDuplicatedAccompanyApply(accompanyPostId, currentMemberId);
         return createAccompanyComment(accompanyPostId,
                 AccompanyCommentRequest.createAccompanyApplyCommentRequest(),
                 currentMemberId, true);
+    }
+
+    @Transactional
+    @Override
+    public void confirmAccompany(Long accompanyCommentId, Long currentMemberId) {
+        AccompanyComment accompanyComment = accompanyCommentRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyCommentId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_COMMENT_NOT_FOUND));
+        AccompanyPost accompanyPost = accompanyComment.getAccompanyPost();
+        checkConfirmerIsWriter(currentMemberId, accompanyPost.getWriter().getId());
+        checkAccompanyCommentIsApplyComment(accompanyComment);
+        checkAlreadyConfirmedAccompanyApplyComment(accompanyComment);
+        createAccompanyReview(accompanyPost,
+                getAccompanyConfirmedMembers(accompanyPost, accompanyComment.getMember()));
+        accompanyComment.updateIsAccompanyConfirmedComment();
+    }
+
+    private List<Member> getAccompanyConfirmedMembers(AccompanyPost accompanyPost,
+            Member newCompanion) {
+        List<Member> companions = new ArrayList<>();
+        companions.add(newCompanion);
+        companions.add(accompanyPost.getWriter());
+        companions.addAll(
+                accompanyReviewRepository.findDistinctReviewerAndRevieweeByAccompanyPostId(
+                                accompanyPost.getId()).stream().map(companionId ->
+                                memberRepository.findByIdAndIsActivatedIsTrue(companionId).orElseThrow(
+                                        () -> new MemberNotFoundException(
+                                                MemberErrorCode.MEMBER_NOT_FOUND)))
+                        .toList());
+
+        return companions;
+    }
+
+    private void createAccompanyReview(AccompanyPost accompanyPost, List<Member> companions) {
+        List<AccompanyReview> accompanyReviews = new ArrayList<>();
+        for (int i = 0; i < companions.size(); i++) {
+            for (int j = i + 1; j < companions.size(); j++) {
+                Member companion1 = companions.get(i);
+                Member companion2 = companions.get(j);
+                if (!accompanyReviewRepository.existsByCompanionsAndAccompanyPostId(
+                        companion1.getId(), companion2.getId(), accompanyPost.getId())) {
+                    accompanyReviews.add(AccompanyReview.builder()
+                            .reviewer(companion1)
+                            .reviewee(companion2)
+                            .accompanyPost(accompanyPost)
+                            .build());
+                    accompanyReviews.add(AccompanyReview.builder()
+                            .reviewer(companion2)
+                            .reviewee(companion1)
+                            .accompanyPost(accompanyPost)
+                            .build());
+                }
+            }
+        }
+
+        accompanyReviewRepository.saveAll(accompanyReviews);
     }
 
     private void checkDuplicatedAccompanyApply(Long accompanyPostId, Long memberId) {
@@ -221,4 +287,27 @@ public class AccompanyServiceImpl implements AccompanyService {
                     AccompanyErrorCode.ACCOMPANY_APPLY_NOT_ALLOWED_FOR_WRITER);
         }
     }
+
+    private void checkConfirmerIsWriter(Long confirmerId, Long writerId) {
+        if (!confirmerId.equals(writerId)) {
+            throw new OnlyWriterCanConfirmApplyException(
+                    AccompanyErrorCode.ONLY_WRITER_CAN_CONFIRM_APPLY);
+        }
+    }
+
+    private void checkAccompanyCommentIsApplyComment(AccompanyComment accompanyComment) {
+        if (!accompanyComment.getIsAccompanyApplyComment()) {
+            throw new AccompanyCommentApplyConfirmDeniedException(
+                    AccompanyErrorCode.ACCOMPANY_COMMENT_APPLY_CONFIRM_DENIED);
+        }
+    }
+
+    private void checkAlreadyConfirmedAccompanyApplyComment(AccompanyComment accompanyComment) {
+        if (accompanyComment.getIsAccompanyConfirmedComment()) {
+            throw new AlreadyApplyConfirmedAccompanyCommentException(
+                    AccompanyErrorCode.ALREADY_APPLY_CONFIRMED_ACCOMPANY_COMMENT);
+        }
+    }
+
+
 }

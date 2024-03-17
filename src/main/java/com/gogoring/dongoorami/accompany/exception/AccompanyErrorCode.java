@@ -16,7 +16,10 @@ public enum AccompanyErrorCode {
     DUPLICATED_ACCOMPANY_APPLY("이미 신청한 동행 구인글입니다."),
     ACCOMPANY_APPLY_COMMENT_MODIFY_DENIED("동행 신청 댓글은 수정이 불가능 합니다."),
     ACCOMPANY_APPLY_NOT_ALLOWED_FOR_WRITER("작성자는 동행 신청이 불가능 합니다."),
-    ALREADY_ENDED_CONCERT("이미 종료된 공연입니다.");
+    ALREADY_ENDED_CONCERT("이미 종료된 공연입니다."),
+    ACCOMPANY_COMMENT_APPLY_CONFIRM_DENIED("동행 신청 댓글을 통해 동행 확정이 가능합니다."),
+    ALREADY_APPLY_CONFIRMED_ACCOMPANY_COMMENT("이미 동행 확정된 동행 신청 댓글입니다."),
+    ONLY_WRITER_CAN_CONFIRM_APPLY("작성자만이 동행을 확정할 수 있습니다.");
 
     private final String message;
 }

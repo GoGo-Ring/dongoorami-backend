@@ -98,4 +98,28 @@ public class AccompanyGlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
+
+    @ExceptionHandler(AccompanyCommentApplyConfirmDeniedException.class)
+    public ResponseEntity<ErrorResponse> catchAccompanyCommentApplyConfirmDeniedException(
+            AccompanyCommentApplyConfirmDeniedException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(AlreadyApplyConfirmedAccompanyCommentException.class)
+    public ResponseEntity<ErrorResponse> catchAlreadyApplyConfirmedAccompanyCommentException(
+            AlreadyApplyConfirmedAccompanyCommentException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(OnlyWriterCanConfirmApplyException.class)
+    public ResponseEntity<ErrorResponse> catchOnlyWriterCanConfirmApplyException(
+            OnlyWriterCanConfirmApplyException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
 }

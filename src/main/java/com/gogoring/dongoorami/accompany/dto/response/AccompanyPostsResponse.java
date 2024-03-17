@@ -31,7 +31,7 @@ public class AccompanyPostsResponse {
         private String gender;
         private Long totalPeople;
 
-        public static AccompanyPostInfo of(AccompanyPost accompanyPost) {
+        public static AccompanyPostInfo of(AccompanyPost accompanyPost, Long commentCount) {
             return AccompanyPostInfo.builder()
                     .id(accompanyPost.getId())
                     .title(accompanyPost.getTitle())
@@ -41,9 +41,9 @@ public class AccompanyPostsResponse {
                     .totalPeople(accompanyPost.getTotalPeople())
                     .createdAt(accompanyPost.getCreatedAt())
                     .updatedAt(accompanyPost.getUpdatedAt())
-                    .writer(accompanyPost.getMember().getNickname())
+                    .writer(accompanyPost.getWriter().getNickname())
                     .viewCount(accompanyPost.getViewCount())
-                    .commentCount(0L) // 임시
+                    .commentCount(commentCount)
                     .build();
         }
     }

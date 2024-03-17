@@ -16,9 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.AccessLevel;
@@ -33,14 +31,13 @@ public class AccompanyPost extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private final RecruitmentStatusType status = RecruitmentStatusType.PROCEEDING;
-    @OneToMany(mappedBy = "accompanyPost")
-    private final List<AccompanyComment> accompanyComments = new ArrayList<>();
     private Long viewCount = 0L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    private Member member;
+    @JoinColumn(name = "writer_id")
+    private Member writer;
     private String title;
     @ManyToOne
     @JoinColumn(name = "concert_id")
@@ -61,11 +58,11 @@ public class AccompanyPost extends BaseEntity {
     private List<AccompanyPurposeType> purposes;
 
     @Builder
-    public AccompanyPost(Member member, String title, Concert concert,
+    public AccompanyPost(Member writer, String title, Concert concert,
             String region, Long startAge, Long endAge, Long totalPeople, String gender,
             LocalDate startDate, LocalDate endDate, String content, List<String> images,
             List<AccompanyPurposeType> purposes) {
-        this.member = member;
+        this.writer = writer;
         this.title = title;
         this.concert = concert;
         this.region = AccompanyRegionType.getValue(region);
@@ -78,22 +75,15 @@ public class AccompanyPost extends BaseEntity {
         this.content = content;
         this.images = images;
         this.purposes = purposes;
-        concert.addAccompanyPost(this);
     }
 
     public void increaseViewCount() {
         this.viewCount++;
     }
 
-    public void addAccompanyComment(AccompanyComment accompanyComment) {
-        accompanyComments.add(accompanyComment);
-        accompanyComment.setAccompanyPost(this);
-    }
-
     public void update(AccompanyPost accompanyPost, Long memberId) {
         checkIsWriter(memberId);
         this.title = accompanyPost.title;
-        accompanyPost.getConcert().addAccompanyPost(accompanyPost);
         this.concert = accompanyPost.concert;
         this.region = accompanyPost.region;
         this.startAge = accompanyPost.startAge;
@@ -108,7 +98,7 @@ public class AccompanyPost extends BaseEntity {
     }
 
     private void checkIsWriter(Long memberId) {
-        if (!this.member.getId().equals(memberId)) {
+        if (!this.writer.getId().equals(memberId)) {
             throw new OnlyWriterCanModifyException(AccompanyErrorCode.ONLY_WRITER_CAN_MODIFY);
 
         }
