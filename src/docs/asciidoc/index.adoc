@@ -235,6 +235,23 @@ include::{snippets}/AccompanyControllerTest/getReviewees/query-parameters.adoc[]
 include::{snippets}/AccompanyControllerTest/getReviewees/http-response.adoc[]
 include::{snippets}/AccompanyControllerTest/getReviewees/response-fields.adoc[]
 
+=== 평가 항목
+아래 값들로 보내주시면 됩니다.
+
+- 시간 약속을 잘 지켜요.
+- 응답이 빨라요.
+- 친절하고 매너가 좋아요.
+- 정산이 확실해요.
+
+=== 특정 동행 구인글에 대한 모든 리뷰 작성
+
+.Request
+include::{snippets}/AccompanyControllerTest/updateAccompanyReviews/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/updateAccompanyReviews/request-fields.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/updateAccompanyReviews/http-response.adoc[]
+
 == 공연 API
 === 공연 후기 작성
 
