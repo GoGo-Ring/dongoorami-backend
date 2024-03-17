@@ -1,6 +1,5 @@
 package com.gogoring.dongoorami.member.domain;
 
-import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.global.common.BaseEntity;
 import com.gogoring.dongoorami.member.exception.AlreadySignUpException;
 import com.gogoring.dongoorami.member.exception.MemberErrorCode;
@@ -11,7 +10,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,9 +53,6 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Integer manner;
 
-    @OneToMany(mappedBy = "writer")
-    private final List<AccompanyPost> accompanyPosts = new ArrayList<>();
-
     @Builder
     public Member(String profileImage, String provider, String providerId) {
         this.profileImage = profileImage;
@@ -98,10 +93,6 @@ public class Member extends BaseEntity {
     public void updateNicknameAndIntroduction(String nickname, String introduction) {
         this.nickname = nickname;
         this.introduction = introduction;
-    }
-
-    public void addAccompanyPost(AccompanyPost accompanyPost) {
-        accompanyPosts.add(accompanyPost);
     }
 
     private void checkIsNull() {
