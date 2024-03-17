@@ -26,6 +26,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Slice;
 
 @Import(QueryDslConfig.class)
 @DataJpaTest
@@ -112,5 +113,39 @@ public class WishRepositoryTest {
 
         // then
         assertThat(savedWish.getId()).isEqualTo(wish.getId());
+    }
+
+    @Test
+    @DisplayName("id 내림차순으로 특정 회원의 찜 목록을 조회할 수 있다.")
+    void success_findAllByMember() {
+        // given
+        Member member = MemberDataFactory.createMember();
+        memberRepository.save(member);
+
+        Concert concert = ConcertDataFactory.createConcert();
+        concertRepository.save(concert);
+
+        AccompanyPost accompanyPost = AccompanyDataFactory.createAccompanyPosts(member, 1, concert)
+                .get(0);
+        accompanyPostRepository.save(accompanyPost);
+
+        int size = 5;
+        List<Wish> wishes = WishDataFactory.createWishes(member, accompanyPost, size + 5);
+        wishRepository.saveAll(wishes);
+
+        long minId = 987654321L;
+        long maxId = -1L;
+        for (Wish wish : wishes) {
+            minId = Math.min(minId, wish.getId());
+            maxId = Math.max(maxId, wish.getId());
+        }
+
+        // when
+        Slice<Wish> slice = wishRepository.findAllByMember(maxId, size, member);
+
+        // then
+        assertThat(slice.getSize()).isEqualTo(size);
+        assertThat(slice.getContent().stream().map(Wish::getId)
+                .toList()).doesNotContain(minId);
     }
 }
