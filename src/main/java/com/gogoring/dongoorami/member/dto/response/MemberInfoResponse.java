@@ -17,11 +17,11 @@ public class MemberInfoResponse {
 
     private final String introduction;
 
-    private final Integer manner;
+    private final Double manner;
 
     @Builder
     public MemberInfoResponse(String nickname, String profileImage, String gender, Integer age,
-            String introduction, Integer manner) {
+            String introduction, Double manner) {
         this.nickname = nickname;
         this.profileImage = profileImage;
         this.gender = gender;

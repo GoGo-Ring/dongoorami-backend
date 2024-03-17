@@ -51,7 +51,7 @@ public class Member extends BaseEntity {
     private String introduction;
 
     @Column(nullable = false)
-    private Integer manner;
+    private Double manner;
 
     @Builder
     public Member(String profileImage, String provider, String providerId) {
@@ -61,7 +61,7 @@ public class Member extends BaseEntity {
         this.roles = new ArrayList<>() {{
             add(Role.ROLE_MEMBER);
         }};
-        this.manner = 0;
+        this.manner = (double) 0;
     }
 
     public List<GrantedAuthority> getRoles() {
@@ -93,6 +93,10 @@ public class Member extends BaseEntity {
     public void updateNicknameAndIntroduction(String nickname, String introduction) {
         this.nickname = nickname;
         this.introduction = introduction;
+    }
+
+    public void updateManner(Double manner) {
+        this.manner = manner;
     }
 
     private void checkIsNull() {
