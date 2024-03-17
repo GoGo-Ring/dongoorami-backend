@@ -28,6 +28,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @Import(QueryDslConfig.class)
 @DataJpaTest
@@ -213,5 +214,65 @@ class AccompanyReviewRepositoryTest {
 
         // then
         assertThat(accompanyReview, notNullValue());
+    }
+
+    @Test
+    @DisplayName("특정 멤버가 받은 별점 평균을 조회할 수 있다.")
+    void success_averageRatingByRevieweeId() {
+        // given
+        Member member1 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        Member member2 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        Member member3 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        Member member4 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        memberRepository.saveAll(Arrays.asList(member1, member2, member3, member4));
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member1, 1, concert)).get(0);
+        List<AccompanyComment> accompanyComments = new ArrayList<>();
+        accompanyComments.addAll(createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+        AccompanyReview accompanyReview1 = AccompanyReview.builder()
+                .reviewer(member2)
+                .reviewee(member1)
+                .accompanyPost(accompanyPost)
+                .build();
+        AccompanyReview accompanyReview2 = AccompanyReview.builder()
+                .reviewer(member3)
+                .reviewee(member1)
+                .accompanyPost(accompanyPost)
+                .build();
+        AccompanyReview accompanyReview3 = AccompanyReview.builder()
+                .reviewer(member4)
+                .reviewee(member1)
+                .accompanyPost(accompanyPost)
+                .build();
+        ReflectionTestUtils.setField(accompanyReview1, "rating", 5);
+        ReflectionTestUtils.setField(accompanyReview2, "rating", 4);
+        ReflectionTestUtils.setField(accompanyReview3, "rating", 3);
+        accompanyReviewRepository.saveAll(Arrays.asList(accompanyReview1, accompanyReview2, accompanyReview3));
+
+        // when
+        Double ratingAverage = accompanyReviewRepository.averageRatingByRevieweeId(member1.getId());
+
+        // then
+        assertThat(ratingAverage, equalTo((5+4+3)/3.0));
     }
 }
