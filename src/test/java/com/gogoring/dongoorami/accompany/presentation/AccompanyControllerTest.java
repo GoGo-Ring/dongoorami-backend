@@ -975,8 +975,8 @@ class AccompanyControllerTest {
 
     @Test
     @WithCustomMockUser
-    @DisplayName("사용자는 특정 동행 구인글에 대한 동행자를 조회할 수 있다.")
-    void success_getConcertsByKeyword() throws Exception {
+    @DisplayName("사용자는 특정 동행 구인글에 대한 리뷰 대상자를 조회할 수 있다.")
+    void success_getReviewees() throws Exception {
         // given
         Member member1 = ((CustomUserDetails) SecurityContextHolder
                 .getContext()
