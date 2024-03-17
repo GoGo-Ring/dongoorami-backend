@@ -5,6 +5,7 @@ import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyRegionTyp
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
+import com.gogoring.dongoorami.accompany.dto.request.AccompanyReviewRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
@@ -75,7 +76,7 @@ public class AccompanyController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Long accompanyPostId = accompanyService.createAccompanyPost(accompanyPostRequest, images,
                 customUserDetails.getId());
-        return ResponseEntity.created(URI.create("/api/v1/accompany/posts/" + accompanyPostId))
+        return ResponseEntity.created(URI.create("/api/v1/accompanies/posts/" + accompanyPostId))
                 .build();
     }
 
@@ -86,7 +87,7 @@ public class AccompanyController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         accompanyService.createAccompanyComment(accompanyPostId, accompanyCommentRequest,
                 customUserDetails.getId(), false);
-        return ResponseEntity.created(URI.create("/api/v1/accompany/posts/" + accompanyPostId))
+        return ResponseEntity.created(URI.create("/api/v1/accompanies/posts/" + accompanyPostId))
                 .build();
     }
 
@@ -157,7 +158,7 @@ public class AccompanyController {
             @PathVariable Long accompanyPostId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         accompanyService.createAccompanyApplyComment(accompanyPostId, customUserDetails.getId());
-        return ResponseEntity.created(URI.create("/api/v1/accompany/posts/" + accompanyPostId))
+        return ResponseEntity.created(URI.create("/api/v1/accompanies/posts/" + accompanyPostId))
                 .build();
     }
 
@@ -177,13 +178,14 @@ public class AccompanyController {
                 accompanyService.getReviewees(accompanyPostId, customUserDetails.getId()));
     }
 
-    @PostMapping("/reviews/{accompanyPostId}")
-    public ResponseEntity<Void> createAccompanyReviews(
+    @PatchMapping("/reviews/{accompanyPostId}")
+    public ResponseEntity<Void> updateAccompanyReviews(
+            @Valid @RequestBody List<AccompanyReviewRequest> accompanyReviewRequests,
             @PathVariable Long accompanyPostId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        accompanyService.createAccompanyApplyComment(accompanyPostId, customUserDetails.getId());
-        return ResponseEntity.created(URI.create("/api/v1/accompany/posts/" + accompanyPostId))
-                .build();
+        accompanyService.updateAccompanyReview(accompanyReviewRequests, accompanyPostId,
+                customUserDetails.getId());
+        return ResponseEntity.ok().build();
     }
 
 }
