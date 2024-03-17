@@ -1,7 +1,11 @@
 package com.gogoring.dongoorami.accompany.domain;
 
+import com.gogoring.dongoorami.accompany.dto.request.AccompanyReviewRequest;
+import com.gogoring.dongoorami.accompany.exception.AccompanyErrorCode;
+import com.gogoring.dongoorami.accompany.exception.InvalidAccompanyRegionTypeException;
 import com.gogoring.dongoorami.global.common.BaseEntity;
 import com.gogoring.dongoorami.member.domain.Member;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,6 +14,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.util.Arrays;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,6 +42,9 @@ public class AccompanyReview extends BaseEntity {
     private Member reviewee;
     private String content;
     private Integer rating;
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    private List<RatingItemType> ratingItemTypes;
 
     @Builder
     private AccompanyReview(AccompanyPost accompanyPost, Member reviewer, Member reviewee) {
@@ -44,8 +53,11 @@ public class AccompanyReview extends BaseEntity {
         this.reviewee = reviewee;
     }
 
-    public void setAccompanyPost(AccompanyPost accompanyPost) {
-        this.accompanyPost = accompanyPost;
+    public void update(AccompanyReviewRequest accompanyReviewRequest) {
+        this.content = accompanyReviewRequest.getContent();
+        this.rating = accompanyReviewRequest.getRating();
+        this.ratingItemTypes = accompanyReviewRequest.getRatingItemTypes().stream()
+                .map(RatingItemType::getValue).toList();
     }
 
     public void updateContent(String content) {
@@ -66,5 +78,31 @@ public class AccompanyReview extends BaseEntity {
         public String getName() {
             return name;
         }
+    }
+
+    public enum RatingItemType {
+
+        ON_TIME("시간 약속을 잘 지켜요."),
+        QUICK_RESPONSE("응답이 빨라요."),
+        KINDNESS("친절하고 매너가 좋아요."),
+        ACCURATE_SETTLEMENT("정산이 확실해요.");
+
+        String name;
+
+        RatingItemType(String name) {
+            this.name = name;
+        }
+
+        public static RatingItemType getValue(String name) {
+            return Arrays.stream(RatingItemType.values()).filter(
+                            ratingItemType -> ratingItemType.getName().equals(name)).findAny()
+                    .orElseThrow(() -> new InvalidAccompanyRegionTypeException(
+                            AccompanyErrorCode.INVALID_RATING_ITEM_TYPE));
+        }
+
+        public String getName() {
+            return name;
+        }
+
     }
 }
