@@ -169,4 +169,21 @@ public class AccompanyController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/reviews/reviewees")
+    public ResponseEntity<List<MemberProfile>> getReviewees(
+            @RequestParam Long accompanyPostId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(
+                accompanyService.getReviewees(accompanyPostId, customUserDetails.getId()));
+    }
+
+    @PostMapping("/reviews/{accompanyPostId}")
+    public ResponseEntity<Void> createAccompanyReviews(
+            @PathVariable Long accompanyPostId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        accompanyService.createAccompanyApplyComment(accompanyPostId, customUserDetails.getId());
+        return ResponseEntity.created(URI.create("/api/v1/accompany/posts/" + accompanyPostId))
+                .build();
+    }
+
 }
