@@ -6,6 +6,7 @@ import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
+import com.gogoring.dongoorami.accompany.dto.request.AccompanyReviewRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse.AccompanyCommentInfo;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
@@ -235,6 +236,16 @@ public class AccompanyServiceImpl implements AccompanyService {
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
         return getCompanions(accompanyPost, currentMemberId).stream()
                 .map(companion -> MemberProfile.of(companion, currentMemberId)).toList();
+    }
+
+    @Transactional
+    @Override
+    public void updateAccompanyReview(List<AccompanyReviewRequest> accompanyReviewRequests,
+            Long accompanyPostId, Long currentMemberId) {
+        accompanyReviewRequests.forEach(accompanyReviewRequest ->
+                accompanyReviewRepository.findAccompanyReviewByReviewerIdAndRevieweeIdAndAccompanyPostId(
+                                currentMemberId, accompanyReviewRequest.getMemberId(), accompanyPostId)
+                        .update(accompanyReviewRequest));
     }
 
     private List<Member> getAccompanyConfirmedMembers(AccompanyPost accompanyPost,

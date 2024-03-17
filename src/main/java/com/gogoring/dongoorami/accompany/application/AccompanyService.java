@@ -3,6 +3,7 @@ package com.gogoring.dongoorami.accompany.application;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
+import com.gogoring.dongoorami.accompany.dto.request.AccompanyReviewRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
@@ -44,4 +45,7 @@ public interface AccompanyService {
     void confirmAccompany(Long accompanyCommentId, Long currentMemberId);
 
     List<MemberProfile> getReviewees(Long accompanyPostId, Long currentMemberId);
+
+    void updateAccompanyReview(List<AccompanyReviewRequest> accompanyReviewRequests,
+            Long accompanyPostId, Long currentMemberId);
 }
