@@ -48,4 +48,18 @@ public class WishServiceImpl implements WishService {
             wishRepository.save(wish);
         }
     }
+
+    @Override
+    public void deleteWish(Long accompanyPostId, Long memberId) {
+        AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
+                accompanyPostId).orElseThrow(() -> new AccompanyPostNotFoundException(
+                AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Wish wish = wishRepository.findByAccompanyPostAndMemberAndIsActivatedIsTrue(accompanyPost,
+                member).orElseThrow(() -> new WishNotFoundException(WishErrorCode.WISH_NOT_FOUND));
+
+        wish.updateIsActivatedFalse();
+    }
 }

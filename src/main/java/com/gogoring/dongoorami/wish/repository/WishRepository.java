@@ -13,4 +13,7 @@ public interface WishRepository extends JpaRepository<Wish, Long> {
     Boolean existsByAccompanyPostAndMember(AccompanyPost accompanyPost, Member member);
 
     Optional<Wish> findByAccompanyPostAndMember(AccompanyPost accompanyPost, Member member);
+
+    Optional<Wish> findByAccompanyPostAndMemberAndIsActivatedIsTrue(AccompanyPost accompanyPost,
+            Member member);
 }
