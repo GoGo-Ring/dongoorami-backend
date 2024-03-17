@@ -39,6 +39,7 @@ import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeTy
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
+import com.gogoring.dongoorami.accompany.dto.request.AccompanyReviewRequest;
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyReviewRepository;
@@ -52,6 +53,7 @@ import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -1039,6 +1041,75 @@ class AccompanyControllerTest {
                                         STRING).description("소개"),
                                 fieldWithPath("[].currentMember").type(
                                         BOOLEAN).description("본인 여부")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("특정 동행 구인글에 대해 모든 리뷰를 작성할 수 있다.")
+    void updateAccompanyReviews() throws Exception {
+        // given
+        Member member1 = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        Member member2 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjghjgdslk")
+                .build();
+        Member member3 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("kljkljkljllagjdgklkkkkkkkg")
+                .build();
+        List<Member> members = Arrays.asList(member1, member2, member3);
+        memberRepository.saveAll(Arrays.asList(member1, member2, member3));
+        String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
+                member1.getRoles());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member1, 1, concert)).get(0);
+        accompanyReviewRepository.saveAll(createAccompanyReview(accompanyPost, members));
+        List<AccompanyReviewRequest> accompanyReviewRequests = new ArrayList<>();
+        for (Member member : Arrays.asList(member2, member3)) {
+            accompanyReviewRequests.add(
+                    AccompanyReviewRequest.builder()
+                            .memberId(member.getId())
+                            .content("친절하셨어요~")
+                            .rating(3)
+                            .ratingItemTypes(
+                                    Arrays.asList("시간 약속을 잘 지켜요.", "응답이 빨라요.", "친절하고 매너가 좋아요."))
+                            .build());
+        }
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/accompanies/reviews/{accompanyPostId}", accompanyPost.getId())
+                        .header("Authorization", accessToken)
+                        .content(objectMapper.writeValueAsString(accompanyReviewRequests))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/updateAccompanyReviews",
+                        preprocessRequest(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                        ),
+                        requestFields(
+                                fieldWithPath("[]").type(ARRAY)
+                                        .description("리뷰 대상자에 대한 리뷰"),
+                                fieldWithPath("[].memberId").type(NUMBER)
+                                        .description("리뷰 대상자 id"),
+                                fieldWithPath("[].content").type(STRING)
+                                        .description("내용"),
+                                fieldWithPath("[].rating").type(NUMBER)
+                                        .description("평점(1~5)"),
+                                fieldWithPath("[].ratingItemTypes").type(ARRAY)
+                                        .description("평가 항목")
                         ))
                 );
     }
