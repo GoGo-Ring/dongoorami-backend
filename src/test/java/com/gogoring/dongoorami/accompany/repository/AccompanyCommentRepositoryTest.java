@@ -59,6 +59,32 @@ class AccompanyCommentRepositoryTest {
     }
 
     @Test
+    @DisplayName("특정 동행 구인글의 댓글 수를 조회할 수 있다.")
+    void success_countByAccompanyPostId() {
+        // given
+        Member member1 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        memberRepository.save(member1);
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member1, 1, concert)).get(0);
+        int size = 3;
+        List<AccompanyComment> accompanyComments = new ArrayList<>();
+        accompanyComments.addAll(createAccompanyComment(accompanyPost, member1, size));
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        // when
+        long commentCount = accompanyCommentRepository.countByAccompanyPostId(
+                accompanyPost.getId());
+
+        // then
+        assertThat(commentCount, equalTo((long) size));
+    }
+
+    @Test
     @DisplayName("동행 댓글 신청 수를 조회할 수 있다.")
     void success_countByIsActivatedIsTrueAndIsAccompanyApplyCommentTrue() {
         // given
@@ -151,7 +177,8 @@ class AccompanyCommentRepositoryTest {
         List<AccompanyComment> accompanyComments = new ArrayList<>();
         accompanyComments.addAll(createAccompanyComment(accompanyPost, member2, 3));
         accompanyComments.add(
-                new AccompanyCommentRequest("가는 길만 동행해도 괜찮을까요!?").toEntity(accompanyPost, member2, false));
+                new AccompanyCommentRequest("가는 길만 동행해도 괜찮을까요!?").toEntity(accompanyPost, member2,
+                        false));
         accompanyCommentRepository.saveAll(accompanyComments);
 
         // when
