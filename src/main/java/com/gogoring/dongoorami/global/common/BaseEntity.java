@@ -28,4 +28,8 @@ public abstract class BaseEntity {
     public void updateIsActivatedFalse() {
         this.isActivated = false;
     }
+
+    public void updateIsActivatedTrue() {
+        this.isActivated = true;
+    }
 }
