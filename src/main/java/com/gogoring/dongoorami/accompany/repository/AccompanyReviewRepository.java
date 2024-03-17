@@ -21,4 +21,10 @@ public interface AccompanyReviewRepository extends JpaRepository<AccompanyReview
             @Param("companion2Id") Long companion2Id,
             @Param("accompanyPostId") Long accompanyPostId
     );
+
+    AccompanyReview findAccompanyReviewByReviewerIdAndRevieweeIdAndAccompanyPostId(Long reviewerId,
+            Long revieweeId, Long AccompanyPostId);
+
+    @Query("SELECT AVG(ar.rating) FROM AccompanyReview ar WHERE ar.reviewee.id = :revieweeId")
+    Double averageRatingByRevieweeId(@Param("revieweeId") Long revieweeId);
 }
