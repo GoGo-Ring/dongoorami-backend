@@ -1,6 +1,7 @@
 package com.gogoring.dongoorami.wish.presentation;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -9,7 +10,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gogoring.dongoorami.accompany.AccompanyDataFactory;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
@@ -58,9 +58,6 @@ public class WishControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @BeforeEach
     void setUp() {
         wishRepository.deleteAll();
@@ -97,7 +94,7 @@ public class WishControllerTest {
         // when
         ResultActions resultActions = mockMvc.perform(
                 post("/api/v1/wishes/{accompanyPostId}", accompanyPost.getId()).header(
-                                "Authorization", accessToken));
+                        "Authorization", accessToken));
 
         // then
         resultActions.andExpect(status().isCreated())
@@ -138,5 +135,41 @@ public class WishControllerTest {
 
         // then
         resultActions.andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("찜 정보를 삭제할 수 있다.")
+    void success_deleteWish() throws Exception {
+        // given
+        Member member = MemberDataFactory.createLoginMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        Concert concert = ConcertDataFactory.createConcert();
+        concertRepository.save(concert);
+
+        AccompanyPost accompanyPost = AccompanyDataFactory.createAccompanyPosts(member, 1, concert)
+                .get(0);
+        accompanyPostRepository.save(accompanyPost);
+
+        Wish wish = WishDataFactory.createWish(member, accompanyPost);
+        wishRepository.save(wish);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/v1/wishes/{accompanyPostId}", accompanyPost.getId()).header(
+                        "Authorization", accessToken));
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/deleteWish",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("accompanyPostId").description("찜 삭제할 동행 구인글 아이디")
+                        ))
+                );
     }
 }
