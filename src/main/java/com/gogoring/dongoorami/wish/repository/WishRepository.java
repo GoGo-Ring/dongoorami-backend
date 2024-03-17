@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface WishRepository extends JpaRepository<Wish, Long> {
+public interface WishRepository extends JpaRepository<Wish, Long>, WishCustomRepository {
 
     Boolean existsByAccompanyPostAndMember(AccompanyPost accompanyPost, Member member);
 
