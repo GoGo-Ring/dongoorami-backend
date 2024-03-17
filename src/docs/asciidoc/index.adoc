@@ -330,3 +330,11 @@ include::{snippets}/WishControllerTest/createWish/path-parameters.adoc[]
 .Response
 include::{snippets}/WishControllerTest/createWish/http-response.adoc[]
 
+=== 찜 정보 삭제
+
+.Request
+include::{snippets}/WishControllerTest/deleteWish/http-request.adoc[]
+include::{snippets}/WishControllerTest/deleteWish/path-parameters.adoc[]
+
+.Response
+include::{snippets}/WishControllerTest/deleteWish/http-response.adoc[]
