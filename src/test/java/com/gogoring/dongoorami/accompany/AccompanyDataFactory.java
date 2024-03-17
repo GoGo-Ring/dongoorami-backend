@@ -40,11 +40,14 @@ public class AccompanyDataFactory {
         return imageUrls;
     }
 
-    static public List<AccompanyComment> createAccompanyComment(Member member, int size) {
+    static public List<AccompanyComment> createAccompanyComment(AccompanyPost accompanyPost, Member member, int size) {
         List<AccompanyComment> accompanyComments = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             accompanyComments.add(
-                    AccompanyComment.builder().member(member).content("가는 길만 동행해도 괜찮을까요!?")
+                    AccompanyComment.builder()
+                            .accompanyPost(accompanyPost)
+                            .member(member)
+                            .content("가는 길만 동행해도 괜찮을까요!?")
                             .isAccompanyApplyComment(false)
                             .build());
         }

@@ -31,7 +31,7 @@ public class AccompanyPostsResponse {
         private String gender;
         private Long totalPeople;
 
-        public static AccompanyPostInfo of(AccompanyPost accompanyPost) {
+        public static AccompanyPostInfo of(AccompanyPost accompanyPost, Long commentCount) {
             return AccompanyPostInfo.builder()
                     .id(accompanyPost.getId())
                     .title(accompanyPost.getTitle())
@@ -43,7 +43,7 @@ public class AccompanyPostsResponse {
                     .updatedAt(accompanyPost.getUpdatedAt())
                     .writer(accompanyPost.getWriter().getNickname())
                     .viewCount(accompanyPost.getViewCount())
-                    .commentCount(Long.valueOf(accompanyPost.getAccompanyComments().size()))
+                    .commentCount(commentCount)
                     .build();
         }
     }

@@ -20,6 +20,8 @@ import lombok.NoArgsConstructor;
 @Entity
 public class AccompanyReview extends BaseEntity {
 
+    @Enumerated(EnumType.STRING)
+    private final AccompanyReviewStatusType status = AccompanyReviewStatusType.BEFORE_ACCOMPANY;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,16 +36,12 @@ public class AccompanyReview extends BaseEntity {
     private Member reviewee;
     private String content;
     private Integer rating;
-    @Enumerated(EnumType.STRING)
-    private final AccompanyReviewStatusType status = AccompanyReviewStatusType.BEFORE_ACCOMPANY;
 
     @Builder
     private AccompanyReview(AccompanyPost accompanyPost, Member reviewer, Member reviewee) {
         this.accompanyPost = accompanyPost;
         this.reviewer = reviewer;
         this.reviewee = reviewee;
-        reviewer.addReviewForWrite(this);
-        reviewee.addReviewForReceive(this);
     }
 
     public void setAccompanyPost(AccompanyPost accompanyPost) {

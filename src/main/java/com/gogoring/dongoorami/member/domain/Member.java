@@ -1,8 +1,6 @@
 package com.gogoring.dongoorami.member.domain;
 
-import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
-import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
 import com.gogoring.dongoorami.global.common.BaseEntity;
 import com.gogoring.dongoorami.member.exception.AlreadySignUpException;
 import com.gogoring.dongoorami.member.exception.MemberErrorCode;
@@ -28,11 +26,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @Getter
 @Entity
 public class Member extends BaseEntity {
-
-    @OneToMany(mappedBy = "reviewer")
-    private final List<AccompanyReview> reviewsForWrite = new ArrayList<>();
-    @OneToMany(mappedBy = "reviewee")
-    private final List<AccompanyReview> reviewsForReceive = new ArrayList<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -105,14 +98,6 @@ public class Member extends BaseEntity {
     public void updateNicknameAndIntroduction(String nickname, String introduction) {
         this.nickname = nickname;
         this.introduction = introduction;
-    }
-
-    public void addReviewForWrite(AccompanyReview accompanyReview) {
-        reviewsForWrite.add(accompanyReview);
-    }
-
-    public void addReviewForReceive(AccompanyReview accompanyReview) {
-        reviewsForReceive.add(accompanyReview);
     }
 
     public void addAccompanyPost(AccompanyPost accompanyPost) {

@@ -78,7 +78,11 @@ public class AccompanyServiceImpl implements AccompanyService {
         return new AccompanyPostsResponse(
                 accompanyPosts.hasNext(),
                 accompanyPosts.getContent().stream().map(
-                        AccompanyPostInfo::of).toList());
+                        accompanyPost -> {
+                            int commentCount = accompanyCommentRepository.findAllByAccompanyPostId(
+                                    accompanyPost.getId()).size();
+                            return AccompanyPostInfo.of(accompanyPost, (long) commentCount);
+                        }).toList());
     }
 
     @Transactional
@@ -106,9 +110,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        AccompanyComment accompanyComment = accompanyCommentRequest.toEntity(member,
-                isAccompanyApplyComment);
-        accompanyPost.addAccompanyComment(accompanyComment);
+        AccompanyComment accompanyComment = accompanyCommentRequest.toEntity(accompanyPost, member, isAccompanyApplyComment);
         accompanyCommentRepository.save(accompanyComment);
 
         return accompanyPost.getId();
@@ -121,7 +123,8 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        List<AccompanyCommentInfo> accompanyCommentInfos = accompanyPost.getAccompanyComments()
+        List<AccompanyCommentInfo> accompanyCommentInfos = accompanyCommentRepository.findAllByAccompanyPostId(
+                        accompanyPostId)
                 .stream()
                 .filter(AccompanyComment::isActivated)
                 .map((AccompanyComment accompanyComment) -> AccompanyCommentInfo.of(
@@ -159,7 +162,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        accompanyPost.getAccompanyComments().forEach(
+        accompanyCommentRepository.findAllByAccompanyPostId(accompanyPostId).forEach(
                 accompanyComment -> accompanyComment.updateIsActivatedFalse(currentMemberId));
         accompanyPost.updateIsActivatedFalse();
     }

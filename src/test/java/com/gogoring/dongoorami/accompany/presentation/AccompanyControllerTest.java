@@ -520,8 +520,7 @@ class AccompanyControllerTest {
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1, concert)).get(0);
-        List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
-        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+        List<AccompanyComment> accompanyComments = createAccompanyComment(accompanyPost, member, 3);
         accompanyCommentRepository.saveAll(accompanyComments);
 
         // when
@@ -670,8 +669,7 @@ class AccompanyControllerTest {
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1, concert)).get(0);
-        List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
-        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+        List<AccompanyComment> accompanyComments = createAccompanyComment(accompanyPost, member, 3);
         accompanyCommentRepository.saveAll(accompanyComments);
 
         // when
@@ -829,8 +827,7 @@ class AccompanyControllerTest {
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1, concert)).get(0);
-        List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
-        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+        List<AccompanyComment> accompanyComments = createAccompanyComment(accompanyPost, member, 3);
         accompanyCommentRepository.saveAll(accompanyComments);
         AccompanyCommentRequest accompanyCommentRequest = new AccompanyCommentRequest(
                 "오는 길만 동행 가능할까요??");
@@ -873,8 +870,7 @@ class AccompanyControllerTest {
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1, concert)).get(0);
-        List<AccompanyComment> accompanyComments = createAccompanyComment(member, 3);
-        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+        List<AccompanyComment> accompanyComments = createAccompanyComment(accompanyPost, member, 3);
         accompanyCommentRepository.saveAll(accompanyComments);
 
         // when
@@ -954,9 +950,8 @@ class AccompanyControllerTest {
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member1, 1, concert)).get(0);
         AccompanyComment accompanyComment = AccompanyCommentRequest.createAccompanyApplyCommentRequest()
-                .toEntity(member2, true);
+                .toEntity(accompanyPost, member2, true);
         accompanyComment.setAccompanyPost(accompanyPost);
-        accompanyComment.getAccompanyPost().addAccompanyComment(accompanyComment);
         accompanyComment = accompanyCommentRepository.save(accompanyComment);
 
         // when

@@ -82,10 +82,9 @@ class AccompanyReviewRepositoryTest {
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member1, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = new ArrayList<>();
-        accompanyComments.addAll(createAccompanyComment(member1, 3));
+        accompanyComments.addAll(createAccompanyComment(accompanyPost, member1, 3));
         accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
-                .toEntity(member2, true));
-        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+                .toEntity(accompanyPost, member2, true));
         accompanyCommentRepository.saveAll(accompanyComments);
         List<AccompanyReview> accompanyReviews = new ArrayList<>();
         accompanyReviews.add(AccompanyReview.builder()
@@ -132,10 +131,9 @@ class AccompanyReviewRepositoryTest {
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member1, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = new ArrayList<>();
-        accompanyComments.addAll(createAccompanyComment(member1, 3));
+        accompanyComments.addAll(createAccompanyComment(accompanyPost, member1, 3));
         accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
-                .toEntity(member2, true));
-        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+                .toEntity(accompanyPost, member2, true));
         accompanyCommentRepository.saveAll(accompanyComments);
         List<AccompanyReview> accompanyReviews = new ArrayList<>();
         accompanyReviews.add(AccompanyReview.builder()

@@ -82,12 +82,11 @@ class AccompanyCommentRepositoryTest {
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member1, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = new ArrayList<>();
-        accompanyComments.addAll(createAccompanyComment(member1, 3));
+        accompanyComments.addAll(createAccompanyComment(accompanyPost, member1, 3));
         accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
-                .toEntity(member2, true));
+                .toEntity(accompanyPost, member2, true));
         accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
-                .toEntity(member3, true));
-        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+                .toEntity(accompanyPost, member3, true));
         accompanyCommentRepository.saveAll(accompanyComments);
 
         // when
@@ -117,10 +116,9 @@ class AccompanyCommentRepositoryTest {
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member1, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = new ArrayList<>();
-        accompanyComments.addAll(createAccompanyComment(member1, 3));
+        accompanyComments.addAll(createAccompanyComment(accompanyPost, member1, 3));
         accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
-                .toEntity(member2, true));
-        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+                .toEntity(accompanyPost, member2, true));
         accompanyCommentRepository.saveAll(accompanyComments);
 
         // when
@@ -151,10 +149,9 @@ class AccompanyCommentRepositoryTest {
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member1, 1, concert)).get(0);
         List<AccompanyComment> accompanyComments = new ArrayList<>();
-        accompanyComments.addAll(createAccompanyComment(member2, 3));
+        accompanyComments.addAll(createAccompanyComment(accompanyPost, member2, 3));
         accompanyComments.add(
-                new AccompanyCommentRequest("가는 길만 동행해도 괜찮을까요!?").toEntity(member2, false));
-        accompanyComments.stream().forEach(accompanyPost::addAccompanyComment);
+                new AccompanyCommentRequest("가는 길만 동행해도 괜찮을까요!?").toEntity(accompanyPost, member2, false));
         accompanyCommentRepository.saveAll(accompanyComments);
 
         // when

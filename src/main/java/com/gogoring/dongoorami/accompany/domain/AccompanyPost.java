@@ -16,9 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.AccessLevel;
@@ -33,8 +31,6 @@ public class AccompanyPost extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private final RecruitmentStatusType status = RecruitmentStatusType.PROCEEDING;
-    @OneToMany(mappedBy = "accompanyPost")
-    private final List<AccompanyComment> accompanyComments = new ArrayList<>();
     private Long viewCount = 0L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -79,7 +75,6 @@ public class AccompanyPost extends BaseEntity {
         this.content = content;
         this.images = images;
         this.purposes = purposes;
-        concert.addAccompanyPost(this);
         writer.addAccompanyPost(this);
     }
 
@@ -87,15 +82,9 @@ public class AccompanyPost extends BaseEntity {
         this.viewCount++;
     }
 
-    public void addAccompanyComment(AccompanyComment accompanyComment) {
-        accompanyComments.add(accompanyComment);
-        accompanyComment.setAccompanyPost(this);
-    }
-
     public void update(AccompanyPost accompanyPost, Long memberId) {
         checkIsWriter(memberId);
         this.title = accompanyPost.title;
-        accompanyPost.getConcert().addAccompanyPost(accompanyPost);
         this.concert = accompanyPost.concert;
         this.region = accompanyPost.region;
         this.startAge = accompanyPost.startAge;
