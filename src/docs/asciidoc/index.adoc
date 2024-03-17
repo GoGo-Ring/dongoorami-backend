@@ -225,6 +225,16 @@ include::{snippets}/AccompanyControllerTest/confirmAccompany/path-parameters.ado
 .Response
 include::{snippets}/AccompanyControllerTest/confirmAccompany/http-response.adoc[]
 
+=== 특정 동행 구인글에 대한 동행자 조회
+
+.Request
+include::{snippets}/AccompanyControllerTest/getReviewees/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/getReviewees/query-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/getReviewees/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/getReviewees/response-fields.adoc[]
+
 == 공연 API
 === 공연 후기 작성
 
