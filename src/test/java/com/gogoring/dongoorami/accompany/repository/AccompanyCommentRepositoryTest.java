@@ -77,7 +77,7 @@ class AccompanyCommentRepositoryTest {
         accompanyCommentRepository.saveAll(accompanyComments);
 
         // when
-        long commentCount = accompanyCommentRepository.countByAccompanyPostId(
+        long commentCount = accompanyCommentRepository.countByAccompanyPostIdAndIsActivatedIsTrue(
                 accompanyPost.getId());
 
         // then
