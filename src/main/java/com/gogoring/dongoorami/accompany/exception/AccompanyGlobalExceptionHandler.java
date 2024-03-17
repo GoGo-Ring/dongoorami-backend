@@ -122,4 +122,12 @@ public class AccompanyGlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
     }
+
+    @ExceptionHandler(InvalidRatingItemTypeException.class)
+    public ResponseEntity<ErrorResponse> catchInvalidRatingItemTypeException(
+            InvalidRatingItemTypeException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getErrorCode(), e.getMessage()));
+    }
 }
