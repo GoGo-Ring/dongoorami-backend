@@ -42,4 +42,6 @@ public interface AccompanyService {
     Long createAccompanyApplyComment(Long accompanyPostId, Long currentMemberId);
 
     void confirmAccompany(Long accompanyCommentId, Long currentMemberId);
+
+    List<MemberProfile> getReviewees(Long accompanyPostId, Long currentMemberId);
 }

@@ -79,7 +79,8 @@ public class AccompanyServiceImpl implements AccompanyService {
                 accompanyPosts.hasNext(),
                 accompanyPosts.getContent().stream().map(
                         accompanyPost -> {
-                            long commentCount = accompanyCommentRepository.countByAccompanyPostIdAndIsActivatedIsTrue(accompanyPost.getId());
+                            long commentCount = accompanyCommentRepository.countByAccompanyPostIdAndIsActivatedIsTrue(
+                                    accompanyPost.getId());
                             return AccompanyPostInfo.of(accompanyPost, commentCount);
                         }).toList());
     }
@@ -109,7 +110,8 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        AccompanyComment accompanyComment = accompanyCommentRequest.toEntity(accompanyPost, member, isAccompanyApplyComment);
+        AccompanyComment accompanyComment = accompanyCommentRequest.toEntity(accompanyPost, member,
+                isAccompanyApplyComment);
         accompanyCommentRepository.save(accompanyComment);
 
         return accompanyPost.getId();
@@ -225,6 +227,16 @@ public class AccompanyServiceImpl implements AccompanyService {
         accompanyComment.updateIsAccompanyConfirmedComment();
     }
 
+    @Override
+    public List<MemberProfile> getReviewees(Long accompanyPostId, Long currentMemberId) {
+        AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyPostId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
+        return getCompanions(accompanyPost, currentMemberId).stream()
+                .map(companion -> MemberProfile.of(companion, currentMemberId)).toList();
+    }
+
     private List<Member> getAccompanyConfirmedMembers(AccompanyPost accompanyPost,
             Member newCompanion) {
         List<Member> companions = new ArrayList<>();
@@ -239,6 +251,17 @@ public class AccompanyServiceImpl implements AccompanyService {
                         .toList());
 
         return companions;
+    }
+
+    private List<Member> getCompanions(AccompanyPost accompanyPost, Long currentMemberId) {
+        return accompanyReviewRepository.findDistinctReviewerAndRevieweeByAccompanyPostId(
+                        accompanyPost.getId()).stream()
+                .filter(companionId -> !companionId.equals(currentMemberId))
+                .map(companionId ->
+                        memberRepository.findByIdAndIsActivatedIsTrue(companionId).orElseThrow(
+                                () -> new MemberNotFoundException(
+                                        MemberErrorCode.MEMBER_NOT_FOUND)))
+                .toList();
     }
 
     private void createAccompanyReview(AccompanyPost accompanyPost, List<Member> companions) {
