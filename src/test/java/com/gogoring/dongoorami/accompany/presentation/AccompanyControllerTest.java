@@ -2,6 +2,7 @@ package com.gogoring.dongoorami.accompany.presentation;
 
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyComment;
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyPosts;
+import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyReview;
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createMockMultipartFiles;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -970,5 +971,75 @@ class AccompanyControllerTest {
                                         "동행 구인글 댓글 id(신청 댓글만 가능)")
                         )
                 ));
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("사용자는 특정 동행 구인글에 대한 동행자를 조회할 수 있다.")
+    void success_getConcertsByKeyword() throws Exception {
+        // given
+        Member member1 = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        Member member2 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjghjgdslk")
+                .build();
+        Member member3 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("kljkljkljllagjdgklkkkkkkkg")
+                .build();
+        List<Member> members = Arrays.asList(member1, member2, member3);
+        for (Member member : members) {
+            ReflectionTestUtils.setField(member, "nickname", "김뭐뭐");
+            ReflectionTestUtils.setField(member, "gender", "여자");
+            ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
+            ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
+        }
+        memberRepository.saveAll(members);
+        String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
+                member1.getRoles());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member1, 1, concert)).get(0);
+        accompanyReviewRepository.saveAll(createAccompanyReview(accompanyPost, members));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompanies/reviews/reviewees").header(
+                                "Authorization", accessToken)
+                        .param("accompanyPostId", accompanyPost.getId().toString())
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getReviewees",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                        ),
+                        responseFields(
+                                fieldWithPath("[]").type(ARRAY)
+                                        .description("동행자 목록"),
+                                fieldWithPath("[].id").type(NUMBER)
+                                        .description("멤버 id"),
+                                fieldWithPath("[].nickname").type(
+                                        STRING).description("닉네임"),
+                                fieldWithPath("[].profileImage").type(
+                                        STRING).description("프로필 이미지 url"),
+                                fieldWithPath("[].gender").type(
+                                        STRING).description("성별"),
+                                fieldWithPath("[].age").type(NUMBER)
+                                        .description("나이"),
+                                fieldWithPath("[].introduction").type(
+                                        STRING).description("소개"),
+                                fieldWithPath("[].currentMember").type(
+                                        BOOLEAN).description("본인 여부")
+                        ))
+                );
     }
 }
