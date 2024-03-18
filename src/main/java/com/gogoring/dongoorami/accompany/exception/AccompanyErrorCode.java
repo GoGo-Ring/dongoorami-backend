@@ -20,7 +20,7 @@ public enum AccompanyErrorCode {
     ACCOMPANY_COMMENT_APPLY_CONFIRM_DENIED("동행 신청 댓글을 통해 동행 확정이 가능합니다."),
     ALREADY_APPLY_CONFIRMED_ACCOMPANY_COMMENT("이미 동행 확정된 동행 신청 댓글입니다."),
     ONLY_WRITER_CAN_CONFIRM_APPLY("작성자만이 동행을 확정할 수 있습니다."),
-    INVALID_RATING_ITEM_TYPE("유효하지 않은 돟행 리뷰 항목입니다.");
+    INVALID_RATING_ITEM_TYPE("유효하지 않은 동행 리뷰 항목입니다.");
 
     private final String message;
 }

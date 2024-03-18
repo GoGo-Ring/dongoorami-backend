@@ -33,7 +33,6 @@ public class MemberServiceImpl implements MemberService {
     private final TokenProvider tokenProvider;
     private final MemberRepository memberRepository;
     private final TokenRepository tokenRepository;
-    private final AccompanyReviewRepository accompanyReviewRepository;
     private final S3ImageUtil s3ImageUtil;
 
     @Override
@@ -107,8 +106,6 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         member.updateNicknameAndIntroduction(memberUpdateRequest.getNickname(),
                 memberUpdateRequest.getIntroduction());
-        Double ratingAverage = accompanyReviewRepository.averageRatingByRevieweeId(member.getId());
-        member.updateManner(ratingAverage != null ? ratingAverage : (double) 0);
 
         return MemberInfoResponse.of(member);
     }
@@ -117,8 +114,6 @@ public class MemberServiceImpl implements MemberService {
     public MemberInfoResponse getMember(Long memberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        Double ratingAverage = accompanyReviewRepository.averageRatingByRevieweeId(member.getId());
-        member.updateManner(ratingAverage != null ? ratingAverage : (double) 0);
 
         return MemberInfoResponse.of(member);
     }

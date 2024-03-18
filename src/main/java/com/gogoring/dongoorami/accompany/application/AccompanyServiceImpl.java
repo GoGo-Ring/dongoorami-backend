@@ -242,10 +242,18 @@ public class AccompanyServiceImpl implements AccompanyService {
     @Override
     public void updateAccompanyReview(List<AccompanyReviewRequest> accompanyReviewRequests,
             Long accompanyPostId, Long currentMemberId) {
-        accompanyReviewRequests.forEach(accompanyReviewRequest ->
-                accompanyReviewRepository.findAccompanyReviewByReviewerIdAndRevieweeIdAndAccompanyPostId(
-                                currentMemberId, accompanyReviewRequest.getMemberId(), accompanyPostId)
-                        .update(accompanyReviewRequest));
+        accompanyReviewRequests.forEach(accompanyReviewRequest -> {
+                    accompanyReviewRepository.findAccompanyReviewByReviewerIdAndRevieweeIdAndAccompanyPostId(
+                                    currentMemberId, accompanyReviewRequest.getMemberId(), accompanyPostId)
+                            .update(accompanyReviewRequest);
+                    Member member = memberRepository.findByIdAndIsActivatedIsTrue(
+                                    accompanyReviewRequest.getMemberId())
+                            .orElseThrow(
+                                    () -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+                    member.updateManner(
+                            accompanyReviewRepository.averageRatingPercentByRevieweeId(member.getId()));
+                }
+        );
     }
 
     private List<Member> getAccompanyConfirmedMembers(AccompanyPost accompanyPost,

@@ -267,12 +267,14 @@ class AccompanyReviewRepositoryTest {
         ReflectionTestUtils.setField(accompanyReview1, "rating", 5);
         ReflectionTestUtils.setField(accompanyReview2, "rating", 4);
         ReflectionTestUtils.setField(accompanyReview3, "rating", 3);
-        accompanyReviewRepository.saveAll(Arrays.asList(accompanyReview1, accompanyReview2, accompanyReview3));
+        accompanyReviewRepository.saveAll(
+                Arrays.asList(accompanyReview1, accompanyReview2, accompanyReview3));
 
         // when
-        Double ratingAverage = accompanyReviewRepository.averageRatingByRevieweeId(member1.getId());
+        Integer ratingAveragePercent = accompanyReviewRepository.averageRatingPercentByRevieweeId(
+                member1.getId());
 
         // then
-        assertThat(ratingAverage, equalTo((5+4+3)/3.0));
+        assertThat(ratingAveragePercent, equalTo((5 + 4 + 3) / 3 * 20));
     }
 }
