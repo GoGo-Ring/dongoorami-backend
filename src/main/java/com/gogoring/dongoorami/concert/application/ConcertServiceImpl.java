@@ -1,6 +1,9 @@
 package com.gogoring.dongoorami.concert.application;
 
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview.AccompanyReviewStatusType;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
+import com.gogoring.dongoorami.accompany.repository.AccompanyReviewRepository;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
@@ -36,6 +39,7 @@ public class ConcertServiceImpl implements ConcertService {
     private final ConcertRepository concertRepository;
     private final ConcertReviewRepository concertReviewRepository;
     private final AccompanyPostRepository accompanyPostRepository;
+    private final AccompanyReviewRepository accompanyReviewRepository;
     private final MemberRepository memberRepository;
 
     @Transactional
@@ -118,7 +122,8 @@ public class ConcertServiceImpl implements ConcertService {
     @Override
     public List<ConcertInfoResponse> getConcertsByKeyword(String keyword) {
         List<Concert> concerts = concertRepository.findAllByNameContaining(
-                keyword).stream().filter(concert -> concert.getEndLocalDate().isAfter(LocalDate.now())).toList();
+                        keyword).stream()
+                .filter(concert -> concert.getEndLocalDate().isAfter(LocalDate.now())).toList();
 
         return concerts.stream().map(ConcertInfoResponse::of).toList();
     }
@@ -127,6 +132,18 @@ public class ConcertServiceImpl implements ConcertService {
     @Transactional
     public void updateConcertStatus() {
         concertRepository.findAllByStatusIsNotAndIsActivatedIsTrue("공연종료")
-                .forEach(Concert::updateStatus);
+                .forEach(concert -> {
+                    concert.updateStatus();
+                    if (concert.isOneDayPassedSinceEndedAt()) {
+                        updateAccompanyReviewsStatus(
+                                accompanyReviewRepository.findAllByConcertId(concert.getId()));
+                    }
+                });
+    }
+
+    private void updateAccompanyReviewsStatus(List<AccompanyReview> accompanyReviews) {
+        accompanyReviews
+                .stream().forEach(accompanyReview -> accompanyReview.updateStatus(
+                        AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_NOT_WRITTEN));
     }
 }

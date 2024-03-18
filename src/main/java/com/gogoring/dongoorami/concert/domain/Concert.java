@@ -127,4 +127,7 @@ public class Concert extends BaseEntity {
         return LocalDate.parse(endedAt, formatter);
     }
 
+    public boolean isOneDayPassedSinceEndedAt() {
+        return LocalDate.now().isAfter(getEndLocalDate().plusDays(1));
+    }
 }

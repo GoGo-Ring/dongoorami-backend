@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 public class AccompanyReview extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    private final AccompanyReviewStatusType status = AccompanyReviewStatusType.BEFORE_ACCOMPANY;
+    private AccompanyReviewStatusType status = AccompanyReviewStatusType.BEFORE_ACCOMPANY;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -62,6 +62,10 @@ public class AccompanyReview extends BaseEntity {
 
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public void updateStatus(AccompanyReviewStatusType status) {
+        this.status = status;
     }
 
     public enum AccompanyReviewStatusType {
