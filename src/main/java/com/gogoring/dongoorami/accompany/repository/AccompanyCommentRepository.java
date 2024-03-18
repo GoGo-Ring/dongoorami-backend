@@ -9,13 +9,13 @@ public interface AccompanyCommentRepository extends JpaRepository<AccompanyComme
 
     Optional<AccompanyComment> findByIdAndIsActivatedIsTrue(Long id);
 
-    List<AccompanyComment> findAllByAccompanyPostId(Long accompanyPostId);
+    List<AccompanyComment> findAllByAccompanyPostIdAndIsActivatedIsTrue(Long accompanyPostId);
 
     long countByAccompanyPostIdAndIsActivatedIsTrue(Long accompanyPostId);
 
     Long countByAccompanyPostIdAndIsActivatedIsTrueAndIsAccompanyApplyCommentTrue(
             Long accompanyPostId);
 
-    boolean existsByAccompanyPostIdAndMemberIdAndIsAccompanyApplyCommentTrue(Long accompanyPostId,
+    boolean existsByAccompanyPostIdAndIsActivatedIsTrueAndMemberIdAndIsAccompanyApplyCommentTrue(Long accompanyPostId,
             Long memberId);
 }

@@ -125,7 +125,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        List<AccompanyCommentInfo> accompanyCommentInfos = accompanyCommentRepository.findAllByAccompanyPostId(
+        List<AccompanyCommentInfo> accompanyCommentInfos = accompanyCommentRepository.findAllByAccompanyPostIdAndIsActivatedIsTrue(
                         accompanyPostId)
                 .stream()
                 .filter(AccompanyComment::isActivated)
@@ -164,7 +164,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        accompanyCommentRepository.findAllByAccompanyPostId(accompanyPostId).forEach(
+        accompanyCommentRepository.findAllByAccompanyPostIdAndIsActivatedIsTrue(accompanyPostId).forEach(
                 accompanyComment -> accompanyComment.updateIsActivatedFalse(currentMemberId));
         accompanyPost.updateIsActivatedFalse();
     }
@@ -325,7 +325,7 @@ public class AccompanyServiceImpl implements AccompanyService {
     }
 
     private void checkDuplicatedAccompanyApply(Long accompanyPostId, Long memberId) {
-        if (accompanyCommentRepository.existsByAccompanyPostIdAndMemberIdAndIsAccompanyApplyCommentTrue(
+        if (accompanyCommentRepository.existsByAccompanyPostIdAndIsActivatedIsTrueAndMemberIdAndIsAccompanyApplyCommentTrue(
                 accompanyPostId, memberId)) {
             throw new DuplicatedAccompanyApplyException(
                     AccompanyErrorCode.DUPLICATED_ACCOMPANY_APPLY);
