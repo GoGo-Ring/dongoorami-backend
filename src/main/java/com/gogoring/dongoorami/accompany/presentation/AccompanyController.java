@@ -201,7 +201,7 @@ public class AccompanyController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/reviews/my-page")
+    @GetMapping("/reviews/reviewees/my-page")
     public ResponseEntity<AccompanyReviewsResponse> getReviews(
             @RequestParam(required = false) Long cursorId,
             @RequestParam(required = false, defaultValue = "10") int size,

@@ -1234,7 +1234,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/accompanies/reviews/my-page").header(
+                get("/api/v1/accompanies/reviewees/reviews/my-page").header(
                                 "Authorization", accessToken)
                         .param("size", String.valueOf(2))
         );
@@ -1306,7 +1306,7 @@ class AccompanyControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/accompanies/reviews/my-page").header(
+                get("/api/v1/accompanies/reviews/reviewees/my-page").header(
                                 "Authorization", accessToken)
                         .param("cursorId", String.valueOf(maxId + 1))
                         .param("size", String.valueOf(2))
