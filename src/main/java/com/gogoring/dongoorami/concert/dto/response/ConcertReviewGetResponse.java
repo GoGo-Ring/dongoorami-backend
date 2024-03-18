@@ -37,14 +37,14 @@ public class ConcertReviewGetResponse {
         this.updatedAt = updatedAt;
     }
 
-    public static ConcertReviewGetResponse of(ConcertReview concertReview, Member member) {
+    public static ConcertReviewGetResponse of(ConcertReview concertReview, Long memberId) {
         return ConcertReviewGetResponse.builder()
                 .id(concertReview.getId())
-                .nickname(member.getNickname())
+                .nickname(concertReview.getMember().getNickname())
                 .title(concertReview.getTitle())
                 .content(concertReview.getContent())
                 .rating(concertReview.getRating())
-                .isWriter(concertReview.getMember().getId().equals(member.getId()))
+                .isWriter(concertReview.getMember().getId().equals(memberId))
                 .updatedAt(concertReview.getUpdatedAt().toLocalDate())
                 .build();
     }
