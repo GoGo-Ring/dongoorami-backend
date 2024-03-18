@@ -92,9 +92,9 @@ include::{snippets}/AccompanyControllerTest/createAccompanyPost/request-part-acc
 === 동행 구인글 작성(이미지 없는 경우)
 
 .Request
-include::{snippets}/AccompanyControllerTest/createAccompanyPostWithNoImages/http-request.adoc[]
-include::{snippets}/AccompanyControllerTest/createAccompanyPostWithNoImages/request-parts.adoc[]
-include::{snippets}/AccompanyControllerTest/createAccompanyPostWithNoImages/request-part-accompanyPostRequest-fields.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyPostGivenNoImages/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyPostGivenNoImages/request-parts.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyPostGivenNoImages/request-part-accompanyPostRequest-fields.adoc[]
 
 .Response
 include::{snippets}/AccompanyControllerTest/createAccompanyPostWithNoImages/http-response.adoc[]
