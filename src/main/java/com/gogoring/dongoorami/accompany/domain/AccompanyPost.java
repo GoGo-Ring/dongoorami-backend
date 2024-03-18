@@ -97,14 +97,18 @@ public class AccompanyPost extends BaseEntity {
         this.purposes = accompanyPost.purposes;
     }
 
-    public void updateStatus(RecruitmentStatusType status) {
-        this.status = status;
+    public void updateStatus() {
+        this.status = RecruitmentStatusType.COMPLETED;
+    }
+
+    public void updateStatus(Long memberId) {
+        checkIsWriter(memberId);
+        this.status = RecruitmentStatusType.COMPLETED;
     }
 
     private void checkIsWriter(Long memberId) {
         if (!this.writer.getId().equals(memberId)) {
             throw new OnlyWriterCanModifyException(AccompanyErrorCode.ONLY_WRITER_CAN_MODIFY);
-
         }
     }
 

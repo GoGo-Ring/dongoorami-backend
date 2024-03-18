@@ -48,4 +48,6 @@ public interface AccompanyService {
 
     void updateAccompanyReview(List<AccompanyReviewRequest> accompanyReviewRequests,
             Long accompanyPostId, Long currentMemberId);
+
+    void updateAccompanyPostStatusCompleted(Long accompanyPostId, Long currentMemberId);
 }

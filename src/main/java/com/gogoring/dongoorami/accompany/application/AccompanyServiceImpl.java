@@ -2,7 +2,6 @@ package com.gogoring.dongoorami.accompany.application;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
-import com.gogoring.dongoorami.accompany.domain.AccompanyPost.RecruitmentStatusType;
 import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
@@ -224,9 +223,10 @@ public class AccompanyServiceImpl implements AccompanyService {
         checkConfirmerIsWriter(currentMemberId, accompanyPost.getWriter().getId());
         checkAccompanyCommentIsApplyComment(accompanyComment);
         checkAlreadyConfirmedAccompanyApplyComment(accompanyComment);
-        List<Member> accompanyConfirmedMembers = getAccompanyConfirmedMembers(accompanyPost, accompanyComment.getMember());
-        if(accompanyPost.getTotalPeople()==accompanyConfirmedMembers.size()){
-            accompanyPost.updateStatus(RecruitmentStatusType.COMPLETED);
+        List<Member> accompanyConfirmedMembers = getAccompanyConfirmedMembers(accompanyPost,
+                accompanyComment.getMember());
+        if (accompanyPost.getTotalPeople() == accompanyConfirmedMembers.size()) {
+            accompanyPost.updateStatus();
         }
         createAccompanyReview(accompanyPost, accompanyConfirmedMembers);
         accompanyComment.updateIsAccompanyConfirmedComment();
@@ -258,6 +258,18 @@ public class AccompanyServiceImpl implements AccompanyService {
                             accompanyReviewRepository.averageRatingPercentByRevieweeId(member.getId()));
                 }
         );
+    }
+
+    @Transactional
+    @Override
+    public void updateAccompanyPostStatusCompleted(Long accompanyPostId, Long currentMemberId) {
+        AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyPostId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+        accompanyPost.updateStatus(member.getId());
     }
 
     private List<Member> getAccompanyConfirmedMembers(AccompanyPost accompanyPost,
