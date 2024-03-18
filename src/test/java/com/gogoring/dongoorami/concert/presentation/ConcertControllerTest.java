@@ -32,6 +32,7 @@ import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.MemberDataFactory;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -130,14 +131,12 @@ public class ConcertControllerTest {
     }
 
     @Test
-    @WithCustomMockUser
     @DisplayName("공연 후기 목록을 조회할 수 있다. - 최초 요청")
     void success_getConcertReviewsFirst() throws Exception {
         // given
-        Member member = MemberDataFactory.createLoginMemberWithNickname();
+        Member member = MemberDataFactory.createMember();
+        ReflectionTestUtils.setField(member, "nickname", "백둥이");
         memberRepository.save(member);
-        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
-                member.getRoles());
 
         Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
@@ -150,8 +149,7 @@ public class ConcertControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/concerts/reviews/{concertId}", concert.getId()).header(
-                                "Authorization", accessToken)
+                get("/api/v1/concerts/reviews/{concertId}", concert.getId())
                         .param("size", String.valueOf(size))
         );
 
@@ -197,14 +195,12 @@ public class ConcertControllerTest {
     }
 
     @Test
-    @WithCustomMockUser
     @DisplayName("공연 후기 목록을 조회할 수 있다. - 이후 요청")
     void getConcertReviewsAfterFirst() throws Exception {
         // given
-        Member member = MemberDataFactory.createLoginMemberWithNickname();
+        Member member = MemberDataFactory.createMember();
+        ReflectionTestUtils.setField(member, "nickname", "백둥이");
         memberRepository.save(member);
-        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
-                member.getRoles());
 
         Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
@@ -221,8 +217,7 @@ public class ConcertControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/concerts/reviews/{concertId}", concert.getId()).header(
-                                "Authorization", accessToken)
+                get("/api/v1/concerts/reviews/{concertId}", concert.getId())
                         .param("cursorId", String.valueOf(maxId + 1))
                         .param("size", String.valueOf(size))
         );
@@ -353,22 +348,18 @@ public class ConcertControllerTest {
     }
 
     @Test
-    @WithCustomMockUser
     @DisplayName("공연 단건 상세 조회를 할 수 있다.")
     void success_getConcert() throws Exception {
         // given
-        Member member = MemberDataFactory.createLoginMemberWithNickname();
+        Member member = MemberDataFactory.createMember();
         memberRepository.save(member);
-        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
-                member.getRoles());
 
         Concert concert = ConcertDataFactory.createConcert();
         concertRepository.save(concert);
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/concerts/{concertId}", concert.getId()).header(
-                        "Authorization", accessToken)
+                get("/api/v1/concerts/{concertId}", concert.getId())
         );
 
         // then
@@ -429,14 +420,11 @@ public class ConcertControllerTest {
     }
 
     @Test
-    @WithCustomMockUser
     @DisplayName("공연 목록을 조회할 수 있다. - 최초 요청")
     void success_getConcertsFirst() throws Exception {
         // given
-        Member member = MemberDataFactory.createLoginMemberWithNickname();
+        Member member = MemberDataFactory.createMember();
         memberRepository.save(member);
-        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
-                member.getRoles());
 
         int size = 3;
         List<Concert> concerts = ConcertDataFactory.createConcerts(size);
@@ -444,8 +432,7 @@ public class ConcertControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/concerts").header(
-                                "Authorization", accessToken)
+                get("/api/v1/concerts")
                         .param("size", String.valueOf(size))
                         .param("keyword", concerts.get(0).getName()
                                 .substring(0, concerts.get(0).getName().length() / 2))
@@ -496,14 +483,11 @@ public class ConcertControllerTest {
     }
 
     @Test
-    @WithCustomMockUser
     @DisplayName("공연 목록을 조회할 수 있다. - 이후 요청")
     void success_getConcertsAfterFirst() throws Exception {
         // given
-        Member member = MemberDataFactory.createLoginMemberWithNickname();
+        Member member = MemberDataFactory.createMember();
         memberRepository.save(member);
-        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
-                member.getRoles());
 
         int size = 3;
         List<Concert> concerts = ConcertDataFactory.createConcerts(size);
@@ -515,8 +499,7 @@ public class ConcertControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/concerts").header(
-                                "Authorization", accessToken)
+                get("/api/v1/concerts")
                         .param("cursorId", String.valueOf(maxId))
                         .param("size", String.valueOf(size))
                         .param("keyword", concerts.get(0).getName()

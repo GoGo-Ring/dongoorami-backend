@@ -66,7 +66,7 @@ public class AccompanyController {
             @PathVariable Long accompanyPostId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(
-                accompanyService.getAccompanyPost(customUserDetails.getId(), accompanyPostId));
+                accompanyService.getAccompanyPost(customUserDetails != null ? customUserDetails.getId() : -1, accompanyPostId));
     }
 
     @PostMapping("/posts")
@@ -96,7 +96,7 @@ public class AccompanyController {
             @PathVariable Long accompanyPostId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(
-                accompanyService.getAccompanyComments(accompanyPostId, customUserDetails.getId()));
+                accompanyService.getAccompanyComments(accompanyPostId, customUserDetails != null ? customUserDetails.getId() : -1));
     }
 
     @PostMapping("/posts/{accompanyPostId}")

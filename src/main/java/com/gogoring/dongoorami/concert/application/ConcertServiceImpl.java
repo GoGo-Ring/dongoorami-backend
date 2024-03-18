@@ -55,15 +55,13 @@ public class ConcertServiceImpl implements ConcertService {
             Long memberId) {
         Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(concertId).orElseThrow(
                 () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
-        Member member = memberRepository.findByIdAndIsActivatedIsTrue(memberId)
-                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         Slice<ConcertReviewGetResponse> concertReviewGetResponses = (cursorId == null
                 ? concertReviewRepository.findAllByConcertAndIsActivatedIsTrueOrderByIdDesc(concert,
                 PageRequest.of(0, size))
                 : concertReviewRepository.findAllByIdLessThanAndConcertAndIsActivatedIsTrueOrderByIdDesc(
                         cursorId, concert, PageRequest.of(0, size))).map(
-                concertReview -> ConcertReviewGetResponse.of(concertReview, member));
+                concertReview -> ConcertReviewGetResponse.of(concertReview, memberId));
 
         return ConcertReviewsGetResponse.of(concertReviewGetResponses.hasNext(),
                 concertReviewGetResponses.getContent());

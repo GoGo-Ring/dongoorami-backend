@@ -45,7 +45,7 @@ public class ConcertController {
             @RequestParam(required = false, defaultValue = "10") int size,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(concertService.getConcertReviews(concertId, cursorId, size,
-                customUserDetails.getId()));
+                customUserDetails != null ? customUserDetails.getId() : -1));
     }
 
     @PatchMapping("/concerts/reviews/{concertReviewId}")
