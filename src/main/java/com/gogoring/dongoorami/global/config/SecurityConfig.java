@@ -10,7 +10,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -84,12 +83,11 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         List<String> allowedOriginPatterns = Arrays.asList("http://localhost:3000",
-                "https://dongoorami.netlify.app/");
+                "https://dongoorami.netlify.app/", "https://www.dongoorami.shop:8080/");
         configuration.setAllowedOriginPatterns(allowedOriginPatterns);
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
-        configuration.addAllowedHeader(HttpHeaders.LOCATION);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
