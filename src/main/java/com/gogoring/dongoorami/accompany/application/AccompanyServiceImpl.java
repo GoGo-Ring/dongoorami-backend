@@ -12,6 +12,8 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse.
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyReviewResponse;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyReviewsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
 import com.gogoring.dongoorami.accompany.exception.AccompanyApplyCommentModifyDeniedException;
 import com.gogoring.dongoorami.accompany.exception.AccompanyApplyNotAllowedForWriterException;
@@ -164,8 +166,9 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        accompanyCommentRepository.findAllByAccompanyPostIdAndIsActivatedIsTrue(accompanyPostId).forEach(
-                accompanyComment -> accompanyComment.updateIsActivatedFalse(currentMemberId));
+        accompanyCommentRepository.findAllByAccompanyPostIdAndIsActivatedIsTrue(accompanyPostId)
+                .forEach(accompanyComment -> accompanyComment.updateIsActivatedFalse(
+                        currentMemberId));
         accompanyPost.updateIsActivatedFalse();
     }
 
@@ -270,6 +273,20 @@ public class AccompanyServiceImpl implements AccompanyService {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         accompanyPost.updateStatus(member.getId());
+    }
+
+    @Override
+    public AccompanyReviewsResponse getReviews(Long cursorId, int size, Long currentMemberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByReviewee(
+                cursorId, size, member);
+        List<AccompanyReviewResponse> accompanyReviewResponses = accompanyReviews.stream()
+                .map(AccompanyReviewResponse::of)
+                .toList();
+
+        return AccompanyReviewsResponse.of(accompanyReviews.hasNext(), accompanyReviewResponses);
     }
 
     private List<Member> getAccompanyConfirmedMembers(AccompanyPost accompanyPost,
