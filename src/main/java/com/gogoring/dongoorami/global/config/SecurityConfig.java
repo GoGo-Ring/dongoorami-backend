@@ -10,6 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -51,6 +52,17 @@ public class SecurityConfig {
                                         "/login/oauth2/code/**", "/oauth/**",
                                         "/actuator/**").permitAll()
                                 .requestMatchers("/api/v1/members/reissue").permitAll()
+                                // 동행 API
+                                .requestMatchers(HttpMethod.GET, "/api/v1/accompanies/posts")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/accompanies/posts/{accompanyPostId}").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/accompanies/comments/{accompanyPostId}").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/accompanies/posts/regions").permitAll()
+                                // 공연 API
+                                .requestMatchers(HttpMethod.GET, "/api/v1/concerts/reviews/{concertId}").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/concerts/{concertId}")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/concerts").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandlingConfigurer -> exceptionHandlingConfigurer
