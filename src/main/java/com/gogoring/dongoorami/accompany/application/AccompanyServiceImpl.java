@@ -125,7 +125,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        List<AccompanyCommentInfo> accompanyCommentInfos = accompanyCommentRepository.findAllByAccompanyPostId(
+        List<AccompanyCommentInfo> accompanyCommentInfos = accompanyCommentRepository.findAllByAccompanyPostIdAndIsActivatedIsTrue(
                         accompanyPostId)
                 .stream()
                 .filter(AccompanyComment::isActivated)
@@ -164,7 +164,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        accompanyCommentRepository.findAllByAccompanyPostId(accompanyPostId).forEach(
+        accompanyCommentRepository.findAllByAccompanyPostIdAndIsActivatedIsTrue(accompanyPostId).forEach(
                 accompanyComment -> accompanyComment.updateIsActivatedFalse(currentMemberId));
         accompanyPost.updateIsActivatedFalse();
     }
@@ -223,8 +223,12 @@ public class AccompanyServiceImpl implements AccompanyService {
         checkConfirmerIsWriter(currentMemberId, accompanyPost.getWriter().getId());
         checkAccompanyCommentIsApplyComment(accompanyComment);
         checkAlreadyConfirmedAccompanyApplyComment(accompanyComment);
-        createAccompanyReview(accompanyPost,
-                getAccompanyConfirmedMembers(accompanyPost, accompanyComment.getMember()));
+        List<Member> accompanyConfirmedMembers = getAccompanyConfirmedMembers(accompanyPost,
+                accompanyComment.getMember());
+        if (accompanyPost.getTotalPeople() == accompanyConfirmedMembers.size()) {
+            accompanyPost.updateStatus();
+        }
+        createAccompanyReview(accompanyPost, accompanyConfirmedMembers);
         accompanyComment.updateIsAccompanyConfirmedComment();
     }
 
@@ -254,6 +258,18 @@ public class AccompanyServiceImpl implements AccompanyService {
                             accompanyReviewRepository.averageRatingPercentByRevieweeId(member.getId()));
                 }
         );
+    }
+
+    @Transactional
+    @Override
+    public void updateAccompanyPostStatusCompleted(Long accompanyPostId, Long currentMemberId) {
+        AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyPostId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+        accompanyPost.updateStatus(member.getId());
     }
 
     private List<Member> getAccompanyConfirmedMembers(AccompanyPost accompanyPost,
@@ -309,7 +325,7 @@ public class AccompanyServiceImpl implements AccompanyService {
     }
 
     private void checkDuplicatedAccompanyApply(Long accompanyPostId, Long memberId) {
-        if (accompanyCommentRepository.existsByAccompanyPostIdAndMemberIdAndIsAccompanyApplyCommentTrue(
+        if (accompanyCommentRepository.existsByAccompanyPostIdAndIsActivatedIsTrueAndMemberIdAndIsAccompanyApplyCommentTrue(
                 accompanyPostId, memberId)) {
             throw new DuplicatedAccompanyApplyException(
                     AccompanyErrorCode.DUPLICATED_ACCOMPANY_APPLY);

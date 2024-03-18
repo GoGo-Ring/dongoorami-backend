@@ -27,4 +27,14 @@ public interface AccompanyReviewRepository extends JpaRepository<AccompanyReview
 
     @Query("SELECT AVG(ar.rating)*20 FROM AccompanyReview ar WHERE ar.reviewee.id = :revieweeId")
     Integer averageRatingPercentByRevieweeId(@Param("revieweeId") Long revieweeId);
+
+    @Query("SELECT ar FROM AccompanyReview ar " +
+            "JOIN ar.accompanyPost ap " +
+            "JOIN ap.concert c " +
+            "WHERE c.id = :concertId " +
+            "AND c.isActivated = true " +
+            "AND ar.status = 'BEFORE_ACCOMPANY' " +
+            "AND ar.isActivated = true")
+    List<AccompanyReview> findAllByConcertIdAndActivatedConcertAndActivatedAccompanyReviewAndProceedingStatus(Long concertId);
+
 }

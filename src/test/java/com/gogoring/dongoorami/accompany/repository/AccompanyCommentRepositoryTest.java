@@ -148,7 +148,7 @@ class AccompanyCommentRepositoryTest {
         accompanyCommentRepository.saveAll(accompanyComments);
 
         // when
-        boolean isAccompanyApplied = accompanyCommentRepository.existsByAccompanyPostIdAndMemberIdAndIsAccompanyApplyCommentTrue(
+        boolean isAccompanyApplied = accompanyCommentRepository.existsByAccompanyPostIdAndIsActivatedIsTrueAndMemberIdAndIsAccompanyApplyCommentTrue(
                 accompanyPost.getId(),
                 member2.getId());
 
@@ -182,7 +182,7 @@ class AccompanyCommentRepositoryTest {
         accompanyCommentRepository.saveAll(accompanyComments);
 
         // when
-        boolean isAccompanyApplied = accompanyCommentRepository.existsByAccompanyPostIdAndMemberIdAndIsAccompanyApplyCommentTrue(
+        boolean isAccompanyApplied = accompanyCommentRepository.existsByAccompanyPostIdAndIsActivatedIsTrueAndMemberIdAndIsAccompanyApplyCommentTrue(
                 accompanyPost.getId(),
                 member2.getId());
 

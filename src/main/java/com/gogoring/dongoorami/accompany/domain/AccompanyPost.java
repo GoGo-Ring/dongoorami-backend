@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 public class AccompanyPost extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    private final RecruitmentStatusType status = RecruitmentStatusType.PROCEEDING;
+    private RecruitmentStatusType status = RecruitmentStatusType.PROCEEDING;
     private Long viewCount = 0L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -97,10 +97,18 @@ public class AccompanyPost extends BaseEntity {
         this.purposes = accompanyPost.purposes;
     }
 
+    public void updateStatus() {
+        this.status = RecruitmentStatusType.COMPLETED;
+    }
+
+    public void updateStatus(Long memberId) {
+        checkIsWriter(memberId);
+        this.status = RecruitmentStatusType.COMPLETED;
+    }
+
     private void checkIsWriter(Long memberId) {
         if (!this.writer.getId().equals(memberId)) {
             throw new OnlyWriterCanModifyException(AccompanyErrorCode.ONLY_WRITER_CAN_MODIFY);
-
         }
     }
 

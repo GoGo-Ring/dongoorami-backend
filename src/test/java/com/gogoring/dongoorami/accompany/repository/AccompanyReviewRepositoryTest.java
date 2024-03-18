@@ -2,6 +2,7 @@ package com.gogoring.dongoorami.accompany.repository;
 
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyComment;
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyPosts;
+import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyReview;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -14,6 +15,7 @@ import com.gogoring.dongoorami.concert.ConcertDataFactory;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.global.config.QueryDslConfig;
+import com.gogoring.dongoorami.member.MemberDataFactory;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.util.ArrayList;
@@ -276,5 +278,28 @@ class AccompanyReviewRepositoryTest {
 
         // then
         assertThat(ratingAveragePercent, equalTo((5 + 4 + 3) / 3 * 20));
+    }
+
+    @Test
+    @DisplayName("특정 공연에 대한 동행 목록을 조회할 수 있다.")
+    void success_findAllByConcertId() {
+        // given
+        Member member1 = MemberDataFactory.createMember();
+        Member member2 = MemberDataFactory.createMember();
+        Member member3 = MemberDataFactory.createMember();
+        List<Member> members = Arrays.asList(member1, member2, member3);
+        memberRepository.saveAll(members);
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member1, 1, concert)).get(0);
+        int size = accompanyReviewRepository.saveAll(
+                createAccompanyReview(accompanyPost, members)).size();
+
+        // when
+        List<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByConcertIdAndActivatedConcertAndActivatedAccompanyReviewAndProceedingStatus(
+                concert.getId());
+
+        // then
+        assertThat(accompanyReviews.size(), equalTo(size));
     }
 }
