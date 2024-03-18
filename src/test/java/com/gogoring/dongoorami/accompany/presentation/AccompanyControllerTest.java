@@ -188,6 +188,75 @@ class AccompanyControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
+    @DisplayName("동행 구인글을 게시할 수 있다. - 이미지가 없는 경우")
+    void success_createAccompanyPost_given_noImages() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        byte[] emptyImageBytes = new byte[0];
+        MockMultipartFile images = new MockMultipartFile("images", null, "image/jpeg",
+                emptyImageBytes);
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+        AccompanyPostRequest accompanyPostRequest = AccompanyPostRequest.builder()
+                .concertId(concert.getId())
+                .startDate(LocalDate.of(2024, 3, 22))
+                .endDate(LocalDate.of(2024, 3, 22))
+                .title("서울 같이 갈 울싼 사람 구합니다~~")
+                .gender("여")
+                .region("경상북도/경상남도")
+                .content("같이 올라갈 사람 구해요~")
+                .startAge(13L)
+                .endAge(17L)
+                .totalPeople(1L)
+                .purposes(Arrays.asList("관람", "숙박"))
+                .build();
+        MockMultipartFile request = new MockMultipartFile("accompanyPostRequest", null,
+                "application/json", objectMapper.writeValueAsString(accompanyPostRequest)
+                .getBytes(StandardCharsets.UTF_8));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                multipart("/api/v1/accompanies/posts")
+                        .file(images)
+                        .file(request)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .with(csrf().asHeader())
+                        .header("Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isCreated())
+                .andDo(document("{ClassName}/createAccompanyPostGivenNoImages",
+                                preprocessRequest(prettyPrint()),
+                                requestParts(
+                                        partWithName("images").description("이미지 0개 이상"),
+                                        partWithName("accompanyPostRequest").description("동행 게시글 정보")
+                                ),
+                                requestPartFields("accompanyPostRequest",
+                                        fieldWithPath("concertId").description("공연 id"),
+                                        fieldWithPath("startDate").description("시작 날짜"),
+                                        fieldWithPath("endDate").description("종료 날짜"),
+                                        fieldWithPath("gender").description("성별"),
+                                        fieldWithPath("region").description("공연 지역"),
+                                        fieldWithPath("content").description("내용"),
+                                        fieldWithPath("startAge").description("시작 연령"),
+                                        fieldWithPath("endAge").description("종료 연령"),
+                                        fieldWithPath("totalPeople").description("인원 수"),
+                                        fieldWithPath("title").description("제목"),
+                                        fieldWithPath("purposes").description("동행 목적 1개 이상")
+                                )
+                        )
+                );
+    }
+
+    @Test
     @DisplayName("동행 구인글 목록을 조회할 수 있다. - 최초 요청")
     void success_getAccompanyPostsFirst() throws Exception {
         // given
