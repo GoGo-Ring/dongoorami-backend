@@ -97,7 +97,7 @@ include::{snippets}/AccompanyControllerTest/createAccompanyPostGivenNoImages/req
 include::{snippets}/AccompanyControllerTest/createAccompanyPostGivenNoImages/request-part-accompanyPostRequest-fields.adoc[]
 
 .Response
-include::{snippets}/AccompanyControllerTest/createAccompanyPostWithNoImages/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/createAccompanyPostGivenNoImages/http-response.adoc[]
 
 === 동행 구인글 수정
 
