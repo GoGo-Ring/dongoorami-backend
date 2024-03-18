@@ -2,7 +2,7 @@ package com.gogoring.dongoorami.accompany.presentation;
 
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyComment;
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyPosts;
-import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyReview;
+import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyReviews;
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createMockMultipartFiles;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -33,9 +33,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gogoring.dongoorami.accompany.AccompanyDataFactory;
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
@@ -49,6 +51,7 @@ import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.global.customMockUser.WithCustomMockUser;
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
+import com.gogoring.dongoorami.member.MemberDataFactory;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.nio.charset.StandardCharsets;
@@ -1058,7 +1061,7 @@ class AccompanyControllerTest {
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member1, 1, concert)).get(0);
-        accompanyReviewRepository.saveAll(createAccompanyReview(accompanyPost, members));
+        accompanyReviewRepository.saveAll(createAccompanyReviews(accompanyPost, members));
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -1122,7 +1125,7 @@ class AccompanyControllerTest {
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member1, 1, concert)).get(0);
-        accompanyReviewRepository.saveAll(createAccompanyReview(accompanyPost, members));
+        accompanyReviewRepository.saveAll(createAccompanyReviews(accompanyPost, members));
         List<AccompanyReviewRequest> accompanyReviewRequests = new ArrayList<>();
         for (Member member : Arrays.asList(member2, member3)) {
             accompanyReviewRequests.add(
@@ -1196,5 +1199,149 @@ class AccompanyControllerTest {
                                 parameterWithName("accompanyPostId").description("동행 구인글 id")
                         )
                 ));
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("특정 회원이 받은 동행 구인 후기를 조회할 수 있다. - 최초 요청")
+    void success_getReviewsFirst() throws Exception {
+        // given
+        Member member1 = MemberDataFactory.createLoginMember();
+        Member member2 = MemberDataFactory.createMember();
+        Member member3 = MemberDataFactory.createMember();
+        memberRepository.saveAll(List.of(member1, member2, member3));
+        String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
+                member1.getRoles());
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        AccompanyPost accompanyPost = accompanyPostRepository.save(
+                createAccompanyPosts(member1, 1, concert).get(0));
+
+        List<AccompanyComment> accompanyComments = new ArrayList<>(
+                createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        AccompanyReview accompanyReview1 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member2, member1);
+        AccompanyReview accompanyReview2 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member3, member1);
+        ReflectionTestUtils.setField(accompanyReview1, "content", "친절한 분이셨습니다~");
+        ReflectionTestUtils.setField(accompanyReview2, "content", "덕분에 공연 재밌게 봤어요!");
+        accompanyReviewRepository.saveAll(List.of(accompanyReview1, accompanyReview2));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompanies/reviews/my-page").header(
+                                "Authorization", accessToken)
+                        .param("size", String.valueOf(2))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getReviewsFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("size").description(
+                                        "조회할 후기 개수, 값 넣지 않으면 기본 10개").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNext").type(BOOLEAN)
+                                        .description("다음 후기 정보 존재 여부"),
+                                fieldWithPath("accompanyReviewResponses").type(ARRAY)
+                                        .description("동행 구인 후기 목록"),
+                                fieldWithPath("accompanyReviewResponses[].accompanyReviewId").type(NUMBER)
+                                        .description("후기 아이디"),
+                                fieldWithPath("accompanyReviewResponses[].accompanyPostId").type(NUMBER)
+                                        .description("후기가 작성된 동행 구인글 아이디"),
+                                fieldWithPath("accompanyReviewResponses[].title").type(
+                                                STRING)
+                                        .description("동행 구인글 제목"),
+                                fieldWithPath("accompanyReviewResponses[].content").type(
+                                                STRING)
+                                        .description("동행 후기 내용"),
+                                fieldWithPath("accompanyReviewResponses[].updatedAt").type(
+                                                STRING)
+                                        .description("작성 날짜")
+
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("특정 회원이 받은 동행 구인 후기를 조회할 수 있다. - 이후 요청")
+    void success_getReviewsAfterFirst() throws Exception {
+        // given
+        Member member1 = MemberDataFactory.createLoginMember();
+        Member member2 = MemberDataFactory.createMember();
+        Member member3 = MemberDataFactory.createMember();
+        memberRepository.saveAll(List.of(member1, member2, member3));
+        String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
+                member1.getRoles());
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        AccompanyPost accompanyPost = accompanyPostRepository.save(
+                createAccompanyPosts(member1, 1, concert).get(0));
+
+        List<AccompanyComment> accompanyComments = new ArrayList<>(
+                createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        AccompanyReview accompanyReview1 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member2, member1);
+        AccompanyReview accompanyReview2 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member3, member1);
+        ReflectionTestUtils.setField(accompanyReview1, "content", "친절한 분이셨습니다~");
+        ReflectionTestUtils.setField(accompanyReview2, "content", "덕분에 공연 재밌게 봤어요!");
+        accompanyReviewRepository.saveAll(List.of(accompanyReview1, accompanyReview2));
+
+        long maxId = Math.max(accompanyReview1.getId(), accompanyReview2.getId());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompanies/reviews/my-page").header(
+                                "Authorization", accessToken)
+                        .param("cursorId", String.valueOf(maxId + 1))
+                        .param("size", String.valueOf(2))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getReviewsAfterFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("cursorId").description("마지막으로 받은 후기 아이디"),
+                                parameterWithName("size").description(
+                                        "조회할 후기 개수, 값 넣지 않으면 기본 10개").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNext").type(BOOLEAN)
+                                        .description("다음 후기 정보 존재 여부"),
+                                fieldWithPath("accompanyReviewResponses").type(ARRAY)
+                                        .description("동행 구인 후기 목록"),
+                                fieldWithPath("accompanyReviewResponses[].accompanyReviewId").type(NUMBER)
+                                        .description("후기 아이디"),
+                                fieldWithPath("accompanyReviewResponses[].accompanyPostId").type(NUMBER)
+                                        .description("후기가 작성된 동행 구인글 아이디"),
+                                fieldWithPath("accompanyReviewResponses[].title").type(
+                                                STRING)
+                                        .description("동행 구인글 제목"),
+                                fieldWithPath("accompanyReviewResponses[].content").type(
+                                                STRING)
+                                        .description("동행 후기 내용"),
+                                fieldWithPath("accompanyReviewResponses[].updatedAt").type(
+                                                STRING)
+                                        .description("작성 날짜")
+
+                        ))
+                );
     }
 }
