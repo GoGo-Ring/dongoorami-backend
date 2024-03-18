@@ -276,7 +276,7 @@ public class AccompanyServiceImpl implements AccompanyService {
     }
 
     @Override
-    public AccompanyReviewsResponse getReviews(Long cursorId, int size, Long currentMemberId) {
+    public AccompanyReviewsResponse getReceivedReviews(Long cursorId, int size, Long currentMemberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
 

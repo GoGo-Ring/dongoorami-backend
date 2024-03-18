@@ -52,5 +52,5 @@ public interface AccompanyService {
 
     void updateAccompanyPostStatusCompleted(Long accompanyPostId, Long currentMemberId);
 
-    AccompanyReviewsResponse getReviews(Long cursorId, int size, Long currentMemberId);
+    AccompanyReviewsResponse getReceivedReviews(Long cursorId, int size, Long currentMemberId);
 }

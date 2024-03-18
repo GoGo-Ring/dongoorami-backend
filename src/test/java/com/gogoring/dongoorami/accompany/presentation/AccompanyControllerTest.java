@@ -1204,7 +1204,7 @@ class AccompanyControllerTest {
     @Test
     @WithCustomMockUser
     @DisplayName("특정 회원이 받은 동행 구인 후기를 조회할 수 있다. - 최초 요청")
-    void success_getReviewsFirst() throws Exception {
+    void success_getReceivedReviewsFirst() throws Exception {
         // given
         Member member1 = MemberDataFactory.createLoginMember();
         Member member2 = MemberDataFactory.createMember();
@@ -1241,7 +1241,7 @@ class AccompanyControllerTest {
 
         // then
         resultActions.andExpect(status().isOk())
-                .andDo(document("{ClassName}/getReviewsFirst",
+                .andDo(document("{ClassName}/getReceivedReviewsFirst",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         queryParameters(
@@ -1274,7 +1274,7 @@ class AccompanyControllerTest {
     @Test
     @WithCustomMockUser
     @DisplayName("특정 회원이 받은 동행 구인 후기를 조회할 수 있다. - 이후 요청")
-    void success_getReviewsAfterFirst() throws Exception {
+    void success_getReceivedReviewsAfterFirst() throws Exception {
         // given
         Member member1 = MemberDataFactory.createLoginMember();
         Member member2 = MemberDataFactory.createMember();
@@ -1314,7 +1314,7 @@ class AccompanyControllerTest {
 
         // then
         resultActions.andExpect(status().isOk())
-                .andDo(document("{ClassName}/getReviewsAfterFirst",
+                .andDo(document("{ClassName}/getReceivedReviewsAfterFirst",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         queryParameters(

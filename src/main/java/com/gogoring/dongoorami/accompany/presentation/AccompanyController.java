@@ -202,11 +202,11 @@ public class AccompanyController {
     }
 
     @GetMapping("/reviews/reviewees/my-page")
-    public ResponseEntity<AccompanyReviewsResponse> getReviews(
+    public ResponseEntity<AccompanyReviewsResponse> getReceivedReviews(
             @RequestParam(required = false) Long cursorId,
             @RequestParam(required = false, defaultValue = "10") int size,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(
-                accompanyService.getReviews(cursorId, size, customUserDetails.getId()));
+                accompanyService.getReceivedReviews(cursorId, size, customUserDetails.getId()));
     }
 }
