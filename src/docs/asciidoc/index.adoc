@@ -319,3 +319,44 @@ include::{snippets}/ConcertControllerTest/getConcertsByKeyword/query-parameters.
 .Response
 include::{snippets}/ConcertControllerTest/getConcertsByKeyword/http-response.adoc[]
 include::{snippets}/ConcertControllerTest/getConcertsByKeyword/response-fields.adoc[]
+
+== 찜 API
+=== 찜 정보 저장
+
+.Request
+include::{snippets}/WishControllerTest/createWish/http-request.adoc[]
+include::{snippets}/WishControllerTest/createWish/path-parameters.adoc[]
+
+.Response
+include::{snippets}/WishControllerTest/createWish/http-response.adoc[]
+
+=== 찜 정보 삭제
+
+.Request
+include::{snippets}/WishControllerTest/deleteWish/http-request.adoc[]
+include::{snippets}/WishControllerTest/deleteWish/path-parameters.adoc[]
+
+.Response
+include::{snippets}/WishControllerTest/deleteWish/http-response.adoc[]
+
+=== 찜 목록 조회(최초 요청)
+
+.Request
+include::{snippets}/WishControllerTest/getWishesFirst/http-request.adoc[]
+include::{snippets}/WishControllerTest/getWishesFirst/query-parameters.adoc[]
+
+.Response
+include::{snippets}/WishControllerTest/getWishesFirst/http-response.adoc[]
+include::{snippets}/WishControllerTest/getWishesFirst/response-fields.adoc[]
+
+=== 찜 목록 조회(이후 요청)
+
+최초 요청 api와는 cursorId 유무의 차이가 있습니다
+
+.Request
+include::{snippets}/WishControllerTest/getWishesAfterFirst/http-request.adoc[]
+include::{snippets}/WishControllerTest/getWishesAfterFirst/query-parameters.adoc[]
+
+.Response
+include::{snippets}/WishControllerTest/getWishesAfterFirst/http-response.adoc[]
+include::{snippets}/WishControllerTest/getWishesAfterFirst/response-fields.adoc[]
