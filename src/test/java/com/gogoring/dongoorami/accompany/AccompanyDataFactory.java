@@ -3,6 +3,7 @@ package com.gogoring.dongoorami.accompany;
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.member.domain.Member;
@@ -40,7 +41,8 @@ public class AccompanyDataFactory {
         return imageUrls;
     }
 
-    static public List<AccompanyComment> createAccompanyComment(AccompanyPost accompanyPost, Member member, int size) {
+    static public List<AccompanyComment> createAccompanyComment(AccompanyPost accompanyPost,
+            Member member, int size) {
         List<AccompanyComment> accompanyComments = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             accompanyComments.add(
@@ -99,6 +101,29 @@ public class AccompanyDataFactory {
         }
 
         return accompanyPosts;
+    }
+
+    public static List<AccompanyReview> createAccompanyReview(AccompanyPost accompanyPost,
+            List<Member> companions) {
+        List<AccompanyReview> accompanyReviews = new ArrayList<>();
+        for (int i = 0; i < companions.size(); i++) {
+            for (int j = i + 1; j < companions.size(); j++) {
+                Member companion1 = companions.get(i);
+                Member companion2 = companions.get(j);
+                accompanyReviews.add(AccompanyReview.builder()
+                        .reviewer(companion1)
+                        .reviewee(companion2)
+                        .accompanyPost(accompanyPost)
+                        .build());
+                accompanyReviews.add(AccompanyReview.builder()
+                        .reviewer(companion2)
+                        .reviewee(companion1)
+                        .accompanyPost(accompanyPost)
+                        .build());
+            }
+        }
+
+        return accompanyReviews;
     }
 
 }

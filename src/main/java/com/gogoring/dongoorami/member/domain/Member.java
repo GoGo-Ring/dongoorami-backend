@@ -95,6 +95,10 @@ public class Member extends BaseEntity {
         this.introduction = introduction;
     }
 
+    public void updateManner(Integer manner) {
+        this.manner = manner;
+    }
+
     private void checkIsNull() {
         if (this.nickname != null || this.gender != null || this.birthDate != null) {
             throw new AlreadySignUpException(MemberErrorCode.ALREADY_SIGN_UP);

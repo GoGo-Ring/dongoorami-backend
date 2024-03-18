@@ -4,6 +4,7 @@ import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccom
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyPosts;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
@@ -27,6 +28,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @Import(QueryDslConfig.class)
 @DataJpaTest
@@ -163,5 +165,116 @@ class AccompanyReviewRepositoryTest {
         assertThat(isMember1Member2AccompanyReviewExist, equalTo(true));
         assertThat(isMember2Member1AccompanyReviewExist, equalTo(true));
         assertThat(isMember1Member3AccompanyReviewExist, equalTo(false));
+    }
+
+    @Test
+    @DisplayName("리뷰 작성자 id, 리뷰 대상자 id, 동행구인글 id로 동행 리뷰를 조회할 수 있다.")
+    void success_findAccompanyReviewByReviewerIdAndRevieweeIdAndAccompanyPostId() {
+        // given
+        Member member1 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        Member member2 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        Member member3 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        memberRepository.saveAll(Arrays.asList(member1, member2));
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member1, 1, concert)).get(0);
+        List<AccompanyComment> accompanyComments = new ArrayList<>();
+        accompanyComments.addAll(createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+        List<AccompanyReview> accompanyReviews = new ArrayList<>();
+        accompanyReviews.add(AccompanyReview.builder()
+                .reviewer(member1)
+                .reviewee(member2)
+                .accompanyPost(accompanyPost)
+                .build());
+        accompanyReviews.add(AccompanyReview.builder()
+                .reviewer(member2)
+                .reviewee(member1)
+                .accompanyPost(accompanyPost)
+                .build());
+        accompanyReviewRepository.saveAll(accompanyReviews);
+
+        // when
+        AccompanyReview accompanyReview = accompanyReviewRepository.findAccompanyReviewByReviewerIdAndRevieweeIdAndAccompanyPostId(
+                member1.getId(), member2.getId(), accompanyPost.getId());
+
+        // then
+        assertThat(accompanyReview, notNullValue());
+    }
+
+    @Test
+    @DisplayName("특정 멤버가 받은 별점 평균을 조회할 수 있다.")
+    void success_averageRatingByRevieweeId() {
+        // given
+        Member member1 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        Member member2 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        Member member3 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        Member member4 = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjgh")
+                .build();
+        memberRepository.saveAll(Arrays.asList(member1, member2, member3, member4));
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member1, 1, concert)).get(0);
+        List<AccompanyComment> accompanyComments = new ArrayList<>();
+        accompanyComments.addAll(createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+        AccompanyReview accompanyReview1 = AccompanyReview.builder()
+                .reviewer(member2)
+                .reviewee(member1)
+                .accompanyPost(accompanyPost)
+                .build();
+        AccompanyReview accompanyReview2 = AccompanyReview.builder()
+                .reviewer(member3)
+                .reviewee(member1)
+                .accompanyPost(accompanyPost)
+                .build();
+        AccompanyReview accompanyReview3 = AccompanyReview.builder()
+                .reviewer(member4)
+                .reviewee(member1)
+                .accompanyPost(accompanyPost)
+                .build();
+        ReflectionTestUtils.setField(accompanyReview1, "rating", 5);
+        ReflectionTestUtils.setField(accompanyReview2, "rating", 4);
+        ReflectionTestUtils.setField(accompanyReview3, "rating", 3);
+        accompanyReviewRepository.saveAll(
+                Arrays.asList(accompanyReview1, accompanyReview2, accompanyReview3));
+
+        // when
+        Integer ratingAveragePercent = accompanyReviewRepository.averageRatingPercentByRevieweeId(
+                member1.getId());
+
+        // then
+        assertThat(ratingAveragePercent, equalTo((5 + 4 + 3) / 3 * 20));
     }
 }
