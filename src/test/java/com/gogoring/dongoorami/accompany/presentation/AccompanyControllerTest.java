@@ -1030,7 +1030,7 @@ class AccompanyControllerTest {
     @Test
     @WithCustomMockUser
     @DisplayName("특정 동행 구인글에 대해 모든 리뷰를 작성할 수 있다.")
-    void updateAccompanyReviews() throws Exception {
+    void success_updateAccompanyReviews() throws Exception {
         // given
         Member member1 = ((CustomUserDetails) SecurityContextHolder
                 .getContext()
@@ -1094,5 +1094,38 @@ class AccompanyControllerTest {
                                         .description("평가 항목")
                         ))
                 );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("특정 동행 구인글의 동행 상태를 변경할 수 있다.")
+    void success_updateAccompanyPostStatusCompleted() throws Exception {
+        // given
+        Member member = ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal()).getMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, 1, concert)).get(0);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/v1/accompanies/posts/{accompanyPostId}/status", accompanyPost.getId())
+                        .header("Authorization", accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/updateAccompanyPostStatusCompleted",
+                        preprocessRequest(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("accompanyPostId").description("동행 구인글 id")
+                        )
+                ));
     }
 }
