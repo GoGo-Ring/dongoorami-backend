@@ -30,6 +30,11 @@ public interface AccompanyReviewRepository extends JpaRepository<AccompanyReview
 
     @Query("SELECT ar FROM AccompanyReview ar " +
             "JOIN ar.accompanyPost ap " +
-            "WHERE ap.concert.id = :concertId")
-    List<AccompanyReview> findAllByConcertId(Long concertId);
+            "JOIN ap.concert c " +
+            "WHERE c.id = :concertId " +
+            "AND c.isActivated = true " +
+            "AND ar.status = 'BEFORE_ACCOMPANY' " +
+            "AND ar.isActivated = true")
+    List<AccompanyReview> findAllByConcertIdAndActivatedConcertAndActivatedAccompanyReviewAndProceedingStatus(Long concertId);
+
 }

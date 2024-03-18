@@ -136,7 +136,7 @@ public class ConcertServiceImpl implements ConcertService {
                     concert.updateStatus();
                     if (concert.isOneDayPassedSinceEndedAt()) {
                         updateAccompanyReviewsStatus(
-                                accompanyReviewRepository.findAllByConcertId(concert.getId()));
+                                accompanyReviewRepository.findAllByConcertIdAndActivatedConcertAndActivatedAccompanyReviewAndProceedingStatus(concert.getId()));
                     }
                 });
     }

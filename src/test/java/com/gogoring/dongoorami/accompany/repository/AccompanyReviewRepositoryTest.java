@@ -296,7 +296,7 @@ class AccompanyReviewRepositoryTest {
                 createAccompanyReview(accompanyPost, members)).size();
 
         // when
-        List<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByConcertId(
+        List<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByConcertIdAndActivatedConcertAndActivatedAccompanyReviewAndProceedingStatus(
                 concert.getId());
 
         // then
