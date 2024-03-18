@@ -66,7 +66,9 @@ public class AccompanyController {
             @PathVariable Long accompanyPostId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(
-                accompanyService.getAccompanyPost(customUserDetails != null ? customUserDetails.getId() : -1, accompanyPostId));
+                accompanyService.getAccompanyPost(
+                        customUserDetails != null ? customUserDetails.getId() : -1,
+                        accompanyPostId));
     }
 
     @PostMapping("/posts")
@@ -96,7 +98,8 @@ public class AccompanyController {
             @PathVariable Long accompanyPostId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(
-                accompanyService.getAccompanyComments(accompanyPostId, customUserDetails != null ? customUserDetails.getId() : -1));
+                accompanyService.getAccompanyComments(accompanyPostId,
+                        customUserDetails != null ? customUserDetails.getId() : -1));
     }
 
     @PostMapping("/posts/{accompanyPostId}")
@@ -184,6 +187,15 @@ public class AccompanyController {
             @PathVariable Long accompanyPostId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         accompanyService.updateAccompanyReview(accompanyReviewRequests, accompanyPostId,
+                customUserDetails.getId());
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/posts/{accompanyPostId}/status")
+    public ResponseEntity<Void> updateAccompanyPostStatus(
+            @PathVariable Long accompanyPostId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        accompanyService.updateAccompanyPostStatusCompleted(accompanyPostId,
                 customUserDetails.getId());
         return ResponseEntity.ok().build();
     }
