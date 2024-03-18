@@ -185,19 +185,17 @@ class AccompanyControllerTest {
     }
 
     @Test
-    @WithCustomMockUser
     @DisplayName("동행 구인글 목록을 조회할 수 있다. - 최초 요청")
     void success_getAccompanyPostsFirst() throws Exception {
         // given
-        Member member = ((CustomUserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal()).getMember();
+        Member member = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjghjgdslk")
+                .build();
         ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         memberRepository.save(member);
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
-        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
-                member.getRoles());
         String size = "3";
         AccompanyPostFilterRequest accompanyPostFilterRequest1 = AccompanyPostFilterRequest.builder()
                 .gender("여")
@@ -214,7 +212,6 @@ class AccompanyControllerTest {
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/v1/accompanies/posts")
-                        .header("Authorization", accessToken)
                         .param("size", size)
                         .param("gender", accompanyPostFilterRequest1.getGender())
                         .param("region", accompanyPostFilterRequest1.getRegion())
@@ -283,14 +280,14 @@ class AccompanyControllerTest {
     }
 
     @Test
-    @WithCustomMockUser
     @DisplayName("동행 구인글 목록을 조회할 수 있다. - 이후 요청")
     void success_getAccompanyPostsAfterFirst() throws Exception {
         // given
-        Member member = ((CustomUserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal()).getMember();
+        Member member = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjghjgdslk")
+                .build();
         ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         memberRepository.save(member);
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
@@ -383,21 +380,19 @@ class AccompanyControllerTest {
     }
 
     @Test
-    @WithCustomMockUser
     @DisplayName("동행 구인글을 단건 상세 조회할 수 있다.")
     void success_getAccompanyPost() throws Exception {
         // given
-        Member member = ((CustomUserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal()).getMember();
+        Member member = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjghjgdslk")
+                .build();
         ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         ReflectionTestUtils.setField(member, "gender", "여자");
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
         ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
         memberRepository.save(member);
-        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
-                member.getRoles());
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1, concert)).get(0);
@@ -406,7 +401,6 @@ class AccompanyControllerTest {
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/v1/accompanies/posts/{accompanyPostId}", accompanyPost.getId())
-                        .header("Authorization", accessToken)
         );
 
         // then
@@ -502,21 +496,19 @@ class AccompanyControllerTest {
     }
 
     @Test
-    @WithCustomMockUser
     @DisplayName("특정 동행 구인글의 전체 댓글을 조회할 수 있다.")
     void success_getAccompanyComments() throws Exception {
         // given
-        Member member = ((CustomUserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal()).getMember();
+        Member member = Member.builder()
+                .profileImage("image.png")
+                .provider("kakao")
+                .providerId("alsjkghlaskdjghjgdslk")
+                .build();
         ReflectionTestUtils.setField(member, "nickname", "김뫄뫄");
         ReflectionTestUtils.setField(member, "gender", "여자");
         ReflectionTestUtils.setField(member, "birthDate", LocalDate.of(2001, 1, 17));
         ReflectionTestUtils.setField(member, "introduction", "안녕하세요~");
         memberRepository.save(member);
-        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
-                member.getRoles());
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, 1, concert)).get(0);
@@ -526,7 +518,6 @@ class AccompanyControllerTest {
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/v1/accompanies/comments/{accompanyPostId}", accompanyPost.getId())
-                        .header("Authorization", accessToken)
         );
 
         // then
@@ -690,22 +681,13 @@ class AccompanyControllerTest {
     }
 
     @Test
-    @WithCustomMockUser
     @DisplayName("지역 목록을 조회할 수 있다.")
     void success_getAccompanyPostRegions() throws Exception {
         // given
-        Member member = ((CustomUserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal()).getMember();
-        memberRepository.save(member);
-        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
-                member.getRoles());
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/v1/accompanies/posts/regions")
-                        .header("Authorization", accessToken)
         );
 
         // then
