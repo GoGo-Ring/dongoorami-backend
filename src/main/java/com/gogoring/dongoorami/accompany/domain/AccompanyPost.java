@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 public class AccompanyPost extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    private final RecruitmentStatusType status = RecruitmentStatusType.PROCEEDING;
+    private RecruitmentStatusType status = RecruitmentStatusType.PROCEEDING;
     private Long viewCount = 0L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -95,6 +95,10 @@ public class AccompanyPost extends BaseEntity {
         this.content = accompanyPost.content;
         this.images = accompanyPost.images;
         this.purposes = accompanyPost.purposes;
+    }
+
+    public void updateStatus(RecruitmentStatusType status) {
+        this.status = status;
     }
 
     private void checkIsWriter(Long memberId) {

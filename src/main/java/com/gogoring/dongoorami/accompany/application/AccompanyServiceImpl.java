@@ -2,6 +2,7 @@ package com.gogoring.dongoorami.accompany.application;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
+import com.gogoring.dongoorami.accompany.domain.AccompanyPost.RecruitmentStatusType;
 import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
@@ -223,8 +224,11 @@ public class AccompanyServiceImpl implements AccompanyService {
         checkConfirmerIsWriter(currentMemberId, accompanyPost.getWriter().getId());
         checkAccompanyCommentIsApplyComment(accompanyComment);
         checkAlreadyConfirmedAccompanyApplyComment(accompanyComment);
-        createAccompanyReview(accompanyPost,
-                getAccompanyConfirmedMembers(accompanyPost, accompanyComment.getMember()));
+        List<Member> accompanyConfirmedMembers = getAccompanyConfirmedMembers(accompanyPost, accompanyComment.getMember());
+        if(accompanyPost.getTotalPeople()==accompanyConfirmedMembers.size()){
+            accompanyPost.updateStatus(RecruitmentStatusType.COMPLETED);
+        }
+        createAccompanyReview(accompanyPost, accompanyConfirmedMembers);
         accompanyComment.updateIsAccompanyConfirmedComment();
     }
 
