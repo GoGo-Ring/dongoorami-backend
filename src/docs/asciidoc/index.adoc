@@ -234,7 +234,7 @@ include::{snippets}/AccompanyControllerTest/confirmAccompany/path-parameters.ado
 .Response
 include::{snippets}/AccompanyControllerTest/confirmAccompany/http-response.adoc[]
 
-== 동행 구인글 상태 모집 완료로 변경
+=== 동행 구인글 상태 모집 완료로 변경
 include::{snippets}/AccompanyControllerTest/updateAccompanyPostStatusCompleted/http-request.adoc[]
 include::{snippets}/AccompanyControllerTest/updateAccompanyPostStatusCompleted/path-parameters.adoc[]
 
