@@ -13,8 +13,8 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse.
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
-import com.gogoring.dongoorami.accompany.dto.response.AccompanyReviewResponse;
-import com.gogoring.dongoorami.accompany.dto.response.AccompanyReviewsResponse;
+import com.gogoring.dongoorami.accompany.dto.response.ReviewResponse;
+import com.gogoring.dongoorami.accompany.dto.response.ReviewsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
 import com.gogoring.dongoorami.accompany.exception.AccompanyApplyCommentModifyDeniedException;
 import com.gogoring.dongoorami.accompany.exception.AccompanyApplyNotAllowedForWriterException;
@@ -277,7 +277,7 @@ public class AccompanyServiceImpl implements AccompanyService {
     }
 
     @Override
-    public AccompanyReviewsResponse getReceivedReviews(Long cursorId, int size,
+    public ReviewsResponse getReceivedReviews(Long cursorId, int size,
             Long currentMemberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
@@ -285,15 +285,15 @@ public class AccompanyServiceImpl implements AccompanyService {
         Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByMemberAndStatus(
                 cursorId, size, member, false,
                 AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
-        List<AccompanyReviewResponse> accompanyReviewResponses = accompanyReviews.stream()
-                .map(AccompanyReviewResponse::of)
+        List<ReviewResponse> reviewRespons = accompanyReviews.stream()
+                .map(ReviewResponse::of)
                 .toList();
 
-        return AccompanyReviewsResponse.of(accompanyReviews.hasNext(), accompanyReviewResponses);
+        return ReviewsResponse.of(accompanyReviews.hasNext(), reviewRespons);
     }
 
     @Override
-    public AccompanyReviewsResponse getWaitingReviews(Long cursorId, int size,
+    public ReviewsResponse getWaitingReviews(Long cursorId, int size,
             Long currentMemberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
@@ -301,11 +301,11 @@ public class AccompanyServiceImpl implements AccompanyService {
         Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByMemberAndStatus(
                 cursorId, size, member, true,
                 AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_NOT_WRITTEN);
-        List<AccompanyReviewResponse> accompanyReviewResponses = accompanyReviews.stream()
-                .map(AccompanyReviewResponse::of)
+        List<ReviewResponse> reviewRespons = accompanyReviews.stream()
+                .map(ReviewResponse::of)
                 .toList();
 
-        return AccompanyReviewsResponse.of(accompanyReviews.hasNext(), accompanyReviewResponses);
+        return ReviewsResponse.of(accompanyReviews.hasNext(), reviewRespons);
     }
 
     private List<Member> getAccompanyConfirmedMembers(AccompanyPost accompanyPost,

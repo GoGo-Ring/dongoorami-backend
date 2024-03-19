@@ -8,13 +8,13 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class AccompanyReviewResponse {
+public class ReviewResponse {
 
-    private final Long accompanyReviewId;
+    private final Long reviewId;
 
     private final String content;
 
-    private final Long accompanyPostId;
+    private final Long targetId;
 
     private final String title;
 
@@ -22,22 +22,22 @@ public class AccompanyReviewResponse {
     private final LocalDate updatedAt;
 
     @Builder
-    public AccompanyReviewResponse(Long accompanyReviewId, String content, Long accompanyPostId,
+    public ReviewResponse(Long reviewId, String content, Long targetId,
             String title, LocalDate updatedAt) {
-        this.accompanyReviewId = accompanyReviewId;
+        this.reviewId = reviewId;
         this.content = content;
-        this.accompanyPostId = accompanyPostId;
+        this.targetId = targetId;
         this.title = title;
         this.updatedAt = updatedAt;
     }
 
-    public static AccompanyReviewResponse of(AccompanyReview accompanyReview) {
+    public static ReviewResponse of(AccompanyReview accompanyReview) {
         AccompanyPost accompanyPost = accompanyReview.getAccompanyPost();
 
-        return AccompanyReviewResponse.builder()
-                .accompanyReviewId(accompanyReview.getId())
+        return ReviewResponse.builder()
+                .reviewId(accompanyReview.getId())
                 .content(accompanyReview.getContent())
-                .accompanyPostId(accompanyPost.getId())
+                .targetId(accompanyPost.getId())
                 .title(accompanyPost.getTitle())
                 .updatedAt(accompanyReview.getUpdatedAt().toLocalDate())
                 .build();

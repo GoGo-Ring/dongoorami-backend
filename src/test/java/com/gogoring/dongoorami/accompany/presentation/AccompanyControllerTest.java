@@ -1257,19 +1257,19 @@ class AccompanyControllerTest {
                         responseFields(
                                 fieldWithPath("hasNext").type(BOOLEAN)
                                         .description("다음 후기 정보 존재 여부"),
-                                fieldWithPath("accompanyReviewResponses").type(ARRAY)
+                                fieldWithPath("reviewResponses").type(ARRAY)
                                         .description("동행 구인 후기 목록"),
-                                fieldWithPath("accompanyReviewResponses[].accompanyReviewId").type(NUMBER)
+                                fieldWithPath("reviewResponses[].reviewId").type(NUMBER)
                                         .description("후기 아이디"),
-                                fieldWithPath("accompanyReviewResponses[].accompanyPostId").type(NUMBER)
+                                fieldWithPath("reviewResponses[].targetId").type(NUMBER)
                                         .description("후기가 작성된 동행 구인글 아이디"),
-                                fieldWithPath("accompanyReviewResponses[].title").type(
+                                fieldWithPath("reviewResponses[].title").type(
                                                 STRING)
                                         .description("동행 구인글 제목"),
-                                fieldWithPath("accompanyReviewResponses[].content").type(
+                                fieldWithPath("reviewResponses[].content").type(
                                                 STRING)
                                         .description("동행 후기 내용"),
-                                fieldWithPath("accompanyReviewResponses[].updatedAt").type(
+                                fieldWithPath("reviewResponses[].updatedAt").type(
                                                 STRING)
                                         .description("작성 날짜")
 
@@ -1335,19 +1335,19 @@ class AccompanyControllerTest {
                         responseFields(
                                 fieldWithPath("hasNext").type(BOOLEAN)
                                         .description("다음 후기 정보 존재 여부"),
-                                fieldWithPath("accompanyReviewResponses").type(ARRAY)
+                                fieldWithPath("reviewResponses").type(ARRAY)
                                         .description("동행 구인 후기 목록"),
-                                fieldWithPath("accompanyReviewResponses[].accompanyReviewId").type(NUMBER)
+                                fieldWithPath("reviewResponses[].reviewId").type(NUMBER)
                                         .description("후기 아이디"),
-                                fieldWithPath("accompanyReviewResponses[].accompanyPostId").type(NUMBER)
+                                fieldWithPath("reviewResponses[].targetId").type(NUMBER)
                                         .description("후기가 작성된 동행 구인글 아이디"),
-                                fieldWithPath("accompanyReviewResponses[].title").type(
+                                fieldWithPath("reviewResponses[].title").type(
                                                 STRING)
                                         .description("동행 구인글 제목"),
-                                fieldWithPath("accompanyReviewResponses[].content").type(
+                                fieldWithPath("reviewResponses[].content").type(
                                                 STRING)
                                         .description("동행 후기 내용"),
-                                fieldWithPath("accompanyReviewResponses[].updatedAt").type(
+                                fieldWithPath("reviewResponses[].updatedAt").type(
                                                 STRING)
                                         .description("작성 날짜")
 
@@ -1407,18 +1407,18 @@ class AccompanyControllerTest {
                         responseFields(
                                 fieldWithPath("hasNext").type(BOOLEAN)
                                         .description("다음 후기 정보 존재 여부"),
-                                fieldWithPath("accompanyReviewResponses").type(ARRAY)
+                                fieldWithPath("reviewResponses").type(ARRAY)
                                         .description("동행 구인 후기 목록"),
-                                fieldWithPath("accompanyReviewResponses[].accompanyReviewId").type(NUMBER)
+                                fieldWithPath("reviewResponses[].reviewId").type(NUMBER)
                                         .description("후기 아이디"),
-                                fieldWithPath("accompanyReviewResponses[].accompanyPostId").type(NUMBER)
+                                fieldWithPath("reviewResponses[].targetId").type(NUMBER)
                                         .description("후기가 작성된 동행 구인글 아이디"),
-                                fieldWithPath("accompanyReviewResponses[].title").type(
+                                fieldWithPath("reviewResponses[].title").type(
                                                 STRING)
                                         .description("동행 구인글 제목"),
-                                fieldWithPath("accompanyReviewResponses[].content").type(NULL)
+                                fieldWithPath("reviewResponses[].content").type(NULL)
                                         .description("동행 후기 내용(작성 전이므로 null로 들어갑니다.)"),
-                                fieldWithPath("accompanyReviewResponses[].updatedAt").type(
+                                fieldWithPath("reviewResponses[].updatedAt").type(
                                                 STRING)
                                         .description("작성 날짜(값이 들어가있긴한데 무시해주시면 됩니다.)")
 
@@ -1482,18 +1482,18 @@ class AccompanyControllerTest {
                         responseFields(
                                 fieldWithPath("hasNext").type(BOOLEAN)
                                         .description("다음 후기 정보 존재 여부"),
-                                fieldWithPath("accompanyReviewResponses").type(ARRAY)
+                                fieldWithPath("reviewResponses").type(ARRAY)
                                         .description("동행 구인 후기 목록"),
-                                fieldWithPath("accompanyReviewResponses[].accompanyReviewId").type(NUMBER)
+                                fieldWithPath("reviewResponses[].reviewId").type(NUMBER)
                                         .description("후기 아이디"),
-                                fieldWithPath("accompanyReviewResponses[].accompanyPostId").type(NUMBER)
+                                fieldWithPath("reviewResponses[].targetId").type(NUMBER)
                                         .description("후기가 작성된 동행 구인글 아이디"),
-                                fieldWithPath("accompanyReviewResponses[].title").type(
+                                fieldWithPath("reviewResponses[].title").type(
                                                 STRING)
                                         .description("동행 구인글 제목"),
-                                fieldWithPath("accompanyReviewResponses[].content").type(NULL)
+                                fieldWithPath("reviewResponses[].content").type(NULL)
                                         .description("동행 후기 내용(작성 전이므로 null로 들어갑니다.)"),
-                                fieldWithPath("accompanyReviewResponses[].updatedAt").type(
+                                fieldWithPath("reviewResponses[].updatedAt").type(
                                                 STRING)
                                         .description("작성 날짜(값이 들어가있긴한데 무시해주시면 됩니다.)")
 
