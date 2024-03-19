@@ -148,8 +148,9 @@ public class AccompanyServiceImpl implements AccompanyService {
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        List<String> imageUrls = s3ImageUtil.putObjects(images,
-                ImageType.ACCOMPANY_POST);
+        List<String> imageUrls =
+                !images.get(0).isEmpty() ? s3ImageUtil.putObjects(images, ImageType.ACCOMPANY_POST)
+                        : new ArrayList<>();
         Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(
                 accompanyPostRequest.getConcertId()).orElseThrow(
                 () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
