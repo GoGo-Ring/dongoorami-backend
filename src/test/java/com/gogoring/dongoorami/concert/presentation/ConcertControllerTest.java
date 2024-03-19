@@ -1,5 +1,7 @@
 package com.gogoring.dongoorami.concert.presentation;
 
+import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyComment;
+import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyPosts;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -21,6 +23,15 @@ import static org.springframework.restdocs.request.RequestDocumentation.queryPar
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gogoring.dongoorami.accompany.AccompanyDataFactory;
+import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
+import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview.AccompanyReviewStatusType;
+import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
+import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
+import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
+import com.gogoring.dongoorami.accompany.repository.AccompanyReviewRepository;
 import com.gogoring.dongoorami.concert.ConcertDataFactory;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
@@ -32,7 +43,7 @@ import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.member.MemberDataFactory;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,6 +74,15 @@ public class ConcertControllerTest {
     private ConcertReviewRepository concertReviewRepository;
 
     @Autowired
+    private AccompanyPostRepository accompanyPostRepository;
+
+    @Autowired
+    private AccompanyCommentRepository accompanyCommentRepository;
+
+    @Autowired
+    private AccompanyReviewRepository accompanyReviewRepository;
+
+    @Autowired
     private TokenProvider tokenProvider;
 
     @Autowired
@@ -73,6 +93,9 @@ public class ConcertControllerTest {
 
     @BeforeEach
     void setUp() {
+        accompanyReviewRepository.deleteAll();
+        accompanyCommentRepository.deleteAll();
+        accompanyPostRepository.deleteAll();
         concertReviewRepository.deleteAll();
         concertRepository.deleteAll();
         memberRepository.deleteAll();
@@ -80,6 +103,9 @@ public class ConcertControllerTest {
 
     @AfterEach
     void tearDown() {
+        accompanyReviewRepository.deleteAll();
+        accompanyCommentRepository.deleteAll();
+        accompanyPostRepository.deleteAll();
         concertReviewRepository.deleteAll();
         concertRepository.deleteAll();
         memberRepository.deleteAll();
@@ -207,8 +233,7 @@ public class ConcertControllerTest {
 
         int size = 3;
         List<ConcertReview> concertReviews = ConcertDataFactory.createConcertReviews(concert,
-                member,
-                size);
+                member, size);
         concertReviewRepository.saveAll(concertReviews);
         long maxId = -1L;
         for (ConcertReview concertReview : concertReviews) {
@@ -589,6 +614,75 @@ public class ConcertControllerTest {
                                         .description("공연 이름"),
                                 fieldWithPath("[].place").type(STRING)
                                         .description("공연 장소")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("특정 회원이 작성한 공연/동행 구인 후기를 조회할 수 있다.")
+    void success_getConcertAndAccompanyReviews() throws Exception {
+        // given
+        Member member1 = MemberDataFactory.createLoginMember();
+        Member member2 = MemberDataFactory.createMember();
+        Member member3 = MemberDataFactory.createMember();
+        memberRepository.saveAll(List.of(member1, member2, member3));
+        String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
+                member1.getRoles());
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        List<ConcertReview> concertReviews = ConcertDataFactory.createConcertReviews(concert,
+                member1, 2);
+        concertReviewRepository.saveAll(concertReviews);
+
+        AccompanyPost accompanyPost = accompanyPostRepository.save(
+                createAccompanyPosts(member1, 1, concert).get(0));
+
+        List<AccompanyComment> accompanyComments = new ArrayList<>(
+                createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        AccompanyReview accompanyReview1 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member1, member2);
+        AccompanyReview accompanyReview2 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member1, member3);
+        ReflectionTestUtils.setField(accompanyReview1, "content", "친절한 분이셨습니다~");
+        ReflectionTestUtils.setField(accompanyReview2, "content", "덕분에 공연 재밌게 봤어요!");
+        ReflectionTestUtils.setField(accompanyReview1, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        ReflectionTestUtils.setField(accompanyReview2, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        accompanyReviewRepository.saveAll(List.of(accompanyReview1, accompanyReview2));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/concerts/accompanies/reviews").header(
+                                "Authorization", accessToken)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getConcertAndAccompanyReviews",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[]").type(ARRAY)
+                                        .description("공연/동행 구인 후기 목록"),
+                                fieldWithPath("[].reviewId").type(NUMBER)
+                                        .description("후기 아이디"),
+                                fieldWithPath("[].targetId").type(NUMBER)
+                                        .description("후기가 작성된 공연/동행 구인글 아이디"),
+                                fieldWithPath("[].title").type(STRING)
+                                        .description("공연 이름/동행 구인글 제목"),
+                                fieldWithPath("[].content").type(STRING)
+                                        .description("후기 내용"),
+                                fieldWithPath("[].updatedAt").type(STRING)
+                                        .description("작성 날짜"),
+                                fieldWithPath("[].isAccompanyReview").type(BOOLEAN)
+                                        .description("동행 후기/공연 후기 여부, 동행 후기면 true, 공연 후기면 false")
                         ))
                 );
     }
