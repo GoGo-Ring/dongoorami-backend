@@ -280,8 +280,8 @@ public class AccompanyServiceImpl implements AccompanyService {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByReviewee(
-                cursorId, size, member);
+        Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByRevieweeAndStatus(
+                cursorId, size, member, AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
         List<AccompanyReviewResponse> accompanyReviewResponses = accompanyReviews.stream()
                 .map(AccompanyReviewResponse::of)
                 .toList();

@@ -1,6 +1,7 @@
 package com.gogoring.dongoorami.accompany.repository;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview.AccompanyReviewStatusType;
 import com.gogoring.dongoorami.accompany.domain.QAccompanyReview;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -18,11 +19,13 @@ public class AccompanyReviewCustomRepositoryImpl implements AccompanyReviewCusto
     private final QAccompanyReview accompanyReview = QAccompanyReview.accompanyReview;
 
     @Override
-    public Slice<AccompanyReview> findAllByReviewee(Long cursorId, int size, Member member) {
+    public Slice<AccompanyReview> findAllByRevieweeAndStatus(Long cursorId, int size, Member member,
+            AccompanyReviewStatusType statusType) {
         List<AccompanyReview> accompanyReviews = jpaQueryFactory
                 .selectFrom(accompanyReview)
                 .where(
                         accompanyReview.reviewee.eq(member),
+                        accompanyReview.status.eq(statusType),
                         accompanyReview.isActivated.isTrue(),
                         lessThanCursorId(cursorId)
                 ).orderBy(accompanyReview.id.desc()).limit(size).fetch();

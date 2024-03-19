@@ -11,6 +11,7 @@ import com.gogoring.dongoorami.accompany.AccompanyDataFactory;
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview.AccompanyReviewStatusType;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.concert.ConcertDataFactory;
 import com.gogoring.dongoorami.concert.domain.Concert;
@@ -303,7 +304,7 @@ class AccompanyReviewRepositoryTest {
 
     @Test
     @DisplayName("id 내림차순으로 특정 회원이 받은 후기 목록을 조회할 수 있다.")
-    void success_findAllByReviewee() {
+    void success_findAllByRevieweeAndStatus() {
         // given
         Member member1 = MemberDataFactory.createMember();
         Member member2 = MemberDataFactory.createMember();
@@ -327,14 +328,18 @@ class AccompanyReviewRepositoryTest {
                 member3, member1);
         ReflectionTestUtils.setField(accompanyReview1, "rating", 5);
         ReflectionTestUtils.setField(accompanyReview2, "rating", 4);
+        ReflectionTestUtils.setField(accompanyReview1, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        ReflectionTestUtils.setField(accompanyReview2, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
         accompanyReviewRepository.saveAll(List.of(accompanyReview1, accompanyReview2));
 
         long maxId = Math.max(accompanyReview1.getId(), accompanyReview2.getId());
 
         // when
         int size = 2;
-        Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByReviewee(
-                maxId + 1, size, member1);
+        Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByRevieweeAndStatus(
+                maxId + 1, size, member1, AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
 
         // then
         Assertions.assertThat(accompanyReviews.getSize()).isEqualTo(size);
