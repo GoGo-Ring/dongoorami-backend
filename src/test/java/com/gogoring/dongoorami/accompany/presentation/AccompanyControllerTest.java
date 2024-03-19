@@ -17,6 +17,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
+import static org.springframework.restdocs.payload.JsonFieldType.NULL;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -1349,6 +1350,152 @@ class AccompanyControllerTest {
                                 fieldWithPath("accompanyReviewResponses[].updatedAt").type(
                                                 STRING)
                                         .description("작성 날짜")
+
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("특정 회원이 작성 전인 동행 구인 후기를 조회할 수 있다. - 최초 요청")
+    void success_getWaitingReviewsFirst() throws Exception {
+        // given
+        Member member1 = MemberDataFactory.createLoginMember();
+        Member member2 = MemberDataFactory.createMember();
+        Member member3 = MemberDataFactory.createMember();
+        memberRepository.saveAll(List.of(member1, member2, member3));
+        String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
+                member1.getRoles());
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        AccompanyPost accompanyPost = accompanyPostRepository.save(
+                createAccompanyPosts(member1, 1, concert).get(0));
+
+        List<AccompanyComment> accompanyComments = new ArrayList<>(
+                createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        AccompanyReview accompanyReview1 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member1, member2);
+        AccompanyReview accompanyReview2 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member1, member3);
+        ReflectionTestUtils.setField(accompanyReview1, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_NOT_WRITTEN);
+        ReflectionTestUtils.setField(accompanyReview2, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_NOT_WRITTEN);
+        accompanyReviewRepository.saveAll(List.of(accompanyReview1, accompanyReview2));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompanies/reviews/reviewers/my-page").header(
+                                "Authorization", accessToken)
+                        .param("size", String.valueOf(2))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getWaitingReviewsFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("size").description(
+                                        "조회할 후기 개수, 값 넣지 않으면 기본 10개").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNext").type(BOOLEAN)
+                                        .description("다음 후기 정보 존재 여부"),
+                                fieldWithPath("accompanyReviewResponses").type(ARRAY)
+                                        .description("동행 구인 후기 목록"),
+                                fieldWithPath("accompanyReviewResponses[].accompanyReviewId").type(NUMBER)
+                                        .description("후기 아이디"),
+                                fieldWithPath("accompanyReviewResponses[].accompanyPostId").type(NUMBER)
+                                        .description("후기가 작성된 동행 구인글 아이디"),
+                                fieldWithPath("accompanyReviewResponses[].title").type(
+                                                STRING)
+                                        .description("동행 구인글 제목"),
+                                fieldWithPath("accompanyReviewResponses[].content").type(NULL)
+                                        .description("동행 후기 내용(작성 전이므로 null로 들어갑니다.)"),
+                                fieldWithPath("accompanyReviewResponses[].updatedAt").type(
+                                                STRING)
+                                        .description("작성 날짜(값이 들어가있긴한데 무시해주시면 됩니다.)")
+
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("특정 회원이 작성 전인 동행 구인 후기를 조회할 수 있다. - 이후 요청")
+    void success_getWaitingReviewsAfterFirst() throws Exception {
+        // given
+        Member member1 = MemberDataFactory.createLoginMember();
+        Member member2 = MemberDataFactory.createMember();
+        Member member3 = MemberDataFactory.createMember();
+        memberRepository.saveAll(List.of(member1, member2, member3));
+        String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
+                member1.getRoles());
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        AccompanyPost accompanyPost = accompanyPostRepository.save(
+                createAccompanyPosts(member1, 1, concert).get(0));
+
+        List<AccompanyComment> accompanyComments = new ArrayList<>(
+                createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        AccompanyReview accompanyReview1 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member1, member2);
+        AccompanyReview accompanyReview2 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member1, member3);
+        ReflectionTestUtils.setField(accompanyReview1, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_NOT_WRITTEN);
+        ReflectionTestUtils.setField(accompanyReview2, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_NOT_WRITTEN);
+        accompanyReviewRepository.saveAll(List.of(accompanyReview1, accompanyReview2));
+
+        long maxId = Math.max(accompanyReview1.getId(), accompanyReview2.getId());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompanies/reviews/reviewers/my-page").header(
+                                "Authorization", accessToken)
+                        .param("cursorId", String.valueOf(maxId + 1))
+                        .param("size", String.valueOf(2))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getWaitingReviewsAfterFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("cursorId").description("마지막으로 받은 후기 아이디"),
+                                parameterWithName("size").description(
+                                        "조회할 후기 개수, 값 넣지 않으면 기본 10개").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNext").type(BOOLEAN)
+                                        .description("다음 후기 정보 존재 여부"),
+                                fieldWithPath("accompanyReviewResponses").type(ARRAY)
+                                        .description("동행 구인 후기 목록"),
+                                fieldWithPath("accompanyReviewResponses[].accompanyReviewId").type(NUMBER)
+                                        .description("후기 아이디"),
+                                fieldWithPath("accompanyReviewResponses[].accompanyPostId").type(NUMBER)
+                                        .description("후기가 작성된 동행 구인글 아이디"),
+                                fieldWithPath("accompanyReviewResponses[].title").type(
+                                                STRING)
+                                        .description("동행 구인글 제목"),
+                                fieldWithPath("accompanyReviewResponses[].content").type(NULL)
+                                        .description("동행 후기 내용(작성 전이므로 null로 들어갑니다.)"),
+                                fieldWithPath("accompanyReviewResponses[].updatedAt").type(
+                                                STRING)
+                                        .description("작성 날짜(값이 들어가있긴한데 무시해주시면 됩니다.)")
 
                         ))
                 );
