@@ -1271,8 +1271,9 @@ class AccompanyControllerTest {
                                         .description("동행 후기 내용"),
                                 fieldWithPath("reviewResponses[].updatedAt").type(
                                                 STRING)
-                                        .description("작성 날짜")
-
+                                        .description("작성 날짜"),
+                                fieldWithPath("reviewResponses[].isAccompanyReview").type(BOOLEAN)
+                                        .description("동행 후기/공연 후기 여부, 동행 후기면 true, 공연 후기면 false")
                         ))
                 );
     }
@@ -1349,8 +1350,9 @@ class AccompanyControllerTest {
                                         .description("동행 후기 내용"),
                                 fieldWithPath("reviewResponses[].updatedAt").type(
                                                 STRING)
-                                        .description("작성 날짜")
-
+                                        .description("작성 날짜"),
+                                fieldWithPath("reviewResponses[].isAccompanyReview").type(BOOLEAN)
+                                        .description("동행 후기/공연 후기 여부, 동행 후기면 true, 공연 후기면 false")
                         ))
                 );
     }
@@ -1420,8 +1422,9 @@ class AccompanyControllerTest {
                                         .description("동행 후기 내용(작성 전이므로 null로 들어갑니다.)"),
                                 fieldWithPath("reviewResponses[].updatedAt").type(
                                                 STRING)
-                                        .description("작성 날짜(값이 들어가있긴한데 무시해주시면 됩니다.)")
-
+                                        .description("작성 날짜(값이 들어가있긴한데 무시해주시면 됩니다.)"),
+                                fieldWithPath("reviewResponses[].isAccompanyReview").type(BOOLEAN)
+                                        .description("동행 후기/공연 후기 여부, 동행 후기면 true, 공연 후기면 false")
                         ))
                 );
     }
@@ -1495,8 +1498,9 @@ class AccompanyControllerTest {
                                         .description("동행 후기 내용(작성 전이므로 null로 들어갑니다.)"),
                                 fieldWithPath("reviewResponses[].updatedAt").type(
                                                 STRING)
-                                        .description("작성 날짜(값이 들어가있긴한데 무시해주시면 됩니다.)")
-
+                                        .description("작성 날짜(값이 들어가있긴한데 무시해주시면 됩니다.)"),
+                                fieldWithPath("reviewResponses[].isAccompanyReview").type(BOOLEAN)
+                                        .description("동행 후기/공연 후기 여부, 동행 후기면 true, 공연 후기면 false")
                         ))
                 );
     }

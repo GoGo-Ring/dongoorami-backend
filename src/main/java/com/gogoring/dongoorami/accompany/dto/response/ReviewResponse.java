@@ -21,14 +21,17 @@ public class ReviewResponse {
     @JsonFormat(pattern = "yyyy.MM.dd", timezone = "Asia/Seoul")
     private final LocalDate updatedAt;
 
+    private final Boolean isAccompanyReview;
+
     @Builder
     public ReviewResponse(Long reviewId, String content, Long targetId,
-            String title, LocalDate updatedAt) {
+            String title, LocalDate updatedAt, Boolean isAccompanyReview) {
         this.reviewId = reviewId;
         this.content = content;
         this.targetId = targetId;
         this.title = title;
         this.updatedAt = updatedAt;
+        this.isAccompanyReview = isAccompanyReview;
     }
 
     public static ReviewResponse of(AccompanyReview accompanyReview) {
@@ -40,6 +43,7 @@ public class ReviewResponse {
                 .targetId(accompanyPost.getId())
                 .title(accompanyPost.getTitle())
                 .updatedAt(accompanyReview.getUpdatedAt().toLocalDate())
+                .isAccompanyReview(true)
                 .build();
     }
 }
