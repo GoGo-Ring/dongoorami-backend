@@ -30,7 +30,7 @@ public class WishCustomRepositoryImpl implements WishCustomRepository {
         boolean hasNext = false;
         if (!wishes.isEmpty()) {
             Long lastIdInResult = wishes.get(wishes.size() - 1).getId();
-            hasNext = isExistByIdLessThan(lastIdInResult);
+            hasNext = isExistByIdLessThan(lastIdInResult, member);
         }
 
         return new SliceImpl<>(wishes, Pageable.ofSize(size), hasNext);
@@ -40,9 +40,11 @@ public class WishCustomRepositoryImpl implements WishCustomRepository {
         return cursorId != null ? wish.id.lt(cursorId) : null;
     }
 
-    private boolean isExistByIdLessThan(Long id) {
+    private boolean isExistByIdLessThan(Long id, Member member) {
         return jpaQueryFactory.selectFrom(wish)
-                .where(wish.id.lt(id),
+                .where(
+                        wish.member.eq(member),
+                        wish.id.lt(id),
                         wish.isActivated.isTrue())
                 .fetchFirst() != null;
     }
