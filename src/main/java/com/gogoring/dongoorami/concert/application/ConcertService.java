@@ -1,5 +1,6 @@
 package com.gogoring.dongoorami.concert.application;
 
+import com.gogoring.dongoorami.accompany.dto.response.ReviewResponse;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
@@ -26,4 +27,6 @@ public interface ConcertService {
             List<String> statuses);
 
     List<ConcertInfoResponse> getConcertsByKeyword(String keyword);
+
+    List<ReviewResponse> getConcertAndAccompanyReview(Long memberId);
 }
