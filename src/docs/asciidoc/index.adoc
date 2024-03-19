@@ -77,6 +77,49 @@ include::{snippets}/MemberControllerTest/getMember/http-request.adoc[]
 include::{snippets}/MemberControllerTest/getMember/http-response.adoc[]
 include::{snippets}/MemberControllerTest/getMember/response-fields.adoc[]
 
+== 마이페이지 API
+=== 받은 후기 조회(최초 요청)
+
+.Request
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsFirst/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsFirst/query-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsFirst/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsFirst/response-fields.adoc[]
+
+=== 받은 후기 조회(이후 요청)
+최초 요청 api와는 cursorId 유무의 차이가 있습니다
+
+.Request
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsAfterFirst/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsAfterFirst/query-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsAfterFirst/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsAfterFirst/response-fields.adoc[]
+
+=== 작성 전 후기 조회(최초 요청)
+
+.Request
+include::{snippets}/AccompanyControllerTest/getWaitingReviewsFirst/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/getWaitingReviewsFirst/query-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/getWaitingReviewsFirst/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/getWaitingReviewsFirst/response-fields.adoc[]
+
+=== 작성 전 후기 조회(이후 요청)
+최초 요청 api와는 cursorId 유무의 차이가 있습니다
+
+.Request
+include::{snippets}/AccompanyControllerTest/getWaitingReviewsAfterFirst/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/getWaitingReviewsAfterFirst/query-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/getWaitingReviewsAfterFirst/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/getWaitingReviewsAfterFirst/response-fields.adoc[]
+
 == 동행 API
 
 === 동행 목적 종류
@@ -267,27 +310,6 @@ include::{snippets}/AccompanyControllerTest/updateAccompanyReviews/request-field
 
 .Response
 include::{snippets}/AccompanyControllerTest/updateAccompanyReviews/http-response.adoc[]
-
-=== 마이페이지 받은 후기 조회(최초 요청)
-
-.Request
-include::{snippets}/AccompanyControllerTest/getReceivedReviewsFirst/http-request.adoc[]
-include::{snippets}/AccompanyControllerTest/getReceivedReviewsFirst/query-parameters.adoc[]
-
-.Response
-include::{snippets}/AccompanyControllerTest/getReceivedReviewsFirst/http-response.adoc[]
-include::{snippets}/AccompanyControllerTest/getReceivedReviewsFirst/response-fields.adoc[]
-
-=== 마이페이지 받은 후기 조회(이후 요청)
-최초 요청 api와는 cursorId 유무의 차이가 있습니다
-
-.Request
-include::{snippets}/AccompanyControllerTest/getReceivedReviewsAfterFirst/http-request.adoc[]
-include::{snippets}/AccompanyControllerTest/getReceivedReviewsAfterFirst/query-parameters.adoc[]
-
-.Response
-include::{snippets}/AccompanyControllerTest/getReceivedReviewsAfterFirst/http-response.adoc[]
-include::{snippets}/AccompanyControllerTest/getReceivedReviewsAfterFirst/response-fields.adoc[]
 
 == 공연 API
 === 공연 후기 작성
