@@ -3,6 +3,8 @@ package com.gogoring.dongoorami.accompany.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
+import com.gogoring.dongoorami.concert.domain.Concert;
+import com.gogoring.dongoorami.concert.domain.ConcertReview;
 import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,6 +46,19 @@ public class ReviewResponse {
                 .title(accompanyPost.getTitle())
                 .updatedAt(accompanyReview.getUpdatedAt().toLocalDate())
                 .isAccompanyReview(true)
+                .build();
+    }
+
+    public static ReviewResponse of(ConcertReview concertReview) {
+        Concert concert = concertReview.getConcert();
+
+        return ReviewResponse.builder()
+                .reviewId(concertReview.getId())
+                .content(concertReview.getContent())
+                .targetId(concert.getId())
+                .title(concert.getName())
+                .updatedAt(concertReview.getUpdatedAt().toLocalDate())
+                .isAccompanyReview(false)
                 .build();
     }
 }
