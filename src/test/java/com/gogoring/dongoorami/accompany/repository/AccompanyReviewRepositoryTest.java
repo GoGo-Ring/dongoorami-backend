@@ -338,8 +338,9 @@ class AccompanyReviewRepositoryTest {
 
         // when
         int size = 2;
-        Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByRevieweeAndStatus(
-                maxId + 1, size, member1, AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByMemberAndStatus(
+                maxId + 1, size, member1, false,
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
 
         // then
         Assertions.assertThat(accompanyReviews.getSize()).isEqualTo(size);

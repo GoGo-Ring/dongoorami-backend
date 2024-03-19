@@ -38,6 +38,7 @@ import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeType;
 import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview.AccompanyReviewStatusType;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
@@ -1230,11 +1231,15 @@ class AccompanyControllerTest {
                 member3, member1);
         ReflectionTestUtils.setField(accompanyReview1, "content", "친절한 분이셨습니다~");
         ReflectionTestUtils.setField(accompanyReview2, "content", "덕분에 공연 재밌게 봤어요!");
+        ReflectionTestUtils.setField(accompanyReview1, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        ReflectionTestUtils.setField(accompanyReview2, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
         accompanyReviewRepository.saveAll(List.of(accompanyReview1, accompanyReview2));
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/v1/accompanies/reviewees/reviews/my-page").header(
+                get("/api/v1/accompanies/reviews/reviewees/my-page").header(
                                 "Authorization", accessToken)
                         .param("size", String.valueOf(2))
         );
@@ -1300,6 +1305,10 @@ class AccompanyControllerTest {
                 member3, member1);
         ReflectionTestUtils.setField(accompanyReview1, "content", "친절한 분이셨습니다~");
         ReflectionTestUtils.setField(accompanyReview2, "content", "덕분에 공연 재밌게 봤어요!");
+        ReflectionTestUtils.setField(accompanyReview1, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        ReflectionTestUtils.setField(accompanyReview2, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
         accompanyReviewRepository.saveAll(List.of(accompanyReview1, accompanyReview2));
 
         long maxId = Math.max(accompanyReview1.getId(), accompanyReview2.getId());
