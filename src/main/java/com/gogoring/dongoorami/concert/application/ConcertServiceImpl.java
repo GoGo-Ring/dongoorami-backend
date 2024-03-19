@@ -101,7 +101,8 @@ public class ConcertServiceImpl implements ConcertService {
     public ConcertGetResponse getConcert(Long concertId) {
         Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(concertId).orElseThrow(
                 () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
-        Integer totalAccompanies = accompanyPostRepository.findAllByConcertId(concertId).size();
+        Integer totalAccompanies = accompanyPostRepository.countByConcertAndIsActivatedIsTrue(
+                concert);
         Integer totalReviews = concertReviewRepository.countByConcertAndIsActivatedIsTrue(concert);
 
         return ConcertGetResponse.of(concert, totalAccompanies, totalReviews);
