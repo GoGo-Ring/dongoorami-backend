@@ -209,4 +209,13 @@ public class AccompanyController {
         return ResponseEntity.ok(
                 accompanyService.getReceivedReviews(cursorId, size, customUserDetails.getId()));
     }
+
+    @GetMapping("/reviews/reviewers/my-page")
+    public ResponseEntity<AccompanyReviewsResponse> getWaitingReviews(
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(
+                accompanyService.getWaitingReviews(cursorId, size, customUserDetails.getId()));
+    }
 }
