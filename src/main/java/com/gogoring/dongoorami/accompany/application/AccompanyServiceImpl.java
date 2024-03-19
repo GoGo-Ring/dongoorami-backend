@@ -292,6 +292,22 @@ public class AccompanyServiceImpl implements AccompanyService {
         return AccompanyReviewsResponse.of(accompanyReviews.hasNext(), accompanyReviewResponses);
     }
 
+    @Override
+    public AccompanyReviewsResponse getWaitingReviews(Long cursorId, int size,
+            Long currentMemberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByMemberAndStatus(
+                cursorId, size, member, true,
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_NOT_WRITTEN);
+        List<AccompanyReviewResponse> accompanyReviewResponses = accompanyReviews.stream()
+                .map(AccompanyReviewResponse::of)
+                .toList();
+
+        return AccompanyReviewsResponse.of(accompanyReviews.hasNext(), accompanyReviewResponses);
+    }
+
     private List<Member> getAccompanyConfirmedMembers(AccompanyPost accompanyPost,
             Member newCompanion) {
         List<Member> companions = new ArrayList<>();
