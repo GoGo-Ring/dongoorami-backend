@@ -500,6 +500,9 @@ class AccompanyControllerTest {
                                 fieldWithPath(
                                         "memberProfile.currentMember").type(
                                         BOOLEAN).description("본인 여부"),
+                                fieldWithPath(
+                                        "memberProfile.manner").type(
+                                        NUMBER).description("매너 지수"),
                                 fieldWithPath("createdAt").type(STRING).description("생성 날짜"),
                                 fieldWithPath("updatedAt").type(STRING).description("수정 날짜"),
                                 fieldWithPath("viewCount").type(NUMBER).description("조회수"),
@@ -638,7 +641,10 @@ class AccompanyControllerTest {
                                         STRING).description("작성자 소개"),
                                 fieldWithPath(
                                         "accompanyCommentInfos[].memberProfile.currentMember").type(
-                                        BOOLEAN).description("본인 여부")
+                                        BOOLEAN).description("본인 여부"),
+                                fieldWithPath(
+                                        "accompanyCommentInfos[].memberProfile.manner").type(
+                                        NUMBER).description("매너 지수")
                         )
                 ));
     }
@@ -823,7 +829,10 @@ class AccompanyControllerTest {
                                         STRING).description("소개"),
                                 fieldWithPath(
                                         "currentMember").type(
-                                        BOOLEAN).description("본인 여부")
+                                        BOOLEAN).description("본인 여부"),
+                                fieldWithPath(
+                                        "manner").type(
+                                        NUMBER).description("매너 지수")
                         )
                 ));
     }
@@ -1091,7 +1100,9 @@ class AccompanyControllerTest {
                                 fieldWithPath("[].introduction").type(
                                         STRING).description("소개"),
                                 fieldWithPath("[].currentMember").type(
-                                        BOOLEAN).description("본인 여부")
+                                        BOOLEAN).description("본인 여부"),
+                                fieldWithPath("[].manner").type(
+                                        NUMBER).description("매너 지수")
                         ))
                 );
     }

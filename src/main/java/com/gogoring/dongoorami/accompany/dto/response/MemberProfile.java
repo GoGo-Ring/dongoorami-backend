@@ -10,19 +10,21 @@ import lombok.Getter;
 @AllArgsConstructor
 public class MemberProfile {
 
-    private Long id;
+    private final Long id;
 
-    private String nickname;
+    private final String nickname;
 
-    private String profileImage;
+    private final String profileImage;
 
-    private String gender;
+    private final String gender;
 
-    private Integer age;
+    private final Integer age;
 
-    private String introduction;
+    private final String introduction;
 
-    private boolean currentMember;
+    private final boolean currentMember;
+
+    private final Integer manner;
 
     public static MemberProfile of(Member member, Long currentMemberId) {
         return MemberProfile.builder()
@@ -31,7 +33,9 @@ public class MemberProfile {
                 .introduction(member.getIntroduction())
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
-                .currentMember(member.getId() == currentMemberId)
-                .gender(member.getGender()).build();
+                .currentMember(member.getId().equals(currentMemberId))
+                .gender(member.getGender())
+                .manner(member.getManner())
+                .build();
     }
 }
