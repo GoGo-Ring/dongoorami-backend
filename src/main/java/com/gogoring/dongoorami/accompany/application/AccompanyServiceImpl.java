@@ -3,6 +3,7 @@ package com.gogoring.dongoorami.accompany.application;
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview.AccompanyReviewStatusType;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
@@ -276,12 +277,14 @@ public class AccompanyServiceImpl implements AccompanyService {
     }
 
     @Override
-    public AccompanyReviewsResponse getReceivedReviews(Long cursorId, int size, Long currentMemberId) {
+    public AccompanyReviewsResponse getReceivedReviews(Long cursorId, int size,
+            Long currentMemberId) {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByRevieweeAndStatus(
-                cursorId, size, member, AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByMemberAndStatus(
+                cursorId, size, member, false,
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
         List<AccompanyReviewResponse> accompanyReviewResponses = accompanyReviews.stream()
                 .map(AccompanyReviewResponse::of)
                 .toList();

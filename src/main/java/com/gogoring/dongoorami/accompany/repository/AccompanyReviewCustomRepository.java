@@ -7,6 +7,6 @@ import org.springframework.data.domain.Slice;
 
 public interface AccompanyReviewCustomRepository {
 
-    Slice<AccompanyReview> findAllByRevieweeAndStatus(Long cursorId, int size, Member member,
-            AccompanyReviewStatusType statusType);
+    Slice<AccompanyReview> findAllByMemberAndStatus(Long cursorId, int size, Member member,
+            Boolean isReviewer, AccompanyReviewStatusType statusType);
 }
