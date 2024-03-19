@@ -405,3 +405,13 @@ include::{snippets}/WishControllerTest/getWishesAfterFirst/query-parameters.adoc
 .Response
 include::{snippets}/WishControllerTest/getWishesAfterFirst/http-response.adoc[]
 include::{snippets}/WishControllerTest/getWishesAfterFirst/response-fields.adoc[]
+
+== 쪽지 API
+=== 쪽지 전송
+
+.Request
+include::{snippets}/MessageControllerTest/createMessage/http-request.adoc[]
+include::{snippets}/MessageControllerTest/createMessage/request-fields.adoc[]
+
+.Response
+include::{snippets}/MessageControllerTest/createMessage/http-response.adoc[]
