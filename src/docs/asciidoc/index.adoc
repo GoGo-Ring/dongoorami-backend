@@ -120,6 +120,16 @@ include::{snippets}/AccompanyControllerTest/getWaitingReviewsAfterFirst/query-pa
 include::{snippets}/AccompanyControllerTest/getWaitingReviewsAfterFirst/http-response.adoc[]
 include::{snippets}/AccompanyControllerTest/getWaitingReviewsAfterFirst/response-fields.adoc[]
 
+=== 작성한 후기 조회
+공연 후기와 동행 구인 후기를 한꺼번에 조회하기 때문에 다른 api들과는 달리 전체 목록을 한 번에 조회합니다
+
+.Request
+include::{snippets}/ConcertControllerTest/getConcertAndAccompanyReviews/http-request.adoc[]
+
+.Response
+include::{snippets}/ConcertControllerTest/getConcertAndAccompanyReviews/http-response.adoc[]
+include::{snippets}/ConcertControllerTest/getConcertAndAccompanyReviews/response-fields.adoc[]
+
 == 동행 API
 
 === 동행 목적 종류
