@@ -1,6 +1,8 @@
 package com.gogoring.dongoorami.accompany.repository;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview.AccompanyReviewStatusType;
+import com.gogoring.dongoorami.member.domain.Member;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -41,4 +43,6 @@ public interface AccompanyReviewRepository extends JpaRepository<AccompanyReview
     List<AccompanyReview> findAllByConcertIdAndActivatedConcertAndActivatedAccompanyReviewAndProceedingStatus(
             Long concertId);
 
+    List<AccompanyReview> findAllByReviewerAndStatusAndIsActivatedIsTrue(Member reviewer,
+            AccompanyReviewStatusType status);
 }
