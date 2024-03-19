@@ -387,4 +387,43 @@ class AccompanyReviewRepositoryTest {
         // then
         Assertions.assertThat(accompanyReviews.getSize()).isEqualTo(size);
     }
+
+    @Test
+    @DisplayName("특정 회원이 작성한 동행 후기 목록을 조회할 수 있다.")
+    void success_findAllByReviewerAndStatusAndIsActivatedIsTrue() {
+        // given
+        Member member1 = MemberDataFactory.createMember();
+        Member member2 = MemberDataFactory.createMember();
+        Member member3 = MemberDataFactory.createMember();
+        memberRepository.saveAll(List.of(member1, member2, member3));
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        AccompanyPost accompanyPost = accompanyPostRepository.save(
+                createAccompanyPosts(member1, 1, concert).get(0));
+
+        List<AccompanyComment> accompanyComments = new ArrayList<>(
+                createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        AccompanyReview accompanyReview1 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member1, member2);
+        AccompanyReview accompanyReview2 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member1, member3);
+        ReflectionTestUtils.setField(accompanyReview1, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        ReflectionTestUtils.setField(accompanyReview2, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        accompanyReviewRepository.saveAll(List.of(accompanyReview1, accompanyReview2));
+
+        // when
+        List<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByReviewerAndStatusAndIsActivatedIsTrue(
+                member1, AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+
+        // then
+        Assertions.assertThat(accompanyReviews.size()).isEqualTo(2);
+        Assertions.assertThat(accompanyReviews).contains(accompanyReview1, accompanyReview2);
+    }
 }
