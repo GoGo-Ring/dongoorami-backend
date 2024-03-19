@@ -58,10 +58,7 @@ public class AccompanyReview extends BaseEntity {
         this.rating = accompanyReviewRequest.getRating();
         this.ratingItemTypes = accompanyReviewRequest.getRatingItemTypes().stream()
                 .map(RatingItemType::getValue).toList();
-    }
-
-    public void updateContent(String content) {
-        this.content = content;
+        this.status = AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN;
     }
 
     public void updateStatus(AccompanyReviewStatusType status) {
