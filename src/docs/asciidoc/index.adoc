@@ -151,6 +151,27 @@ include::{snippets}/AccompanyControllerTest/getAccompanyPostsByMemberAfterFirst/
 include::{snippets}/AccompanyControllerTest/getAccompanyPostsByMemberAfterFirst/http-response.adoc[]
 include::{snippets}/AccompanyControllerTest/getAccompanyPostsByMemberAfterFirst/response-fields.adoc[]
 
+=== 작성 댓글 조회(최초 요청)
+
+.Request
+include::{snippets}/AccompanyControllerTest/getAccompanyCommentsByMemberFirst/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/getAccompanyCommentsByMemberFirst/query-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/getAccompanyCommentsByMemberFirst/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/getAccompanyCommentsByMemberFirst/response-fields.adoc[]
+
+=== 작성 댓글 조회(이후 요청)
+최초 요청 api와는 cursorId 유무의 차이가 있습니다
+
+.Request
+include::{snippets}/AccompanyControllerTest/getAccompanyCommentsByMemberAfterFirst/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/getAccompanyCommentsByMemberAfterFirst/query-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/getAccompanyCommentsByMemberAfterFirst/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/getAccompanyCommentsByMemberAfterFirst/response-fields.adoc[]
+
 == 동행 API
 
 === 동행 목적 종류
