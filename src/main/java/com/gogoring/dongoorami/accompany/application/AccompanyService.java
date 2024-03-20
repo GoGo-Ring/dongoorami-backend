@@ -5,6 +5,7 @@ import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyReviewRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsShortResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsShortResponse;
@@ -58,5 +59,8 @@ public interface AccompanyService {
     ReviewsResponse getWaitingReviews(Long cursorId, int size, Long currentMemberId);
 
     AccompanyPostsShortResponse getAccompanyPostsByMember(Long cursorId, int size,
+            Long currentMemberId);
+
+    AccompanyCommentsShortResponse getAccompanyCommentsByMember(Long cursorId, int size,
             Long currentMemberId);
 }
