@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MessageRepository extends JpaRepository<Message, Long>, MessageCustomRepository {
 
+    boolean existsBySenderAndReceiverAndIsReadFalseAndIsActivatedIsTrue(Member sender,
+            Member receiver);
 }
