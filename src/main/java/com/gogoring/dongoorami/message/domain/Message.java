@@ -32,10 +32,16 @@ public class Message extends BaseEntity {
 
     private String content;
 
+    private boolean isRead = false;
+
     @Builder
     public Message(Member sender, Member receiver, String content) {
         this.sender = sender;
         this.receiver = receiver;
         this.content = content;
+    }
+
+    public void updateIsRead() {
+        this.isRead = true;
     }
 }
