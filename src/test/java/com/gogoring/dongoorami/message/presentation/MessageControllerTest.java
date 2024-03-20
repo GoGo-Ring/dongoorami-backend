@@ -98,8 +98,8 @@ class MessageControllerTest {
                 .andDo(document("{ClassName}/createMessage",
                         preprocessRequest(prettyPrint()),
                         requestFields(
-                                fieldWithPath("receiverId").type(JsonFieldType.NUMBER)
-                                        .description("받는 사람 id"),
+                                fieldWithPath("partnerId").type(JsonFieldType.NUMBER)
+                                        .description("대화 상대 id"),
                                 fieldWithPath("content").type(JsonFieldType.STRING)
                                         .description("내용")
                         )

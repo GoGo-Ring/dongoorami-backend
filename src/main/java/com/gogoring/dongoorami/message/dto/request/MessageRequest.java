@@ -13,16 +13,16 @@ import lombok.Getter;
 @Getter
 public class MessageRequest {
 
-    @NotNull(message = "receiverId는 공백일 수 없습니다.")
-    private Long receiverId;
+    @NotNull(message = "partnerId는 공백일 수 없습니다.")
+    private Long partnerId;
 
     @NotBlank(message = "content는 공백일 수 없습니다.")
     private String content;
 
-    public Message toEntity(Member sender, Member receiver) {
+    public Message toEntity(Member sender, Member partner) {
         return Message.builder()
                 .sender(sender)
-                .receiver(receiver)
+                .receiver(partner)
                 .content(content)
                 .build();
     }

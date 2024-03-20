@@ -27,12 +27,12 @@ public class MessageServiceImpl implements MessageService {
     public Long createMessage(MessageRequest messageRequest, Long currentMemberId) {
         Member sender = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        Member receiver = memberRepository.findByIdAndIsActivatedIsTrue(
-                        messageRequest.getReceiverId())
+        Member partner = memberRepository.findByIdAndIsActivatedIsTrue(
+                        messageRequest.getPartnerId())
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
-        messageRepository.save(messageRequest.toEntity(sender, receiver));
+        messageRepository.save(messageRequest.toEntity(sender, partner));
 
-        return messageRequest.getReceiverId();
+        return messageRequest.getPartnerId();
     }
 
     @Override
