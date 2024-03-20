@@ -1515,4 +1515,113 @@ class AccompanyControllerTest {
                         ))
                 );
     }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("특정 회원이 작성한 동행 구인글 목록을 조회할 수 있다. - 최초 요청")
+    void success_getAccompanyPostsByMemberFirst() throws Exception {
+        // given
+        Member member = MemberDataFactory.createLoginMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        int size = 3;
+        List<AccompanyPost> accompanyPosts = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, size, concert));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompanies/posts/my-page").header(
+                                "Authorization", accessToken)
+                        .param("size", String.valueOf(size))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getAccompanyPostsByMemberFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("size").description(
+                                        "조회할 동행 구인글 개수, 값 넣지 않으면 기본 10개").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNext").type(BOOLEAN)
+                                        .description("다음 동행 구인글 정보 존재 여부"),
+                                fieldWithPath("accompanyPostShortResponses").type(ARRAY)
+                                        .description("동행 구인글 목록"),
+                                fieldWithPath("accompanyPostShortResponses[].id").type(NUMBER)
+                                        .description("동행 구인글 아이디"),
+                                fieldWithPath("accompanyPostShortResponses[].title").type(STRING)
+                                        .description("동행 구인글 제목"),
+                                fieldWithPath("accompanyPostShortResponses[].content").type(STRING)
+                                        .description("동행 구인글 내용"),
+                                fieldWithPath("accompanyPostShortResponses[].totalPeople").type(
+                                        NUMBER).description("모집 인원"),
+                                fieldWithPath("accompanyPostShortResponses[].updatedAt").type(STRING)
+                                        .description("작성 날짜")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("특정 회원이 작성한 동행 구인글 목록을 조회할 수 있다. - 이후 요청")
+    void success_getAccompanyPostsByMemberAfterFirst() throws Exception {
+        // given
+        Member member = MemberDataFactory.createLoginMember();
+        memberRepository.save(member);
+        String accessToken = tokenProvider.createAccessToken(member.getProviderId(),
+                member.getRoles());
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        int size = 3;
+        List<AccompanyPost> accompanyPosts = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, size, concert));
+
+        long maxId = -1L;
+        for (AccompanyPost accompanyPost : accompanyPosts) {
+            maxId = Math.max(maxId, accompanyPost.getId());
+        }
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompanies/posts/my-page").header(
+                                "Authorization", accessToken)
+                        .param("cursorId", String.valueOf(maxId + 1))
+                        .param("size", String.valueOf(size))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getAccompanyPostsByMemberAfterFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("cursorId").description("마지막으로 받은 후기 아이디"),
+                                parameterWithName("size").description(
+                                        "조회할 동행 구인글 개수, 값 넣지 않으면 기본 10개").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNext").type(BOOLEAN)
+                                        .description("다음 동행 구인글 정보 존재 여부"),
+                                fieldWithPath("accompanyPostShortResponses").type(ARRAY)
+                                        .description("동행 구인글 목록"),
+                                fieldWithPath("accompanyPostShortResponses[].id").type(NUMBER)
+                                        .description("동행 구인글 아이디"),
+                                fieldWithPath("accompanyPostShortResponses[].title").type(STRING)
+                                        .description("동행 구인글 제목"),
+                                fieldWithPath("accompanyPostShortResponses[].content").type(STRING)
+                                        .description("동행 구인글 내용"),
+                                fieldWithPath("accompanyPostShortResponses[].totalPeople").type(
+                                        NUMBER).description("모집 인원"),
+                                fieldWithPath("accompanyPostShortResponses[].updatedAt").type(STRING)
+                                        .description("작성 날짜")
+                        ))
+                );
+    }
 }
