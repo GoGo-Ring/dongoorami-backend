@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Slice;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @Import(QueryDslConfig.class)
 @DataJpaTest
@@ -129,7 +130,8 @@ public class ConcertRepositoryTest {
         concertRepository.saveAll(concerts);
 
         // when
-        List<Concert> savedConcerts = concertRepository.findAllByStatusIsNotAndIsActivatedIsTrue("공연종료");
+        List<Concert> savedConcerts = concertRepository.findAllByStatusIsNotAndIsActivatedIsTrue(
+                "공연종료");
 
         // then
         assertThat(savedConcerts.size()).isEqualTo(size);
@@ -150,5 +152,21 @@ public class ConcertRepositoryTest {
         assertThat(savedConcerts.size()).isEqualTo(size);
     }
 
+    @Test
+    @DisplayName("공연 종료 일자 내림차순으로 공연 5개를 조회할 수 있다.")
+    void success_findTop5ByIsActivatedIsTrueOrderByEndedAtDesc() {
+        // given
+        int size = 7;
+        List<Concert> concerts = ConcertDataFactory.createConcerts(size);
+        ReflectionTestUtils.setField(concerts.get(0), "endedAt", "2099.12.31");
+        ReflectionTestUtils.setField(concerts.get(1), "endedAt", "2098.12.31");
+        concertRepository.saveAll(concerts);
 
+        // when
+        List<Concert> savedConcerts = concertRepository.findTop5ByIsActivatedIsTrueOrderByEndedAtDesc();
+
+        // then
+        assertThat(savedConcerts.size()).isEqualTo(5);
+        assertThat(savedConcerts).contains(concerts.get(0), concerts.get(1));
+    }
 }
