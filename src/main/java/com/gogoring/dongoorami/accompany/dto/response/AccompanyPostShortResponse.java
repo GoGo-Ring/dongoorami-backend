@@ -35,6 +35,7 @@ public class AccompanyPostShortResponse {
                 .id(accompanyPost.getId())
                 .title(accompanyPost.getTitle())
                 .content(accompanyPost.getContent())
+                .totalPeople(accompanyPost.getTotalPeople())
                 .updatedAt(accompanyPost.getUpdatedAt().toLocalDate())
                 .build();
     }
