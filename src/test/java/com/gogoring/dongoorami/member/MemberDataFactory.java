@@ -2,6 +2,7 @@ package com.gogoring.dongoorami.member;
 
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import com.gogoring.dongoorami.member.domain.Member;
+import java.util.UUID;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -11,7 +12,7 @@ public class MemberDataFactory {
         return Member.builder()
                 .profileImage("image.png")
                 .provider("kakao")
-                .providerId("alsjkghlaskdjgh")
+                .providerId(UUID.randomUUID().toString())
                 .build();
     }
 

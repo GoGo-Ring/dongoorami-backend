@@ -3,6 +3,7 @@ package com.gogoring.dongoorami.accompany.application;
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview.AccompanyReviewStatusType;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
@@ -12,6 +13,8 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse.
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
+import com.gogoring.dongoorami.accompany.dto.response.ReviewResponse;
+import com.gogoring.dongoorami.accompany.dto.response.ReviewsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
 import com.gogoring.dongoorami.accompany.exception.AccompanyApplyCommentModifyDeniedException;
 import com.gogoring.dongoorami.accompany.exception.AccompanyApplyNotAllowedForWriterException;
@@ -166,8 +169,9 @@ public class AccompanyServiceImpl implements AccompanyService {
                         accompanyPostId)
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
-        accompanyCommentRepository.findAllByAccompanyPostIdAndIsActivatedIsTrue(accompanyPostId).forEach(
-                accompanyComment -> accompanyComment.updateIsActivatedFalse(currentMemberId));
+        accompanyCommentRepository.findAllByAccompanyPostIdAndIsActivatedIsTrue(accompanyPostId)
+                .forEach(accompanyComment -> accompanyComment.updateIsActivatedFalse(
+                        currentMemberId));
         accompanyPost.updateIsActivatedFalse();
     }
 
@@ -272,6 +276,38 @@ public class AccompanyServiceImpl implements AccompanyService {
         Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
                 .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
         accompanyPost.updateStatus(member.getId());
+    }
+
+    @Override
+    public ReviewsResponse getReceivedReviews(Long cursorId, int size,
+            Long currentMemberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByMemberAndStatus(
+                cursorId, size, member, false,
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        List<ReviewResponse> reviewRespons = accompanyReviews.stream()
+                .map(ReviewResponse::of)
+                .toList();
+
+        return ReviewsResponse.of(accompanyReviews.hasNext(), reviewRespons);
+    }
+
+    @Override
+    public ReviewsResponse getWaitingReviews(Long cursorId, int size,
+            Long currentMemberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByMemberAndStatus(
+                cursorId, size, member, true,
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_NOT_WRITTEN);
+        List<ReviewResponse> reviewRespons = accompanyReviews.stream()
+                .map(ReviewResponse::of)
+                .toList();
+
+        return ReviewsResponse.of(accompanyReviews.hasNext(), reviewRespons);
     }
 
     private List<Member> getAccompanyConfirmedMembers(AccompanyPost accompanyPost,

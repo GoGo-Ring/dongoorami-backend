@@ -2,6 +2,8 @@ package com.gogoring.dongoorami.concert.repository;
 
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
+import com.gogoring.dongoorami.member.domain.Member;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -20,4 +22,6 @@ public interface ConcertReviewRepository extends JpaRepository<ConcertReview, Lo
     Optional<ConcertReview> findByIdAndIsActivatedIsTrue(Long id);
 
     Integer countByConcertAndIsActivatedIsTrue(Concert concert);
+
+    List<ConcertReview> findAllByMemberAndIsActivatedIsTrue(Member member);
 }
