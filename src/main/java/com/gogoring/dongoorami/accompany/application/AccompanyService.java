@@ -7,8 +7,8 @@ import com.gogoring.dongoorami.accompany.dto.request.AccompanyReviewRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
-import com.gogoring.dongoorami.accompany.dto.response.ReviewsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
+import com.gogoring.dongoorami.accompany.dto.response.ReviewsResponse;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,7 +52,7 @@ public interface AccompanyService {
 
     void updateAccompanyPostStatusCompleted(Long accompanyPostId, Long currentMemberId);
 
-    ReviewsResponse getReceivedReviews(Long cursorId, int size, Long currentMemberId);
+    ReviewsResponse getReceivedReviews(Long cursorId, int size, Long memberId);
 
     ReviewsResponse getWaitingReviews(Long cursorId, int size, Long currentMemberId);
 }
