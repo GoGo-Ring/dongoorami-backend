@@ -117,4 +117,37 @@ class MessageRepositoryTest {
         assertThat(member1hasUnReadMember2Message, equalTo(true));
         assertThat(member1hasUnReadMember3Message, equalTo(false));
     }
+
+    @Test
+    @DisplayName("상대방과 주고 받은 쪽지 목록을 조회할 수 있다.")
+    void success_findMessagesWithPartner() {
+        // given
+        List<Member> members = memberRepository.saveAll(
+                Arrays.asList(MemberDataFactory.createMember(), MemberDataFactory.createMember(),
+                        MemberDataFactory.createMember()));
+        Member member1 = members.get(0), member2 = members.get(1), member3 = members.get(2);
+        int member1ToMember2MessageSize = 5, member2ToMember1MessageSize = 7;
+        int messageBetweenMember1AndMember2Size =
+                member1ToMember2MessageSize + member2ToMember1MessageSize;
+
+        messageRepository.saveAll(
+                MessageDataFactory.createMessages(member1, member2, member1ToMember2MessageSize));
+        messageRepository.saveAll(
+                MessageDataFactory.createMessages(member2, member1, member2ToMember1MessageSize));
+        Long latestMessageWithMember3Id = messageRepository.save(
+                MessageDataFactory.createMessages(member3, member1, 1).get(0)).getId();
+        Long cursorId = latestMessageWithMember3Id + 1;
+
+        // when
+        Slice<Message> messages1 = messageRepository.findMessagesWithPartner(member1, member2,
+                cursorId, 30);
+        Slice<Message> messages2 = messageRepository.findMessagesWithPartner(member1, member2,
+                cursorId, 7);
+
+        // then
+        assertThat(messages1.getContent().size(), equalTo(messageBetweenMember1AndMember2Size));
+        assertThat(messages1.hasNext(), equalTo(false));
+        assertThat(messages2.getContent().size(), equalTo(7));
+        assertThat(messages2.hasNext(), equalTo(true));
+    }
 }
