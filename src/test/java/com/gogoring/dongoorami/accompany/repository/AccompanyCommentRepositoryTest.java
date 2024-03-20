@@ -12,11 +12,13 @@ import com.gogoring.dongoorami.concert.ConcertDataFactory;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.global.config.QueryDslConfig;
+import com.gogoring.dongoorami.member.MemberDataFactory;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +28,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Slice;
 
 @Import(QueryDslConfig.class)
 @DataJpaTest
@@ -188,5 +191,38 @@ class AccompanyCommentRepositoryTest {
 
         // then
         assertThat(isAccompanyApplied, equalTo(false));
+    }
+
+    @Test
+    @DisplayName("id 내림차순으로 특정 멤버가 작성한 동행 구인 댓글 목록을 조회할 수 있다.")
+    void success_findAllByMember() {
+        // given
+        Member member = MemberDataFactory.createMember();
+        memberRepository.save(member);
+
+        Concert concert = ConcertDataFactory.createConcert();
+        concertRepository.save(concert);
+
+        AccompanyPost accompanyPost = createAccompanyPosts(member, 1, concert).get(0);
+        accompanyPostRepository.save(accompanyPost);
+
+        int size = 3;
+        List<AccompanyComment> accompanyComments = createAccompanyComment(accompanyPost, member,
+                size + 1);
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        long maxId = -1L;
+        for (AccompanyComment accompanyComment : accompanyComments) {
+            maxId = Math.max(maxId, accompanyComment.getId());
+        }
+
+        // when
+        Slice<AccompanyComment> slice = accompanyCommentRepository.findAllByMember(maxId, size,
+                member);
+
+        // then
+        Assertions.assertThat(slice.getSize()).isEqualTo(size);
+        Assertions.assertThat(slice.getContent().stream().map(AccompanyComment::getId)
+                .toList()).doesNotContain(maxId);
     }
 }
