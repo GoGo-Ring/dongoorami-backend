@@ -494,6 +494,7 @@ include::{snippets}/MessageControllerTest/getMessagesAfterFirst/response-fields.
 
 .Request
 include::{snippets}/MessageControllerTest/getMessagesWithPartnerFirst/http-request.adoc[]
+include::{snippets}/MessageControllerTest/getMessagesWithPartnerFirst/path-parameters.adoc[]
 include::{snippets}/MessageControllerTest/getMessagesWithPartnerFirst/query-parameters.adoc[]
 
 .Response
@@ -504,6 +505,7 @@ include::{snippets}/MessageControllerTest/getMessagesWithPartnerFirst/response-f
 
 .Request
 include::{snippets}/MessageControllerTest/getMessagesWithPartnerAfterFirst/http-request.adoc[]
+include::{snippets}/MessageControllerTest/getMessagesWithPartnerAfterFirst/path-parameters.adoc[]
 include::{snippets}/MessageControllerTest/getMessagesWithPartnerAfterFirst/query-parameters.adoc[]
 
 .Response

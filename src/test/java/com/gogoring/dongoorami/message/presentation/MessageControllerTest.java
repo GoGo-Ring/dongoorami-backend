@@ -14,6 +14,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -99,7 +100,7 @@ class MessageControllerTest {
                         preprocessRequest(prettyPrint()),
                         requestFields(
                                 fieldWithPath("partnerId").type(JsonFieldType.NUMBER)
-                                        .description("대화 상대 id"),
+                                        .description("쪽지 상대 id"),
                                 fieldWithPath("content").type(JsonFieldType.STRING)
                                         .description("내용")
                         )
@@ -154,19 +155,19 @@ class MessageControllerTest {
                                 fieldWithPath("messageResponses.[].id").type(NUMBER)
                                         .description("가장 최근 쪽지 id"),
                                 fieldWithPath("messageResponses.[].partner.id").type(NUMBER)
-                                        .description("대화 상대 id"),
+                                        .description("쪽지 상대 id"),
                                 fieldWithPath("messageResponses.[].partner.nickname").type(STRING)
-                                        .description("대화 상대 닉네임"),
+                                        .description("쪽지 상대 닉네임"),
                                 fieldWithPath("messageResponses.[].partner.profileImage").type(
                                                 STRING)
-                                        .description("대화 상대 프로필 이미지 url"),
+                                        .description("쪽지 상대 프로필 이미지 url"),
                                 fieldWithPath("messageResponses.[].partner.gender").type(STRING)
-                                        .description("대화 상대 성별"),
+                                        .description("쪽지 상대 성별"),
                                 fieldWithPath("messageResponses.[].partner.age").type(NUMBER)
-                                        .description("대화 상대 나이"),
+                                        .description("쪽지 상대 나이"),
                                 fieldWithPath("messageResponses.[].partner.introduction").type(
                                                 STRING)
-                                        .description("대화 상대 소개"),
+                                        .description("쪽지 상대 소개"),
                                 fieldWithPath(
                                         "messageResponses.[].partner.currentMember").type(
                                         BOOLEAN).description("본인 여부"),
@@ -231,7 +232,7 @@ class MessageControllerTest {
                                 parameterWithName("size").description("요청할 쪽지 목록 개수(기본 10개)")
                                         .optional(),
                                 parameterWithName("receivedPartnerIds").description(
-                                        "지금까지 받은 대화 상대 id 리스트").optional()
+                                        "지금까지 받은 쪽지 상대 id 리스트").optional()
                         ),
                         responseFields(
                                 fieldWithPath("hasNext").type(BOOLEAN)
@@ -241,25 +242,25 @@ class MessageControllerTest {
                                 fieldWithPath("messageResponses.[].id").type(NUMBER)
                                         .description("가장 최근 쪽지 id"),
                                 fieldWithPath("messageResponses.[].partner.id").type(NUMBER)
-                                        .description("대화 상대 id"),
+                                        .description("쪽지 상대 id"),
                                 fieldWithPath("messageResponses.[].partner.nickname").type(STRING)
-                                        .description("대화 상대 닉네임"),
+                                        .description("쪽지 상대 닉네임"),
                                 fieldWithPath("messageResponses.[].partner.profileImage").type(
                                                 STRING)
-                                        .description("대화 상대 프로필 이미지 url"),
+                                        .description("쪽지 상대 프로필 이미지 url"),
                                 fieldWithPath("messageResponses.[].partner.gender").type(STRING)
-                                        .description("대화 상대 성별"),
+                                        .description("쪽지 상대 성별"),
                                 fieldWithPath("messageResponses.[].partner.age").type(NUMBER)
-                                        .description("대화 상대 나이"),
+                                        .description("쪽지 상대 나이"),
                                 fieldWithPath("messageResponses.[].partner.introduction").type(
                                                 STRING)
-                                        .description("대화 상대 소개"),
+                                        .description("쪽지 상대 소개"),
                                 fieldWithPath(
                                         "messageResponses.[].partner.currentMember").type(
                                         BOOLEAN).description("본인 여부"),
                                 fieldWithPath(
                                         "messageResponses.[].partner.manner").type(
-                                        NUMBER).description("대화 상대 매너 지수"),
+                                        NUMBER).description("쪽지 상대 매너 지수"),
                                 fieldWithPath("messageResponses.[].content").type(STRING)
                                         .description("가장 최근 쪽지 내용"),
                                 fieldWithPath("messageResponses.[].createdAt").type(STRING)
@@ -299,6 +300,9 @@ class MessageControllerTest {
                 .andDo(document("{ClassName}/getMessagesWithPartnerFirst",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("partnerId").description("쪽지 상대 id")
+                        ),
                         queryParameters(
                                 parameterWithName("size").description("요청할 쪽지 개수(기본 10개)")
                                         .optional()
@@ -311,19 +315,19 @@ class MessageControllerTest {
                                 fieldWithPath("messageResponses.[].id").type(NUMBER)
                                         .description("쪽지 id"),
                                 fieldWithPath("messageResponses.[].partner.id").type(NUMBER)
-                                        .description("대화 상대 id"),
+                                        .description("쪽지 상대 id"),
                                 fieldWithPath("messageResponses.[].partner.nickname").type(STRING)
-                                        .description("대화 상대 닉네임"),
+                                        .description("쪽지 상대 닉네임"),
                                 fieldWithPath("messageResponses.[].partner.profileImage").type(
                                                 STRING)
-                                        .description("대화 상대 프로필 이미지 url"),
+                                        .description("쪽지 상대 프로필 이미지 url"),
                                 fieldWithPath("messageResponses.[].partner.gender").type(STRING)
-                                        .description("대화 상대 성별"),
+                                        .description("쪽지 상대 성별"),
                                 fieldWithPath("messageResponses.[].partner.age").type(NUMBER)
-                                        .description("대화 상대 나이"),
+                                        .description("쪽지 상대 나이"),
                                 fieldWithPath("messageResponses.[].partner.introduction").type(
                                                 STRING)
-                                        .description("대화 상대 소개"),
+                                        .description("쪽지 상대 소개"),
                                 fieldWithPath(
                                         "messageResponses.[].partner.currentMember").type(
                                         BOOLEAN).description("본인 여부"),
@@ -373,6 +377,9 @@ class MessageControllerTest {
                 .andDo(document("{ClassName}/getMessagesWithPartnerAfterFirst",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("partnerId").description("쪽지 상대 id")
+                        ),
                         queryParameters(
                                 parameterWithName("cursorId").description("마지막으로 받은 쪽지 id")
                                         .optional(),
@@ -387,19 +394,19 @@ class MessageControllerTest {
                                 fieldWithPath("messageResponses.[].id").type(NUMBER)
                                         .description("쪽지 id"),
                                 fieldWithPath("messageResponses.[].partner.id").type(NUMBER)
-                                        .description("대화 상대 id"),
+                                        .description("쪽지 상대 id"),
                                 fieldWithPath("messageResponses.[].partner.nickname").type(STRING)
-                                        .description("대화 상대 닉네임"),
+                                        .description("쪽지 상대 닉네임"),
                                 fieldWithPath("messageResponses.[].partner.profileImage").type(
                                                 STRING)
-                                        .description("대화 상대 프로필 이미지 url"),
+                                        .description("쪽지 상대 프로필 이미지 url"),
                                 fieldWithPath("messageResponses.[].partner.gender").type(STRING)
-                                        .description("대화 상대 성별"),
+                                        .description("쪽지 상대 성별"),
                                 fieldWithPath("messageResponses.[].partner.age").type(NUMBER)
-                                        .description("대화 상대 나이"),
+                                        .description("쪽지 상대 나이"),
                                 fieldWithPath("messageResponses.[].partner.introduction").type(
                                                 STRING)
-                                        .description("대화 상대 소개"),
+                                        .description("쪽지 상대 소개"),
                                 fieldWithPath(
                                         "messageResponses.[].partner.currentMember").type(
                                         BOOLEAN).description("본인 여부"),
