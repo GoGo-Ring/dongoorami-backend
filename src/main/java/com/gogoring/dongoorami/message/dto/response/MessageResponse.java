@@ -39,4 +39,16 @@ public class MessageResponse {
                 .hasUnRead(hasUnRead)
                 .build();
     }
+
+    public static MessageResponse of(Message message, Member member) {
+        Member partner =
+                !message.getSender().equals(member) ? message.getSender() : message.getReceiver();
+        return MessageResponse.builder()
+                .id(message.getId())
+                .partner(MemberProfile.of(partner, member.getId()))
+                .content(message.getContent())
+                .createdAt(message.getUpdatedAt())
+                .hasUnRead(!message.isRead())
+                .build();
+    }
 }

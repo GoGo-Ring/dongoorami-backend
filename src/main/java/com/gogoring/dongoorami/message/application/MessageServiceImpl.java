@@ -10,6 +10,7 @@ import com.gogoring.dongoorami.message.dto.response.MessageResponse;
 import com.gogoring.dongoorami.message.dto.response.MessagesResponse;
 import com.gogoring.dongoorami.message.repository.MessageRepository;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,26 @@ public class MessageServiceImpl implements MessageService {
                             partner, member);
                     return MessageResponse.of(message, partner, member, hasUnRead);
                 }).toList());
+    }
+
+    @Transactional
+    @Override
+    public MessagesResponse getMessagesWithPartner(Long cursorId, int size, Long partnerId,
+            Long currentMemberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+        Member partner = memberRepository.findByIdAndIsActivatedIsTrue(partnerId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Slice<Message> messagesWithPartner = messageRepository.findMessagesWithPartner(member,
+                partner, cursorId, size);
+        messagesWithPartner.stream().filter(message -> message.getReceiver().equals(member))
+                .forEach(Message::updateIsRead);
+
+        return new MessagesResponse(messagesWithPartner.hasNext(),
+                messagesWithPartner.getContent().stream()
+                        .map(message -> MessageResponse.of(message, member)).collect(
+                                Collectors.toList()));
     }
 
 }

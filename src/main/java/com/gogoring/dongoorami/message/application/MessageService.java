@@ -10,4 +10,7 @@ public interface MessageService {
 
     MessagesResponse getMessages(Long cursorId, int size, List<Long> receivedPartnerIds,
             Long currentMemberId);
+
+    MessagesResponse getMessagesWithPartner(Long cursorId, int size, Long partnerId,
+            Long currentMemberId);
 }
