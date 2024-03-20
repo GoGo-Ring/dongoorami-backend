@@ -76,13 +76,20 @@ class MessageRepositoryTest {
                 Collections.singletonList(member2.getId()));
         Slice<Message> messageSlice3 = messageRepository.findLatestMessages(member1, cursorId, 5,
                 Arrays.asList(member2.getId(), member3.getId()));
+        Slice<Message> messageSlice4 = messageRepository.findLatestMessages(member1, cursorId, 1,
+                List.of());
 
         // then
         assertThat(messageSlice1.getContent().size(), equalTo(2));
         assertThat(messageSlice1.getContent().get(0).getId(), equalTo(latestMessageWithMember3Id));
         assertThat(messageSlice1.getContent().get(1).getId(), equalTo(latestMessageWithMember2Id));
+        assertThat(messageSlice1.hasNext(), equalTo(false));
         assertThat(messageSlice2.getContent().size(), equalTo(1));
+        assertThat(messageSlice2.hasNext(), equalTo(false));
         assertThat(messageSlice3.getContent().size(), equalTo(0));
+        assertThat(messageSlice3.hasNext(), equalTo(false));
+        assertThat(messageSlice4.getContent().size(), equalTo(1));
+        assertThat(messageSlice4.hasNext(), equalTo(true));
     }
 
     @Test
