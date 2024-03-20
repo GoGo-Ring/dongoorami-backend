@@ -9,6 +9,7 @@ import com.gogoring.dongoorami.accompany.dto.request.AccompanyReviewRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
+import com.gogoring.dongoorami.accompany.dto.response.ReviewsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -200,4 +201,21 @@ public class AccompanyController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/reviews/reviewees/my-page")
+    public ResponseEntity<ReviewsResponse> getReceivedReviews(
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(
+                accompanyService.getReceivedReviews(cursorId, size, customUserDetails.getId()));
+    }
+
+    @GetMapping("/reviews/reviewers/my-page")
+    public ResponseEntity<ReviewsResponse> getWaitingReviews(
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(
+                accompanyService.getWaitingReviews(cursorId, size, customUserDetails.getId()));
+    }
 }

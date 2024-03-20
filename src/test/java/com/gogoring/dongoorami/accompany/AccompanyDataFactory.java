@@ -103,7 +103,7 @@ public class AccompanyDataFactory {
         return accompanyPosts;
     }
 
-    public static List<AccompanyReview> createAccompanyReview(AccompanyPost accompanyPost,
+    public static List<AccompanyReview> createAccompanyReviews(AccompanyPost accompanyPost,
             List<Member> companions) {
         List<AccompanyReview> accompanyReviews = new ArrayList<>();
         for (int i = 0; i < companions.size(); i++) {
@@ -126,4 +126,12 @@ public class AccompanyDataFactory {
         return accompanyReviews;
     }
 
+    public static AccompanyReview createAccompanyReview(AccompanyPost accompanyPost,
+            Member reviewer, Member reviewee) {
+        return AccompanyReview.builder()
+                .accompanyPost(accompanyPost)
+                .reviewer(reviewer)
+                .reviewee(reviewee)
+                .build();
+    }
 }

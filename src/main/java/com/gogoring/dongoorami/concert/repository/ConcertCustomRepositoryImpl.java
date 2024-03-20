@@ -32,7 +32,7 @@ public class ConcertCustomRepositoryImpl implements ConcertCustomRepository {
         boolean hasNext = false;
         if (!concerts.isEmpty()) {
             Long lastIdInResult = concerts.get(concerts.size() - 1).getId();
-            hasNext = isExistByIdLessThan(lastIdInResult);
+            hasNext = isExistByIdLessThan(lastIdInResult, keyword, genres, statuses);
         }
 
         return new SliceImpl<>(concerts, Pageable.ofSize(size), hasNext);
@@ -57,10 +57,16 @@ public class ConcertCustomRepositoryImpl implements ConcertCustomRepository {
         return cursorId != null ? concert.id.lt(cursorId) : null;
     }
 
-    private boolean isExistByIdLessThan(Long id) {
+    private boolean isExistByIdLessThan(Long id, String keyword, List<String> genres,
+            List<String> statuses) {
         return jpaQueryFactory.selectFrom(concert)
-                .where(concert.id.lt(id),
-                        concert.isActivated.eq(true))
+                .where(
+                        nameLikes(keyword),
+                        genresEquals(genres),
+                        statusesEquals(statuses),
+                        concert.id.lt(id),
+                        concert.isActivated.eq(true)
+                )
                 .fetchFirst() != null;
     }
 }

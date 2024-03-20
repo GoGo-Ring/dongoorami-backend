@@ -160,4 +160,29 @@ public class ConcertReviewRepositoryTest {
         // then
         assertThat(totalReviews).isEqualTo(size);
     }
+
+    @Test
+    @DisplayName("특정 회원이 작성한 공연 후기 목록을 조회할 수 있다.")
+    void success_findAllByMemberAndIsActivatedIsTrue() {
+        // given
+        Member member = MemberDataFactory.createMember();
+        memberRepository.save(member);
+
+        Concert concert = ConcertDataFactory.createConcert();
+        concertRepository.save(concert);
+
+        int size = 3;
+        List<ConcertReview> concertReviews = ConcertDataFactory.createConcertReviews(concert,
+                member, size);
+        concertReviewRepository.saveAll(concertReviews);
+
+        // when
+        List<ConcertReview> savedConcertReviews = concertReviewRepository.findAllByMemberAndIsActivatedIsTrue(
+                member);
+
+        // then
+        assertThat(savedConcertReviews.size()).isEqualTo(concertReviews.size());
+        assertThat(savedConcertReviews).contains(concertReviews.get(0), concertReviews.get(1),
+                concertReviews.get(2));
+    }
 }

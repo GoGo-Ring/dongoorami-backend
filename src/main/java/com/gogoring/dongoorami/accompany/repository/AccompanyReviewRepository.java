@@ -1,14 +1,19 @@
 package com.gogoring.dongoorami.accompany.repository;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview.AccompanyReviewStatusType;
+import com.gogoring.dongoorami.member.domain.Member;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface AccompanyReviewRepository extends JpaRepository<AccompanyReview, Long> {
+public interface AccompanyReviewRepository extends JpaRepository<AccompanyReview, Long>,
+        AccompanyReviewCustomRepository {
 
-    @Query("SELECT DISTINCT ar.reviewer.id, ar.reviewee.id FROM AccompanyReview ar WHERE ar.accompanyPost.id = :accompanyPostId")
+    @Query("SELECT DISTINCT ar.reviewer.id, ar.reviewee.id "
+            + "FROM AccompanyReview ar "
+            + "WHERE ar.accompanyPost.id = :accompanyPostId")
     List<Long> findDistinctReviewerAndRevieweeByAccompanyPostId(
             @Param("accompanyPostId") Long accompanyPostId);
 
@@ -35,6 +40,9 @@ public interface AccompanyReviewRepository extends JpaRepository<AccompanyReview
             "AND c.isActivated = true " +
             "AND ar.status = 'BEFORE_ACCOMPANY' " +
             "AND ar.isActivated = true")
-    List<AccompanyReview> findAllByConcertIdAndActivatedConcertAndActivatedAccompanyReviewAndProceedingStatus(Long concertId);
+    List<AccompanyReview> findAllByConcertIdAndActivatedConcertAndActivatedAccompanyReviewAndProceedingStatus(
+            Long concertId);
 
+    List<AccompanyReview> findAllByReviewerAndStatusAndIsActivatedIsTrue(Member reviewer,
+            AccompanyReviewStatusType status);
 }

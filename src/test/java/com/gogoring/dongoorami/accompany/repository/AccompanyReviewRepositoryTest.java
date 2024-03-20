@@ -2,14 +2,16 @@ package com.gogoring.dongoorami.accompany.repository;
 
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyComment;
 import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyPosts;
-import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyReview;
+import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccompanyReviews;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
+import com.gogoring.dongoorami.accompany.AccompanyDataFactory;
 import com.gogoring.dongoorami.accompany.domain.AccompanyComment;
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
+import com.gogoring.dongoorami.accompany.domain.AccompanyReview.AccompanyReviewStatusType;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.concert.ConcertDataFactory;
 import com.gogoring.dongoorami.concert.domain.Concert;
@@ -21,6 +23,7 @@ import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +33,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Slice;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @Import(QueryDslConfig.class)
@@ -183,11 +187,6 @@ class AccompanyReviewRepositoryTest {
                 .provider("kakao")
                 .providerId("alsjkghlaskdjgh")
                 .build();
-        Member member3 = Member.builder()
-                .profileImage("image.png")
-                .provider("kakao")
-                .providerId("alsjkghlaskdjgh")
-                .build();
         memberRepository.saveAll(Arrays.asList(member1, member2));
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
@@ -293,7 +292,7 @@ class AccompanyReviewRepositoryTest {
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member1, 1, concert)).get(0);
         int size = accompanyReviewRepository.saveAll(
-                createAccompanyReview(accompanyPost, members)).size();
+                createAccompanyReviews(accompanyPost, members)).size();
 
         // when
         List<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByConcertIdAndActivatedConcertAndActivatedAccompanyReviewAndProceedingStatus(
@@ -301,5 +300,130 @@ class AccompanyReviewRepositoryTest {
 
         // then
         assertThat(accompanyReviews.size(), equalTo(size));
+    }
+
+    @Test
+    @DisplayName("id 내림차순으로 특정 회원이 받은 후기 목록을 조회할 수 있다.")
+    void success_findAllByRevieweeAndStatus() {
+        // given
+        Member member1 = MemberDataFactory.createMember();
+        Member member2 = MemberDataFactory.createMember();
+        Member member3 = MemberDataFactory.createMember();
+        memberRepository.saveAll(List.of(member1, member2, member3));
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        AccompanyPost accompanyPost = accompanyPostRepository.save(
+                createAccompanyPosts(member1, 1, concert).get(0));
+
+        List<AccompanyComment> accompanyComments = new ArrayList<>(
+                createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        AccompanyReview accompanyReview1 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member2, member1);
+        AccompanyReview accompanyReview2 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member3, member1);
+        ReflectionTestUtils.setField(accompanyReview1, "rating", 5);
+        ReflectionTestUtils.setField(accompanyReview2, "rating", 4);
+        ReflectionTestUtils.setField(accompanyReview1, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        ReflectionTestUtils.setField(accompanyReview2, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        accompanyReviewRepository.saveAll(List.of(accompanyReview1, accompanyReview2));
+
+        long maxId = Math.max(accompanyReview1.getId(), accompanyReview2.getId());
+
+        // when
+        int size = 2;
+        Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByMemberAndStatus(
+                maxId + 1, size, member1, false,
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+
+        // then
+        Assertions.assertThat(accompanyReviews.getSize()).isEqualTo(size);
+    }
+
+    @Test
+    @DisplayName("id 내림차순으로 특정 회원이 작성 전인 후기 목록을 조회할 수 있다.")
+    void success_findAllByReviewerAndStatus() {
+        // given
+        Member member1 = MemberDataFactory.createMember();
+        Member member2 = MemberDataFactory.createMember();
+        Member member3 = MemberDataFactory.createMember();
+        memberRepository.saveAll(List.of(member1, member2, member3));
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        AccompanyPost accompanyPost = accompanyPostRepository.save(
+                createAccompanyPosts(member1, 1, concert).get(0));
+
+        List<AccompanyComment> accompanyComments = new ArrayList<>(
+                createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        AccompanyReview accompanyReview1 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member1, member2);
+        AccompanyReview accompanyReview2 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member1, member3);
+        ReflectionTestUtils.setField(accompanyReview1, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_NOT_WRITTEN);
+        ReflectionTestUtils.setField(accompanyReview2, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_NOT_WRITTEN);
+        accompanyReviewRepository.saveAll(List.of(accompanyReview1, accompanyReview2));
+
+        long maxId = Math.max(accompanyReview1.getId(), accompanyReview2.getId());
+
+        // when
+        int size = 2;
+        Slice<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByMemberAndStatus(
+                maxId + 1, size, member1, true,
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_NOT_WRITTEN);
+
+        // then
+        Assertions.assertThat(accompanyReviews.getSize()).isEqualTo(size);
+    }
+
+    @Test
+    @DisplayName("특정 회원이 작성한 동행 후기 목록을 조회할 수 있다.")
+    void success_findAllByReviewerAndStatusAndIsActivatedIsTrue() {
+        // given
+        Member member1 = MemberDataFactory.createMember();
+        Member member2 = MemberDataFactory.createMember();
+        Member member3 = MemberDataFactory.createMember();
+        memberRepository.saveAll(List.of(member1, member2, member3));
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        AccompanyPost accompanyPost = accompanyPostRepository.save(
+                createAccompanyPosts(member1, 1, concert).get(0));
+
+        List<AccompanyComment> accompanyComments = new ArrayList<>(
+                createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        AccompanyReview accompanyReview1 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member1, member2);
+        AccompanyReview accompanyReview2 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member1, member3);
+        ReflectionTestUtils.setField(accompanyReview1, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        ReflectionTestUtils.setField(accompanyReview2, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        accompanyReviewRepository.saveAll(List.of(accompanyReview1, accompanyReview2));
+
+        // when
+        List<AccompanyReview> accompanyReviews = accompanyReviewRepository.findAllByReviewerAndStatusAndIsActivatedIsTrue(
+                member1, AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+
+        // then
+        Assertions.assertThat(accompanyReviews.size()).isEqualTo(2);
+        Assertions.assertThat(accompanyReviews).contains(accompanyReview1, accompanyReview2);
     }
 }

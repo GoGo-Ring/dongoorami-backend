@@ -1,5 +1,6 @@
 package com.gogoring.dongoorami.concert.presentation;
 
+import com.gogoring.dongoorami.accompany.dto.response.ReviewResponse;
 import com.gogoring.dongoorami.concert.application.ConcertService;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
@@ -81,7 +82,15 @@ public class ConcertController {
     }
 
     @GetMapping("/concerts/keywords")
-    public ResponseEntity<List<ConcertInfoResponse>> getConcertsByKeyword(@RequestParam String keyword){
+    public ResponseEntity<List<ConcertInfoResponse>> getConcertsByKeyword(
+            @RequestParam String keyword) {
         return ResponseEntity.ok(concertService.getConcertsByKeyword(keyword));
+    }
+
+    @GetMapping("/concerts/accompanies/reviews")
+    public ResponseEntity<List<ReviewResponse>> getConcertAndAccompanyReviews(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(concertService.getConcertAndAccompanyReview(
+                customUserDetails.getId()));
     }
 }
