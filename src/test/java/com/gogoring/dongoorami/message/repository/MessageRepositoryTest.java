@@ -84,4 +84,30 @@ class MessageRepositoryTest {
         assertThat(messageSlice2.getContent().size(), equalTo(1));
         assertThat(messageSlice3.getContent().size(), equalTo(0));
     }
+
+    @Test
+    @DisplayName("특정 수신자는 특정 전송자가 자신에게 보낸 메시지 중 읽지 않은 것이 있는지 조회할 수 있다.")
+    void success_existsBySenderAndReceiverAndIsReadFalseAndIsActivatedIsTrue() {
+        // given
+        List<Member> members = memberRepository.saveAll(
+                Arrays.asList(MemberDataFactory.createMember(), MemberDataFactory.createMember(),
+                        MemberDataFactory.createMember()));
+        Member member1 = members.get(0), member2 = members.get(1), member3 = members.get(2);
+
+        messageRepository.saveAll(MessageDataFactory.createMessages(member1, member2, 5));
+        messageRepository.saveAll(MessageDataFactory.createMessages(member2, member1, 5));
+        Message message = MessageDataFactory.createMessages(member3, member1, 1).get(0);
+        message.updateIsRead();
+        messageRepository.save(message);
+
+        // when
+        boolean member1hasUnReadMember2Message = messageRepository.existsBySenderAndReceiverAndIsReadFalseAndIsActivatedIsTrue(
+                member2, member1);
+        boolean member1hasUnReadMember3Message = messageRepository.existsBySenderAndReceiverAndIsReadFalseAndIsActivatedIsTrue(
+                member3, member1);
+
+        // then
+        assertThat(member1hasUnReadMember2Message, equalTo(true));
+        assertThat(member1hasUnReadMember3Message, equalTo(false));
+    }
 }
