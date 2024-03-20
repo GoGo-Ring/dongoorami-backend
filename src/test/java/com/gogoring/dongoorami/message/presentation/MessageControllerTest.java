@@ -170,7 +170,7 @@ class MessageControllerTest {
                                         .description("쪽지 상대 소개"),
                                 fieldWithPath(
                                         "messageResponses.[].partner.currentMember").type(
-                                        BOOLEAN).description("본인 여부"),
+                                        BOOLEAN).description("본인 여부(상대방에 대한 정보라 무조건 false)"),
                                 fieldWithPath(
                                         "messageResponses.[].partner.manner").type(
                                         NUMBER).description("매너 지수"),
@@ -179,7 +179,9 @@ class MessageControllerTest {
                                 fieldWithPath("messageResponses.[].createdAt").type(STRING)
                                         .description("가장 최근 쪽지 작성 일시"),
                                 fieldWithPath("messageResponses.[].hasUnRead").type(BOOLEAN)
-                                        .description("읽지 않은 쪽지 존재 여부(존재 true, 미존재 false)")
+                                        .description("읽지 않은 쪽지 존재 여부(존재 true, 미존재 false)"),
+                                fieldWithPath("messageResponses.[].myMessage").type(BOOLEAN)
+                                        .description("본인이 보낸 쪽지 여부")
                         ))
                 );
     }
@@ -257,7 +259,7 @@ class MessageControllerTest {
                                         .description("쪽지 상대 소개"),
                                 fieldWithPath(
                                         "messageResponses.[].partner.currentMember").type(
-                                        BOOLEAN).description("본인 여부"),
+                                        BOOLEAN).description("본인 여부(상대에 대한 정보라 무조건 false)"),
                                 fieldWithPath(
                                         "messageResponses.[].partner.manner").type(
                                         NUMBER).description("쪽지 상대 매너 지수"),
@@ -266,7 +268,9 @@ class MessageControllerTest {
                                 fieldWithPath("messageResponses.[].createdAt").type(STRING)
                                         .description("가장 최근 쪽지 작성 일시"),
                                 fieldWithPath("messageResponses.[].hasUnRead").type(BOOLEAN)
-                                        .description("읽지 않은 쪽지 존재 여부(존재 true, 미존재 false)")
+                                        .description("읽지 않은 쪽지 존재 여부(존재 true, 미존재 false)"),
+                                fieldWithPath("messageResponses.[].myMessage").type(BOOLEAN)
+                                        .description("본인이 보낸 쪽지 여부")
                         ))
                 );
     }
@@ -330,7 +334,7 @@ class MessageControllerTest {
                                         .description("쪽지 상대 소개"),
                                 fieldWithPath(
                                         "messageResponses.[].partner.currentMember").type(
-                                        BOOLEAN).description("본인 여부"),
+                                        BOOLEAN).description("본인 여부(상대에 대한 정보라 무조건 false)"),
                                 fieldWithPath(
                                         "messageResponses.[].partner.manner").type(
                                         NUMBER).description("매너 지수"),
@@ -339,7 +343,9 @@ class MessageControllerTest {
                                 fieldWithPath("messageResponses.[].createdAt").type(STRING)
                                         .description("쪽지 작성 일시"),
                                 fieldWithPath("messageResponses.[].hasUnRead").type(BOOLEAN)
-                                        .description("쪽지 읽음 여부(읽음 false, 안읽음 true)")
+                                        .description("쪽지 읽음 여부(읽음 false, 안읽음 true)"),
+                                fieldWithPath("messageResponses.[].myMessage").type(BOOLEAN)
+                                        .description("본인이 보낸 쪽지 여부")
                         ))
                 );
     }
@@ -409,7 +415,7 @@ class MessageControllerTest {
                                         .description("쪽지 상대 소개"),
                                 fieldWithPath(
                                         "messageResponses.[].partner.currentMember").type(
-                                        BOOLEAN).description("본인 여부"),
+                                        BOOLEAN).description("본인 여부(상대에 대한 정보라 무조건 false)"),
                                 fieldWithPath(
                                         "messageResponses.[].partner.manner").type(
                                         NUMBER).description("매너 지수"),
@@ -418,7 +424,9 @@ class MessageControllerTest {
                                 fieldWithPath("messageResponses.[].createdAt").type(STRING)
                                         .description("쪽지 작성 일시"),
                                 fieldWithPath("messageResponses.[].hasUnRead").type(BOOLEAN)
-                                        .description("쪽지 읽음 여부(읽음 false, 안읽음 true)")
+                                        .description("쪽지 읽음 여부(읽음 false, 안읽음 true)"),
+                                fieldWithPath("messageResponses.[].myMessage").type(BOOLEAN)
+                                        .description("본인이 보낸 쪽지 여부")
                         ))
                 );
     }

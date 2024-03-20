@@ -21,16 +21,7 @@ public class MessageResponse {
     @JsonFormat(pattern = "yyyy.MM.dd.hh:mm:ss", timezone = "Asia/Seoul")
     private final LocalDateTime createdAt;
     private final boolean hasUnRead;
-
-    public static MessageResponse of(Message message) {
-        return MessageResponse.builder()
-                .id(message.getId())
-                .partner(MemberProfile.of(message.getSender(), message.getSender().getId()))
-                .content(message.getContent())
-                .createdAt(message.getUpdatedAt())
-                .hasUnRead(message.isRead())
-                .build();
-    }
+    private final boolean isMyMessage;
 
     public static MessageResponse of(Message message, Member partner, Member member,
             boolean hasUnRead) {
@@ -40,6 +31,7 @@ public class MessageResponse {
                 .content(message.getContent())
                 .createdAt(message.getCreatedAt())
                 .hasUnRead(hasUnRead)
+                .isMyMessage(message.getSender().equals(member))
                 .build();
     }
 
@@ -52,6 +44,7 @@ public class MessageResponse {
                 .content(message.getContent())
                 .createdAt(message.getUpdatedAt())
                 .hasUnRead(!message.isRead())
+                .isMyMessage(message.getSender().equals(member))
                 .build();
     }
 }
