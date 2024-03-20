@@ -39,6 +39,7 @@ public class MessageCustomRepositoryImpl implements MessageCustomRepository {
                         .and(lessThanCursorId(cursorId))
                 ).orderBy(message.id.desc()).limit(size).fetch();
         boolean hasNext = false;
+
         if (!messages.isEmpty()) {
             Long lastIdInResult = messages.get(messages.size() - 1).getId();
             hasNext = isExistByIdLessThan(lastIdInResult, member,
@@ -49,9 +50,21 @@ public class MessageCustomRepositoryImpl implements MessageCustomRepository {
                 hasNext);
     }
 
-    private BooleanExpression isMemberParticipatingAndPartnerIdIsNotInReceivedPartnerIds(
-            Member member, List<Long> receivedPartnerIds) {
-        if (receivedPartnerIds == null) {
+    @Override
+    public Slice<Message> findMessagesWithPartner(Member sender, Member receiver, Long cursorId,
+            int size) {
+        List<Message> messages = jpaQueryFactory.selectFrom(message)
+                .where(isMessageBetweenSenderAndReceiver(sender, receiver)
+                        .and(lessThanCursorId(cursorId))
+                ).orderBy(message.id.desc()).limit(size).fetch();
+        boolean hasNext = false;
+        if (!messages.isEmpty()) {
+            Long lastIdInResult = messages.get(messages.size() - 1).getId();
+            hasNext = isExistByIdLessThan(lastIdInResult, sender, receiver);
+        }
+
+        return new SliceImpl<>(messages, Pageable.ofSize(size), hasNext);
+    }
 
     private BooleanExpression isMemberParticipatingAndPartnerIdIsNotInPartnerIds(
             Member member, List<Long> partnerIds) {
@@ -74,6 +87,10 @@ public class MessageCustomRepositoryImpl implements MessageCustomRepository {
                 .fetchFirst() != null;
     }
 
+    private boolean isExistByIdLessThan(Long id, Member sender, Member receiver) {
+        return jpaQueryFactory.selectFrom(message)
+                .where(isMessageBetweenSenderAndReceiver(sender, receiver).and(message.id.lt(id)
+                ).and(message.isActivated.eq(true)))
                 .fetchFirst() != null;
     }
 
@@ -103,6 +120,12 @@ public class MessageCustomRepositoryImpl implements MessageCustomRepository {
 
         return latestMessageInSameConversation;
     }
+
+    private BooleanExpression isMessageBetweenSenderAndReceiver(Member sender, Member receiver) {
+        return message.sender.eq(sender).and(message.receiver.eq(receiver))
+                .or(message.sender.eq(receiver).and(message.receiver.eq(sender)));
+    }
+
     private List<Long> getPartnerIdsFromMessages(List<Message> messages, Member member,
             List<Long> receivedPartnerIds) {
         List<Long> partnerIds = new ArrayList<>();

@@ -10,4 +10,6 @@ public interface MessageCustomRepository {
     Slice<Message> findLatestMessages(Member member, Long cursorId, int size,
             List<Long> partnerIds);
 
+    Slice<Message> findMessagesWithPartner(Member sender, Member receiver, Long cursorId, int size);
+
 }
