@@ -7,6 +7,7 @@ import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyReviewRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsShortResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsShortResponse;
@@ -226,6 +227,15 @@ public class AccompanyController {
             @RequestParam(required = false, defaultValue = "10") int size,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(accompanyService.getAccompanyPostsByMember(cursorId, size,
+                customUserDetails.getId()));
+    }
+
+    @GetMapping("/comments/my-page")
+    public ResponseEntity<AccompanyCommentsShortResponse> getAccompanyCommentsByMember(
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(accompanyService.getAccompanyCommentsByMember(cursorId, size,
                 customUserDetails.getId()));
     }
 }
