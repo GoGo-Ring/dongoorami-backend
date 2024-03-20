@@ -321,6 +321,29 @@ include::{snippets}/AccompanyControllerTest/updateAccompanyReviews/request-field
 .Response
 include::{snippets}/AccompanyControllerTest/updateAccompanyReviews/http-response.adoc[]
 
+=== 특정 회원이 받은 후기 조회(최초 요청)
+
+.Request
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsWithMemberIdFirst/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsWithMemberIdFirst/query-parameters.adoc[]
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsWithMemberIdFirst/path-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsWithMemberIdFirst/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsWithMemberIdFirst/response-fields.adoc[]
+
+=== 특정 회원이 받은 후기 조회(이후 요청)
+최초 요청 api와는 cursorId 유무의 차이가 있습니다
+
+.Request
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsWithMemberIdAfterFirst/http-request.adoc[]
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsWithMemberIdAfterFirst/query-parameters.adoc[]
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsWithMemberIdAfterFirst/path-parameters.adoc[]
+
+.Response
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsWithMemberIdAfterFirst/http-response.adoc[]
+include::{snippets}/AccompanyControllerTest/getReceivedReviewsWithMemberIdAfterFirst/response-fields.adoc[]
+
 == 공연 API
 === 공연 후기 작성
 
