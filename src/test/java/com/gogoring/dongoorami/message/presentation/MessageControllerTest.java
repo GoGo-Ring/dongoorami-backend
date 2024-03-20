@@ -152,7 +152,7 @@ class MessageControllerTest {
                                 fieldWithPath("messageResponses").type(ARRAY)
                                         .description("쪽지 목록"),
                                 fieldWithPath("messageResponses.[].id").type(NUMBER)
-                                        .description("가장 최근 댓글 id"),
+                                        .description("가장 최근 쪽지 id"),
                                 fieldWithPath("messageResponses.[].partner.id").type(NUMBER)
                                         .description("대화 상대 id"),
                                 fieldWithPath("messageResponses.[].partner.nickname").type(STRING)
@@ -174,11 +174,11 @@ class MessageControllerTest {
                                         "messageResponses.[].partner.manner").type(
                                         NUMBER).description("매너 지수"),
                                 fieldWithPath("messageResponses.[].content").type(STRING)
-                                        .description("가장 최근 댓글 내용"),
+                                        .description("가장 최근 쪽지 내용"),
                                 fieldWithPath("messageResponses.[].createdAt").type(STRING)
-                                        .description("가장 최근 댓글 작성 일시"),
+                                        .description("가장 최근 쪽지 작성 일시"),
                                 fieldWithPath("messageResponses.[].hasUnRead").type(BOOLEAN)
-                                        .description("대화 상대가 보낸 메시지 중 읽지 않은 것이 있는지")
+                                        .description("읽지 않은 쪽지 존재 여부(존재 true, 미존재 false)")
                         ))
                 );
     }
@@ -206,9 +206,9 @@ class MessageControllerTest {
 
         messageRepository.saveAll(MessageDataFactory.createMessages(member1, member4, 5));
         messageRepository.saveAll(MessageDataFactory.createMessages(member4, member1, 5));
-        Long latestMessageWithMember3Id = messageRepository.save(
+        Long latestMessageId = messageRepository.save(
                 MessageDataFactory.createMessages(member3, member1, 1).get(0)).getId();
-        cursorId = String.valueOf(latestMessageWithMember3Id + 1);
+        cursorId = String.valueOf(latestMessageId + 1);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -239,7 +239,7 @@ class MessageControllerTest {
                                 fieldWithPath("messageResponses").type(ARRAY)
                                         .description("쪽지 목록"),
                                 fieldWithPath("messageResponses.[].id").type(NUMBER)
-                                        .description("가장 최근 댓글 id"),
+                                        .description("가장 최근 쪽지 id"),
                                 fieldWithPath("messageResponses.[].partner.id").type(NUMBER)
                                         .description("대화 상대 id"),
                                 fieldWithPath("messageResponses.[].partner.nickname").type(STRING)
@@ -261,11 +261,157 @@ class MessageControllerTest {
                                         "messageResponses.[].partner.manner").type(
                                         NUMBER).description("대화 상대 매너 지수"),
                                 fieldWithPath("messageResponses.[].content").type(STRING)
-                                        .description("가장 최근 댓글 내용"),
+                                        .description("가장 최근 쪽지 내용"),
                                 fieldWithPath("messageResponses.[].createdAt").type(STRING)
-                                        .description("가장 최근 댓글 작성 일시"),
+                                        .description("가장 최근 쪽지 작성 일시"),
                                 fieldWithPath("messageResponses.[].hasUnRead").type(BOOLEAN)
-                                        .description("대화 상대가 보낸 메시지 중 읽지 않은 것이 있는지")
+                                        .description("읽지 않은 쪽지 존재 여부(존재 true, 미존재 false)")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("사용자와 대화 중인 쪽지 목록을 조회할 수 있다. - 최초 요청")
+    void success_getMessagesWithPartnerFirst() throws Exception {
+        // given
+        List<Member> members = memberRepository.saveAll(
+                Arrays.asList(MemberDataFactory.createLoginMember(),
+                        MemberDataFactory.createMember(),
+                        MemberDataFactory.createMember(), MemberDataFactory.createMember()));
+        Member member1 = members.get(0), member2 = members.get(1);
+        String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
+                member1.getRoles());
+        String size = "10";
+
+        messageRepository.saveAll(MessageDataFactory.createMessages(member1, member2, 5));
+        messageRepository.saveAll(MessageDataFactory.createMessages(member2, member1, 5));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/messages/{partnerId}", member2.getId())
+                        .header("Authorization", accessToken)
+                        .param("size", size)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getMessagesWithPartnerFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("size").description("요청할 쪽지 개수(기본 10개)")
+                                        .optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNext").type(BOOLEAN)
+                                        .description("다음 쪽지 존재 여부"),
+                                fieldWithPath("messageResponses").type(ARRAY)
+                                        .description("쪽지 목록"),
+                                fieldWithPath("messageResponses.[].id").type(NUMBER)
+                                        .description("쪽지 id"),
+                                fieldWithPath("messageResponses.[].partner.id").type(NUMBER)
+                                        .description("대화 상대 id"),
+                                fieldWithPath("messageResponses.[].partner.nickname").type(STRING)
+                                        .description("대화 상대 닉네임"),
+                                fieldWithPath("messageResponses.[].partner.profileImage").type(
+                                                STRING)
+                                        .description("대화 상대 프로필 이미지 url"),
+                                fieldWithPath("messageResponses.[].partner.gender").type(STRING)
+                                        .description("대화 상대 성별"),
+                                fieldWithPath("messageResponses.[].partner.age").type(NUMBER)
+                                        .description("대화 상대 나이"),
+                                fieldWithPath("messageResponses.[].partner.introduction").type(
+                                                STRING)
+                                        .description("대화 상대 소개"),
+                                fieldWithPath(
+                                        "messageResponses.[].partner.currentMember").type(
+                                        BOOLEAN).description("본인 여부"),
+                                fieldWithPath(
+                                        "messageResponses.[].partner.manner").type(
+                                        NUMBER).description("매너 지수"),
+                                fieldWithPath("messageResponses.[].content").type(STRING)
+                                        .description("쪽지 내용"),
+                                fieldWithPath("messageResponses.[].createdAt").type(STRING)
+                                        .description("쪽지 작성 일시"),
+                                fieldWithPath("messageResponses.[].hasUnRead").type(BOOLEAN)
+                                        .description("쪽지 읽음 여부(읽음 false, 안읽음 true)")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("사용자와 대화 중인 쪽지 목록을 조회할 수 있다. - 이후 요청")
+    void success_getMessagesWithPartnerAfterFirst() throws Exception {
+        // given
+        List<Member> members = memberRepository.saveAll(
+                Arrays.asList(MemberDataFactory.createLoginMember(),
+                        MemberDataFactory.createMember(),
+                        MemberDataFactory.createMember(), MemberDataFactory.createMember()));
+        Member member1 = members.get(0), member2 = members.get(1);
+        String accessToken = tokenProvider.createAccessToken(member1.getProviderId(),
+                member1.getRoles());
+        String size = "10", cursorId;
+
+        messageRepository.saveAll(MessageDataFactory.createMessages(member1, member2, 5));
+        messageRepository.saveAll(MessageDataFactory.createMessages(member2, member1, 5));
+        Long latestMessageId = messageRepository.save(
+                MessageDataFactory.createMessages(member1, member2, 1).get(0)).getId();
+        cursorId = String.valueOf(latestMessageId + 1);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/messages/{partnerId}", member2.getId())
+                        .header("Authorization", accessToken)
+                        .param("cursorId", cursorId)
+                        .param("size", size)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getMessagesWithPartnerAfterFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("cursorId").description("마지막으로 받은 쪽지 id")
+                                        .optional(),
+                                parameterWithName("size").description("요청할 쪽지 개수(기본 10개)")
+                                        .optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNext").type(BOOLEAN)
+                                        .description("다음 쪽지 존재 여부"),
+                                fieldWithPath("messageResponses").type(ARRAY)
+                                        .description("쪽지 목록"),
+                                fieldWithPath("messageResponses.[].id").type(NUMBER)
+                                        .description("쪽지 id"),
+                                fieldWithPath("messageResponses.[].partner.id").type(NUMBER)
+                                        .description("대화 상대 id"),
+                                fieldWithPath("messageResponses.[].partner.nickname").type(STRING)
+                                        .description("대화 상대 닉네임"),
+                                fieldWithPath("messageResponses.[].partner.profileImage").type(
+                                                STRING)
+                                        .description("대화 상대 프로필 이미지 url"),
+                                fieldWithPath("messageResponses.[].partner.gender").type(STRING)
+                                        .description("대화 상대 성별"),
+                                fieldWithPath("messageResponses.[].partner.age").type(NUMBER)
+                                        .description("대화 상대 나이"),
+                                fieldWithPath("messageResponses.[].partner.introduction").type(
+                                                STRING)
+                                        .description("대화 상대 소개"),
+                                fieldWithPath(
+                                        "messageResponses.[].partner.currentMember").type(
+                                        BOOLEAN).description("본인 여부"),
+                                fieldWithPath(
+                                        "messageResponses.[].partner.manner").type(
+                                        NUMBER).description("매너 지수"),
+                                fieldWithPath("messageResponses.[].content").type(STRING)
+                                        .description("쪽지 내용"),
+                                fieldWithPath("messageResponses.[].createdAt").type(STRING)
+                                        .description("쪽지 작성 일시"),
+                                fieldWithPath("messageResponses.[].hasUnRead").type(BOOLEAN)
+                                        .description("쪽지 읽음 여부(읽음 false, 안읽음 true)")
                         ))
                 );
     }
