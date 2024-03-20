@@ -29,7 +29,7 @@ public class MessageCustomRepositoryImpl implements MessageCustomRepository {
     public Slice<Message> findLatestMessages(Member member, Long cursorId, int size,
             List<Long> receivedPartnerIds) {
         List<Message> messages = jpaQueryFactory.selectFrom(message)
-                .where(isMemberParticipatingAndPartnerIdIsNotInReceivedPartnerIds(member,
+                .where(isMemberParticipatingAndPartnerIdIsNotInPartnerIds(member,
                         receivedPartnerIds)
                         .and(message.id.in(
                                 select(message.id.max())
@@ -41,7 +41,8 @@ public class MessageCustomRepositoryImpl implements MessageCustomRepository {
         boolean hasNext = false;
         if (!messages.isEmpty()) {
             Long lastIdInResult = messages.get(messages.size() - 1).getId();
-            hasNext = isExistByIdLessThan(lastIdInResult);
+            hasNext = isExistByIdLessThan(lastIdInResult, member,
+                    getPartnerIdsFromMessages(messages, member, receivedPartnerIds));
         }
 
         return new SliceImpl<>(findLatestMessageInSameConversation(messages), Pageable.ofSize(size),
@@ -51,20 +52,28 @@ public class MessageCustomRepositoryImpl implements MessageCustomRepository {
     private BooleanExpression isMemberParticipatingAndPartnerIdIsNotInReceivedPartnerIds(
             Member member, List<Long> receivedPartnerIds) {
         if (receivedPartnerIds == null) {
+
+    private BooleanExpression isMemberParticipatingAndPartnerIdIsNotInPartnerIds(
+            Member member, List<Long> partnerIds) {
+        if (partnerIds == null) {
             return message.sender.eq(member).or(message.receiver.eq(member));
         }
-        return message.sender.eq(member).and(message.receiver.id.notIn(receivedPartnerIds))
-                .or(message.receiver.eq(member).and(message.sender.id.notIn(receivedPartnerIds)));
+        return message.sender.eq(member).and(message.receiver.id.notIn(partnerIds))
+                .or(message.receiver.eq(member).and(message.sender.id.notIn(partnerIds)));
     }
 
     private BooleanExpression lessThanCursorId(Long cursorId) {
         return cursorId != null ? message.id.lt(cursorId) : null;
     }
 
-    private boolean isExistByIdLessThan(Long id) {
+    private boolean isExistByIdLessThan(Long id, Member member, List<Long> partnerIds) {
         return jpaQueryFactory.selectFrom(message)
-                .where(message.id.lt(id),
-                        message.isActivated.eq(true))
+                .where(isMemberParticipatingAndPartnerIdIsNotInPartnerIds(member,
+                        partnerIds).and(message.id.lt(id)
+                ).and(message.isActivated.eq(true)))
+                .fetchFirst() != null;
+    }
+
                 .fetchFirst() != null;
     }
 
@@ -93,5 +102,24 @@ public class MessageCustomRepositoryImpl implements MessageCustomRepository {
         latestMessageInSameConversation.sort(messageIdDescComparator);
 
         return latestMessageInSameConversation;
+    }
+    private List<Long> getPartnerIdsFromMessages(List<Message> messages, Member member,
+            List<Long> receivedPartnerIds) {
+        List<Long> partnerIds = new ArrayList<>();
+        if (receivedPartnerIds != null) {
+            partnerIds.addAll(receivedPartnerIds);
+        }
+
+        messages.stream()
+                .filter(message -> !message.getReceiver().getId().equals(member.getId()))
+                .map(message -> message.getReceiver().getId())
+                .forEach(partnerIds::add);
+
+        messages.stream()
+                .filter(message -> !message.getSender().getId().equals(member.getId()))
+                .map(message -> message.getReceiver().getId())
+                .forEach(partnerIds::add);
+
+        return partnerIds;
     }
 }
