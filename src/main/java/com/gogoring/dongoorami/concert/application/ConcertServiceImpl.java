@@ -8,6 +8,7 @@ import com.gogoring.dongoorami.accompany.repository.AccompanyReviewRepository;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
+import com.gogoring.dongoorami.concert.dto.response.ConcertGetImagesResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetShortResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertInfoResponse;
@@ -144,6 +145,13 @@ public class ConcertServiceImpl implements ConcertService {
                         .map(ReviewResponse::of).toList());
 
         return reviewResponses;
+    }
+
+    @Override
+    public List<ConcertGetImagesResponse> getConcertImages() {
+        return concertRepository.findTop5ByIsActivatedIsTrueOrderByEndedAtDesc().stream()
+                .map(ConcertGetImagesResponse::of)
+                .toList();
     }
 
     @Scheduled(cron = "0 30 15 * * *", zone = "Asia/Seoul")

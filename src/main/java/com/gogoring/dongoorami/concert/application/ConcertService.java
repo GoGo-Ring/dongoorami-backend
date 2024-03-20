@@ -2,6 +2,7 @@ package com.gogoring.dongoorami.concert.application;
 
 import com.gogoring.dongoorami.accompany.dto.response.ReviewResponse;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
+import com.gogoring.dongoorami.concert.dto.response.ConcertGetImagesResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertsGetShortResponse;
@@ -29,4 +30,6 @@ public interface ConcertService {
     List<ConcertInfoResponse> getConcertsByKeyword(String keyword);
 
     List<ReviewResponse> getConcertAndAccompanyReview(Long memberId);
+
+    List<ConcertGetImagesResponse> getConcertImages();
 }

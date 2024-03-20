@@ -16,4 +16,6 @@ public interface ConcertRepository extends JpaRepository<Concert, Long>, Concert
     List<Concert> findAllByStatusIsNotAndIsActivatedIsTrue(String status);
 
     List<Concert> findAllByNameContaining(String keyword);
+
+    List<Concert> findTop5ByIsActivatedIsTrueOrderByEndedAtDesc();
 }
