@@ -1,5 +1,6 @@
 package com.gogoring.dongoorami.message.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.message.domain.Message;
@@ -16,6 +17,8 @@ public class MessageResponse {
     private final Long id;
     private final MemberProfile partner;
     private final String content;
+
+    @JsonFormat(pattern = "yyyy.MM.dd.hh:mm:ss", timezone = "Asia/Seoul")
     private final LocalDateTime createdAt;
     private final boolean hasUnRead;
 
