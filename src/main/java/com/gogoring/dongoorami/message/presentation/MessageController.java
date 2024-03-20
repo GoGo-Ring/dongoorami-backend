@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +42,16 @@ public class MessageController {
             @RequestParam(required = false) List<Long> receivedPartnerIds,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(messageService.getMessages(cursorId, size, receivedPartnerIds,
+                customUserDetails.getId()));
+    }
+
+    @GetMapping("/{partnerId}")
+    public ResponseEntity<MessagesResponse> getMessagesWithPartner(
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @PathVariable Long partnerId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(messageService.getMessagesWithPartner(cursorId, size, partnerId,
                 customUserDetails.getId()));
     }
 
