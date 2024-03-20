@@ -1515,4 +1515,164 @@ class AccompanyControllerTest {
                         ))
                 );
     }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("특정 회원이 받은 동행 구인 후기를 조회할 수 있다. - 최초 요청")
+    void success_getReceivedReviewsWithMemberIdFirst() throws Exception {
+        // given
+        Member member1 = MemberDataFactory.createLoginMember();
+        Member member2 = MemberDataFactory.createMember();
+        Member member3 = MemberDataFactory.createMember();
+        memberRepository.saveAll(List.of(member1, member2, member3));
+        String accessToken = tokenProvider.createAccessToken(member2.getProviderId(),
+                member2.getRoles());
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        AccompanyPost accompanyPost = accompanyPostRepository.save(
+                createAccompanyPosts(member1, 1, concert).get(0));
+
+        List<AccompanyComment> accompanyComments = new ArrayList<>(
+                createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        AccompanyReview accompanyReview1 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member2, member1);
+        AccompanyReview accompanyReview2 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member3, member1);
+        ReflectionTestUtils.setField(accompanyReview1, "content", "친절한 분이셨습니다~");
+        ReflectionTestUtils.setField(accompanyReview2, "content", "덕분에 공연 재밌게 봤어요!");
+        ReflectionTestUtils.setField(accompanyReview1, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        ReflectionTestUtils.setField(accompanyReview2, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        accompanyReviewRepository.saveAll(List.of(accompanyReview1, accompanyReview2));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompanies/reviews/reviewees/{memberId}", member1.getId()).header(
+                                "Authorization", accessToken)
+                        .param("size", String.valueOf(2))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getReceivedReviewsWithMemberIdFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("memberId").description("받은 동행 후기를 조회할 회원 id")
+                        ),
+                        queryParameters(
+                                parameterWithName("size").description(
+                                        "조회할 후기 개수, 값 넣지 않으면 기본 10개").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNext").type(BOOLEAN)
+                                        .description("다음 후기 정보 존재 여부"),
+                                fieldWithPath("reviewResponses").type(ARRAY)
+                                        .description("동행 구인 후기 목록"),
+                                fieldWithPath("reviewResponses[].reviewId").type(NUMBER)
+                                        .description("후기 아이디"),
+                                fieldWithPath("reviewResponses[].targetId").type(NUMBER)
+                                        .description("후기가 작성된 동행 구인글 아이디"),
+                                fieldWithPath("reviewResponses[].title").type(
+                                                STRING)
+                                        .description("동행 구인글 제목"),
+                                fieldWithPath("reviewResponses[].content").type(
+                                                STRING)
+                                        .description("동행 후기 내용"),
+                                fieldWithPath("reviewResponses[].updatedAt").type(
+                                                STRING)
+                                        .description("작성 날짜"),
+                                fieldWithPath("reviewResponses[].isAccompanyReview").type(BOOLEAN)
+                                        .description("동행 후기/공연 후기 여부, 동행 후기면 true, 공연 후기면 false")
+                        ))
+                );
+    }
+
+    @Test
+    @WithCustomMockUser
+    @DisplayName("특정 회원이 받은 동행 구인 후기를 조회할 수 있다. - 이후 요청")
+    void success_getReceivedReviewsWithMemberIdAfterFirst() throws Exception {
+        // given
+        Member member1 = MemberDataFactory.createLoginMember();
+        Member member2 = MemberDataFactory.createMember();
+        Member member3 = MemberDataFactory.createMember();
+        memberRepository.saveAll(List.of(member1, member2, member3));
+        String accessToken = tokenProvider.createAccessToken(member2.getProviderId(),
+                member2.getRoles());
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        AccompanyPost accompanyPost = accompanyPostRepository.save(
+                createAccompanyPosts(member1, 1, concert).get(0));
+
+        List<AccompanyComment> accompanyComments = new ArrayList<>(
+                createAccompanyComment(accompanyPost, member1, 3));
+        accompanyComments.add(AccompanyCommentRequest.createAccompanyApplyCommentRequest()
+                .toEntity(accompanyPost, member2, true));
+        accompanyCommentRepository.saveAll(accompanyComments);
+
+        AccompanyReview accompanyReview1 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member2, member1);
+        AccompanyReview accompanyReview2 = AccompanyDataFactory.createAccompanyReview(accompanyPost,
+                member3, member1);
+        ReflectionTestUtils.setField(accompanyReview1, "content", "친절한 분이셨습니다~");
+        ReflectionTestUtils.setField(accompanyReview2, "content", "덕분에 공연 재밌게 봤어요!");
+        ReflectionTestUtils.setField(accompanyReview1, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        ReflectionTestUtils.setField(accompanyReview2, "status",
+                AccompanyReviewStatusType.AFTER_ACCOMPANY_AND_WRITTEN);
+        accompanyReviewRepository.saveAll(List.of(accompanyReview1, accompanyReview2));
+
+        long maxId = Math.max(accompanyReview1.getId(), accompanyReview2.getId());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompanies/reviews/reviewees/{memberId}", member1.getId()).header(
+                                "Authorization", accessToken)
+                        .param("cursorId", String.valueOf(maxId + 1))
+                        .param("size", String.valueOf(2))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getReceivedReviewsWithMemberIdAfterFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("memberId").description("받은 동행 후기를 조회할 회원 id")
+                        ),
+                        queryParameters(
+                                parameterWithName("cursorId").description("마지막으로 받은 후기 아이디"),
+                                parameterWithName("size").description(
+                                        "조회할 후기 개수, 값 넣지 않으면 기본 10개").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNext").type(BOOLEAN)
+                                        .description("다음 후기 정보 존재 여부"),
+                                fieldWithPath("reviewResponses").type(ARRAY)
+                                        .description("동행 구인 후기 목록"),
+                                fieldWithPath("reviewResponses[].reviewId").type(NUMBER)
+                                        .description("후기 아이디"),
+                                fieldWithPath("reviewResponses[].targetId").type(NUMBER)
+                                        .description("후기가 작성된 동행 구인글 아이디"),
+                                fieldWithPath("reviewResponses[].title").type(
+                                                STRING)
+                                        .description("동행 구인글 제목"),
+                                fieldWithPath("reviewResponses[].content").type(
+                                                STRING)
+                                        .description("동행 후기 내용"),
+                                fieldWithPath("reviewResponses[].updatedAt").type(
+                                                STRING)
+                                        .description("작성 날짜"),
+                                fieldWithPath("reviewResponses[].isAccompanyReview").type(BOOLEAN)
+                                        .description("동행 후기/공연 후기 여부, 동행 후기면 true, 공연 후기면 false")
+                        ))
+                );
+    }
 }
