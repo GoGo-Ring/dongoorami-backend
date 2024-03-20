@@ -34,7 +34,6 @@ public class MessageController {
                 .build();
     }
 
-    // 이후 요청에는 partnerId도 보내줘야 함.
     @GetMapping
     public ResponseEntity<MessagesResponse> getMessages(
             @RequestParam(required = false) Long cursorId,
