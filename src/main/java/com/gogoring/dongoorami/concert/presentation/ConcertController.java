@@ -3,6 +3,7 @@ package com.gogoring.dongoorami.concert.presentation;
 import com.gogoring.dongoorami.accompany.dto.response.ReviewResponse;
 import com.gogoring.dongoorami.concert.application.ConcertService;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
+import com.gogoring.dongoorami.concert.dto.response.ConcertGetImagesResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertsGetShortResponse;
@@ -92,5 +93,10 @@ public class ConcertController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(concertService.getConcertAndAccompanyReview(
                 customUserDetails.getId()));
+    }
+
+    @GetMapping("/concerts/images")
+    public ResponseEntity<List<ConcertGetImagesResponse>> getConcertImages() {
+        return ResponseEntity.ok(concertService.getConcertImages());
     }
 }
