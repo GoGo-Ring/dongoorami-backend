@@ -1621,11 +1621,11 @@ class AccompanyControllerTest {
                                 fieldWithPath("accompanyPostShortResponses[].totalPeople").type(
                                         NUMBER).description("모집 인원"),
                                 fieldWithPath("accompanyPostShortResponses[].updatedAt").type(
-                                        STRING).description("작성 날짜")  
+                                        STRING).description("작성 날짜")
                         ))
                 );
     }
-  
+
     @Test
     @WithCustomMockUser
     @DisplayName("특정 회원이 작성한 동행 구인 댓글 목록을 조회할 수 있다. - 최초 요청")
@@ -1744,11 +1744,11 @@ class AccompanyControllerTest {
                                 fieldWithPath("accompanyCommentShortResponses[].content").type(
                                         STRING).description("동행 구인 댓글 내용"),
                                 fieldWithPath("accompanyCommentShortResponses[].updatedAt").type(
-                                        STRING).description("작성 날짜") 
+                                        STRING).description("작성 날짜")
                         ))
                 );
-    }       
-          
+    }
+
     @Test
     @WithCustomMockUser
     @DisplayName("특정 회원이 받은 동행 구인 후기를 조회할 수 있다. - 최초 요청")
