@@ -769,6 +769,8 @@ public class ConcertControllerTest {
                                         .description("포스터 이미지 url"),
                                 fieldWithPath("concertGetShortResponses[].status").type(STRING)
                                         .description("공연 상태"),
+                                fieldWithPath("accompanyPostInfos").type(ARRAY)
+                                        .description("동행 구인글 목록"),
                                 fieldWithPath("accompanyPostInfos[].id").type(NUMBER)
                                         .description("동행 구인글 id"),
                                 fieldWithPath("accompanyPostInfos[].title").type(
@@ -868,6 +870,8 @@ public class ConcertControllerTest {
                                         .description("포스터 이미지 url"),
                                 fieldWithPath("concertGetShortResponses[].status").type(STRING)
                                         .description("공연 상태"),
+                                fieldWithPath("accompanyPostInfos").type(ARRAY)
+                                        .description("동행 구인글 목록"),
                                 fieldWithPath("accompanyPostInfos[].id").type(NUMBER)
                                         .description("동행 구인글 id"),
                                 fieldWithPath("accompanyPostInfos[].title").type(
