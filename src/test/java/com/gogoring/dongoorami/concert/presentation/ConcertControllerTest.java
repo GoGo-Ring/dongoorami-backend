@@ -816,10 +816,10 @@ public class ConcertControllerTest {
 
         int size = 3;
         List<Concert> concerts = concertRepository.saveAll(ConcertDataFactory.createConcerts(size));
-        Long concertCursorId = concerts.get(concerts.size() - 1).getId() - 1;
+        Long concertCursorId = concerts.get(concerts.size() - 1).getId() + 1;
         List<AccompanyPost> accompanyPosts = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, size, concerts.get(0)));
-        Long accompanyPostCursorId = accompanyPosts.get(accompanyPosts.size() - 1).getId() - 1;
+        Long accompanyPostCursorId = accompanyPosts.get(accompanyPosts.size() - 1).getId() + 1;
         String keyword = concerts.get(0).getName()
                 .substring(0, concerts.get(0).getName().length() / 2);
 

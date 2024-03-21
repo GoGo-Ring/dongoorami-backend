@@ -302,7 +302,7 @@ class AccompanyPostRepositoryTest {
                 ConcertDataFactory.createConcerts(size * 3));
         List<AccompanyPost> accompanyPosts = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, size * 3, concerts.get(0)));
-        Long accompanyPostCursorId = accompanyPosts.get(accompanyPosts.size() - 1).getId() - 1;
+        Long accompanyPostCursorId = accompanyPosts.get(accompanyPosts.size() - 1).getId() + 1;
         String keyword = accompanyPosts.get(0).getTitle()
                 .substring(0, accompanyPosts.get(0).getTitle().length() / 2);
 

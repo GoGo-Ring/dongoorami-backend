@@ -177,7 +177,7 @@ public class ConcertRepositoryTest {
         int size = 3;
         List<Concert> concerts = concertRepository.saveAll(
                 ConcertDataFactory.createConcerts(size * 3));
-        Long concertCursorId = concerts.get(concerts.size() - 1).getId() - 1;
+        Long concertCursorId = concerts.get(concerts.size() - 1).getId() + 1;
         String keyword = concerts.get(0).getName()
                 .substring(0, concerts.get(0).getName().length() / 2);
 
