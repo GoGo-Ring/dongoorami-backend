@@ -290,6 +290,33 @@ class AccompanyPostRepositoryTest {
                 .toList()).doesNotContain(maxId);
     }
 
+    @Test
+    @DisplayName("id 내림차순으로 특정 공연에 대한 동행 구인글 목록을 조회할 수 있다.")
+    void success_findAllByConcert() {
+        // given
+        Member member = MemberDataFactory.createMember();
+        memberRepository.save(member);
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        int size = 3;
+        List<AccompanyPost> accompanyPosts = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, size + 1, concert));
+
+        long maxId = -1L;
+        for (AccompanyPost accompanyPost : accompanyPosts) {
+            maxId = Math.max(maxId, accompanyPost.getId());
+        }
+
+        // when
+        Slice<AccompanyPost> slice = accompanyPostRepository.findAllByConcert(maxId, size, concert);
+
+        // then
+        Assertions.assertThat(slice.getSize()).isEqualTo(size);
+        Assertions.assertThat(slice.getContent().stream().map(AccompanyPost::getId)
+                .toList()).doesNotContain(maxId);
+    }
+
     private boolean isAccompanyPostEqualsAccompanyPostFilterRequest(AccompanyPost accompanyPost,
             AccompanyPostFilterRequest accompanyPostFilterRequest) {
         return ((accompanyPostFilterRequest.getGender() == null || accompanyPost.getGender()
