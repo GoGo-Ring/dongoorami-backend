@@ -11,4 +11,6 @@ public interface AccompanyPostCustomRepository {
             AccompanyPostFilterRequest accompanyPostFilterRequest);
 
     Slice<AccompanyPost> findAllByMember(Long cursorId, int size, Member member);
+
+    Slice<AccompanyPost> findAllByKeyword(Long cursorId, int size, String keyword);
 }
