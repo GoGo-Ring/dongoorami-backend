@@ -3,11 +3,12 @@ package com.gogoring.dongoorami.concert.presentation;
 import com.gogoring.dongoorami.accompany.dto.response.ReviewResponse;
 import com.gogoring.dongoorami.concert.application.ConcertService;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
+import com.gogoring.dongoorami.concert.dto.response.AccompanyPostsAndConcertsResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetImagesResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
+import com.gogoring.dongoorami.concert.dto.response.ConcertInfoResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertsGetShortResponse;
-import com.gogoring.dongoorami.concert.dto.response.ConcertInfoResponse;
 import com.gogoring.dongoorami.global.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -98,5 +99,18 @@ public class ConcertController {
     @GetMapping("/concerts/images")
     public ResponseEntity<List<ConcertGetImagesResponse>> getConcertImages() {
         return ResponseEntity.ok(concertService.getConcertImages());
+    }
+
+    @GetMapping("/accompanies-concerts")
+    public ResponseEntity<AccompanyPostsAndConcertsResponse> getAccompanyPostsAndConcertsByKeyword(
+            @RequestParam(required = false) Long accompanyPostCursorId,
+            @RequestParam(required = false) Long concertCursorId,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(
+                concertService.getAccompanyPostsAndConcertsByKeyword(accompanyPostCursorId,
+                        concertCursorId, size, keyword,
+                        customUserDetails != null ? customUserDetails.getId() : -1));
     }
 }
