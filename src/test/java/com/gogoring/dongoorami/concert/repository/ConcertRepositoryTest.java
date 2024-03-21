@@ -138,7 +138,7 @@ public class ConcertRepositoryTest {
     }
 
     @Test
-    @DisplayName("키워드로 공연 목록을 조회할 수 있다.")
+    @DisplayName("특정 키워드를 이름으로 포함하는 공연 목록을 조회할 수 있다.")
     void success_findAllByNameContaining() {
         // given
         int size = 7;
@@ -168,5 +168,25 @@ public class ConcertRepositoryTest {
         // then
         assertThat(savedConcerts.size()).isEqualTo(5);
         assertThat(savedConcerts).contains(concerts.get(0), concerts.get(1));
+    }
+
+    @Test
+    @DisplayName("키워드 기반 공연 목록을 조회할 수 있다.")
+    void success_findAllByKeyword() {
+        // given
+        int size = 3;
+        List<Concert> concerts = concertRepository.saveAll(
+                ConcertDataFactory.createConcerts(size * 3));
+        Long concertCursorId = concerts.get(concerts.size() - 1).getId() - 1;
+        String keyword = concerts.get(0).getName()
+                .substring(0, concerts.get(0).getName().length() / 2);
+
+        // when
+        Slice<Concert> concertsContainingKeyword = concertRepository.findAllByKeyword(
+                concertCursorId, size, keyword);
+
+        // then
+        assertThat(concertsContainingKeyword.hasNext()).isEqualTo(true);
+        assertThat(concertsContainingKeyword.getContent().size()).isEqualTo(size);
     }
 }
