@@ -8,4 +8,6 @@ public interface ConcertCustomRepository {
 
     Slice<Concert> findAllByGenreAndStatus(Long cursorId, int size, String keyword,
             List<String> genres, List<String> statuses);
+
+    Slice<Concert> findAllByKeyword(Long cursorId, int size, String keyword);
 }
