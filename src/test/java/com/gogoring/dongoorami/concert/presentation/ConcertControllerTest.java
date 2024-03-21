@@ -686,4 +686,32 @@ public class ConcertControllerTest {
                         ))
                 );
     }
+
+    @Test
+    @DisplayName("공연 사진 5개를 조회할 수 있다.")
+    void success_getConcertImages() throws Exception {
+        // given
+        List<Concert> concerts = ConcertDataFactory.createConcerts(5);
+        concertRepository.saveAll(concerts);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/concerts/images")
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getConcertImages",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[]").type(ARRAY)
+                                        .description("공연 사진 정보 목록"),
+                                fieldWithPath("[].id").type(NUMBER)
+                                        .description("공연 아이디"),
+                                fieldWithPath("[].imageUrl").type(STRING)
+                                        .description("공연 포스터 url")
+                        ))
+                );
+    }
 }

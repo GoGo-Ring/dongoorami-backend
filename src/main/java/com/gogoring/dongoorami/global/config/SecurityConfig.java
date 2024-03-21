@@ -56,14 +56,21 @@ public class SecurityConfig {
                                 // 동행 API
                                 .requestMatchers(HttpMethod.GET, "/api/v1/accompanies/posts")
                                 .permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/accompanies/posts/{accompanyPostId}").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/accompanies/comments/{accompanyPostId}").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/accompanies/posts/regions").permitAll()
+                                .requestMatchers(HttpMethod.GET,
+                                        "/api/v1/accompanies/posts/{accompanyPostId}").permitAll()
+                                .requestMatchers(HttpMethod.GET,
+                                        "/api/v1/accompanies/comments/{accompanyPostId}")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.GET,
+                                        "/api/v1/accompanies/posts/regions").permitAll()
                                 // 공연 API
-                                .requestMatchers(HttpMethod.GET, "/api/v1/concerts/reviews/{concertId}").permitAll()
+                                .requestMatchers(HttpMethod.GET,
+                                        "/api/v1/concerts/reviews/{concertId}").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/concerts/{concertId}")
                                 .permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/concerts").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/concerts/images")
+                                .permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandlingConfigurer -> exceptionHandlingConfigurer

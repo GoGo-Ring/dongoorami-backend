@@ -483,6 +483,15 @@ include::{snippets}/ConcertControllerTest/getConcertsByKeyword/query-parameters.
 include::{snippets}/ConcertControllerTest/getConcertsByKeyword/http-response.adoc[]
 include::{snippets}/ConcertControllerTest/getConcertsByKeyword/response-fields.adoc[]
 
+=== 메인페이지 공연 사진 목록 조회
+
+.Request
+include::{snippets}/ConcertControllerTest/getConcertImages/http-request.adoc[]
+
+.Response
+include::{snippets}/ConcertControllerTest/getConcertImages/http-response.adoc[]
+include::{snippets}/ConcertControllerTest/getConcertImages/response-fields.adoc[]
+
 == 찜 API
 === 찜 정보 저장
 
