@@ -8,11 +8,15 @@ import com.gogoring.dongoorami.accompany.dto.request.AccompanyCommentRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyReviewRequest;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentShortResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse.AccompanyCommentInfo;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsShortResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostShortResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsShortResponse;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
 import com.gogoring.dongoorami.accompany.dto.response.ReviewResponse;
 import com.gogoring.dongoorami.accompany.dto.response.ReviewsResponse;
@@ -308,6 +312,38 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .toList();
 
         return ReviewsResponse.of(accompanyReviews.hasNext(), reviewResponses);
+    }
+
+    @Override
+    public AccompanyPostsShortResponse getAccompanyPostsByMember(Long cursorId, int size,
+            Long currentMemberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Slice<AccompanyPost> accompanyPosts = accompanyPostRepository.findAllByMember(cursorId,
+                size, member);
+        List<AccompanyPostShortResponse> accompanyPostShortResponses = accompanyPosts.stream()
+                .map(AccompanyPostShortResponse::of)
+                .toList();
+
+        return AccompanyPostsShortResponse.of(accompanyPosts.hasNext(),
+                accompanyPostShortResponses);
+    }
+
+    @Override
+    public AccompanyCommentsShortResponse getAccompanyCommentsByMember(Long cursorId, int size,
+            Long currentMemberId) {
+        Member member = memberRepository.findByIdAndIsActivatedIsTrue(currentMemberId)
+                .orElseThrow(() -> new MemberNotFoundException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Slice<AccompanyComment> accompanyComments = accompanyCommentRepository.findAllByMember(
+                cursorId, size, member);
+        List<AccompanyCommentShortResponse> accompanyCommentShortResponses = accompanyComments.stream()
+                .map(AccompanyCommentShortResponse::of)
+                .toList();
+
+        return AccompanyCommentsShortResponse.of(accompanyComments.hasNext(),
+                accompanyCommentShortResponses);
     }
 
     private List<Member> getAccompanyConfirmedMembers(AccompanyPost accompanyPost,

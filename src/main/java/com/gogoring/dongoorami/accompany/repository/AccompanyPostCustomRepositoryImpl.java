@@ -5,6 +5,7 @@ import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeTy
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyRegionType;
 import com.gogoring.dongoorami.accompany.domain.QAccompanyPost;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
+import com.gogoring.dongoorami.member.domain.Member;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -39,6 +40,25 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
         if (!accompanyPosts.isEmpty()) {
             Long lastIdInResult = accompanyPosts.get(accompanyPosts.size() - 1).getId();
             hasNext = isExistByIdLessThan(lastIdInResult);
+        }
+
+        return new SliceImpl<>(accompanyPosts, Pageable.ofSize(size), hasNext);
+    }
+
+    @Override
+    public Slice<AccompanyPost> findAllByMember(Long cursorId, int size, Member member) {
+        List<AccompanyPost> accompanyPosts = jpaQueryFactory
+                .selectFrom(accompanyPost)
+                .where(
+                        accompanyPost.writer.eq(member),
+                        accompanyPost.isActivated.isTrue(),
+                        lessThanCursorId(cursorId)
+                ).orderBy(accompanyPost.id.desc()).limit(size).fetch();
+
+        boolean hasNext = false;
+        if (!accompanyPosts.isEmpty()) {
+            Long lastIdInResult = accompanyPosts.get(accompanyPosts.size() - 1).getId();
+            hasNext = isExistByIdLessThanOfIdAndMember(lastIdInResult, member);
         }
 
         return new SliceImpl<>(accompanyPosts, Pageable.ofSize(size), hasNext);
@@ -80,11 +100,19 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
         return cursorId != null ? accompanyPost.id.lt(cursorId) : null;
     }
 
-
     private boolean isExistByIdLessThan(Long id) {
         return jpaQueryFactory.selectFrom(accompanyPost)
                 .where(accompanyPost.id.lt(id),
                         accompanyPost.isActivated.eq(true))
                 .fetchFirst() != null;
+    }
+
+    private boolean isExistByIdLessThanOfIdAndMember(Long id, Member member) {
+        return jpaQueryFactory.selectFrom(accompanyPost)
+                .where(
+                        accompanyPost.writer.eq(member),
+                        accompanyPost.id.lt(id),
+                        accompanyPost.isActivated.eq(true)
+                ).fetchFirst() != null;
     }
 }

@@ -5,8 +5,10 @@ import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostRequest;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyReviewRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsShortResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsShortResponse;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
 import com.gogoring.dongoorami.accompany.dto.response.ReviewsResponse;
 import java.util.List;
@@ -55,4 +57,10 @@ public interface AccompanyService {
     ReviewsResponse getReceivedReviews(Long cursorId, int size, Long memberId);
 
     ReviewsResponse getWaitingReviews(Long cursorId, int size, Long currentMemberId);
+
+    AccompanyPostsShortResponse getAccompanyPostsByMember(Long cursorId, int size,
+            Long currentMemberId);
+
+    AccompanyCommentsShortResponse getAccompanyCommentsByMember(Long cursorId, int size,
+            Long currentMemberId);
 }

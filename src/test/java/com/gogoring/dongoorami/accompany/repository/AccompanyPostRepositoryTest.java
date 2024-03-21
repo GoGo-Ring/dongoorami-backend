@@ -13,10 +13,12 @@ import com.gogoring.dongoorami.concert.ConcertDataFactory;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.repository.ConcertRepository;
 import com.gogoring.dongoorami.global.config.QueryDslConfig;
+import com.gogoring.dongoorami.member.MemberDataFactory;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.util.Arrays;
 import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -258,6 +260,34 @@ class AccompanyPostRepositoryTest {
                         .map(accompanyPost -> isAccompanyPostEqualsAccompanyPostFilterRequest(
                                 accompanyPost, accompanyPostFilterRequest3))
                         .toList(), everyItem(equalTo(true)));
+    }
+
+    @Test
+    @DisplayName("id 내림차순으로 특정 멤버가 작성한 동행 구인글 목록을 조회할 수 있다.")
+    void success_findAllByMember() {
+        // given
+        Member member = MemberDataFactory.createMember();
+        memberRepository.save(member);
+
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+
+        int size = 3;
+        List<AccompanyPost> accompanyPosts = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, size + 1, concert));
+
+        long maxId = -1L;
+        for (AccompanyPost accompanyPost : accompanyPosts) {
+            maxId = Math.max(maxId, accompanyPost.getId());
+        }
+
+        // when
+        Slice<AccompanyPost> slice = accompanyPostRepository.findAllByMember(maxId,
+                size, member);
+
+        // then
+        Assertions.assertThat(slice.getSize()).isEqualTo(size);
+        Assertions.assertThat(slice.getContent().stream().map(AccompanyPost::getId)
+                .toList()).doesNotContain(maxId);
     }
 
     private boolean isAccompanyPostEqualsAccompanyPostFilterRequest(AccompanyPost accompanyPost,
