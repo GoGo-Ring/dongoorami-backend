@@ -9,6 +9,7 @@ import com.gogoring.dongoorami.accompany.dto.request.AccompanyReviewRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsShortResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsConcertResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsShortResponse;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
@@ -246,5 +247,14 @@ public class AccompanyController {
             @RequestParam(required = false, defaultValue = "10") int size) {
         return ResponseEntity.ok(
                 accompanyService.getReceivedReviews(cursorId, size, memberId));
+    }
+
+    @GetMapping("/posts/concerts/{concertId}")
+    public ResponseEntity<AccompanyPostsConcertResponse> getAccompanyPostsByConcert(
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @PathVariable Long concertId) {
+        return ResponseEntity.ok(
+                accompanyService.getAccompanyPostsByConcert(cursorId, size, concertId));
     }
 }
