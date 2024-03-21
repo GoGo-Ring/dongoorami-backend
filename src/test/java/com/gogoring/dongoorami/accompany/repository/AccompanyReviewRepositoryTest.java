@@ -23,6 +23,7 @@ import com.gogoring.dongoorami.member.repository.MemberRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -108,7 +109,7 @@ class AccompanyReviewRepositoryTest {
         accompanyReviewRepository.saveAll(accompanyReviews);
 
         // when
-        List<Long> companionIds = accompanyReviewRepository.findDistinctReviewerAndRevieweeByAccompanyPostId(
+        Set<Long> companionIds = accompanyReviewRepository.findDistinctReviewerAndRevieweeByAccompanyPostId(
                 accompanyPost.getId());
 
         // then

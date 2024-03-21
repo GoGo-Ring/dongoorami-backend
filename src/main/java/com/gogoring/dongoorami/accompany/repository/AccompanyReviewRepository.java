@@ -4,6 +4,7 @@ import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
 import com.gogoring.dongoorami.accompany.domain.AccompanyReview.AccompanyReviewStatusType;
 import com.gogoring.dongoorami.member.domain.Member;
 import java.util.List;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,7 +15,7 @@ public interface AccompanyReviewRepository extends JpaRepository<AccompanyReview
     @Query("SELECT DISTINCT ar.reviewer.id, ar.reviewee.id "
             + "FROM AccompanyReview ar "
             + "WHERE ar.accompanyPost.id = :accompanyPostId")
-    List<Long> findDistinctReviewerAndRevieweeByAccompanyPostId(
+    Set<Long> findDistinctReviewerAndRevieweeByAccompanyPostId(
             @Param("accompanyPostId") Long accompanyPostId);
 
     @Query("SELECT CASE WHEN COUNT(ar) > 0 THEN true ELSE false END " +
