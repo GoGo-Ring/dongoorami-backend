@@ -493,7 +493,6 @@ include::{snippets}/ConcertControllerTest/getConcertImages/http-response.adoc[]
 include::{snippets}/ConcertControllerTest/getConcertImages/response-fields.adoc[]
 
 === 동행 구인글/공연 통합 검색(최초 요청)
-로그인 한 사용자의 경우, 헤더에 accessToken 값 필요
 
 .Request
 include::{snippets}/ConcertControllerTest/getAccompanyPostsAndConcertsByKeywordFirst/http-request.adoc[]
@@ -504,7 +503,6 @@ include::{snippets}/ConcertControllerTest/getAccompanyPostsAndConcertsByKeywordF
 include::{snippets}/ConcertControllerTest/getAccompanyPostsAndConcertsByKeywordFirst/response-fields.adoc[]
 
 === 동행 구인글/공연 통합 검색(이후 요청)
-로그인 한 사용자의 경우, 헤더에 accessToken 값 필요
 
 최초 요청 api와는 cursorId 유무의 차이가 있습니다
 
