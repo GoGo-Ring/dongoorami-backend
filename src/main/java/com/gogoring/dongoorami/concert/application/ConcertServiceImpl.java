@@ -1,13 +1,19 @@
 package com.gogoring.dongoorami.concert.application;
 
+import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.domain.AccompanyReview;
 import com.gogoring.dongoorami.accompany.domain.AccompanyReview.AccompanyReviewStatusType;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
+import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
 import com.gogoring.dongoorami.accompany.dto.response.ReviewResponse;
+import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyReviewRepository;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
+import com.gogoring.dongoorami.concert.dto.response.AccompanyPostsAndConcertsResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetImagesResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetShortResponse;
@@ -42,6 +48,7 @@ public class ConcertServiceImpl implements ConcertService {
     private final ConcertRepository concertRepository;
     private final ConcertReviewRepository concertReviewRepository;
     private final AccompanyPostRepository accompanyPostRepository;
+    private final AccompanyCommentRepository accompanyCommentRepository;
     private final AccompanyReviewRepository accompanyReviewRepository;
     private final MemberRepository memberRepository;
 
@@ -152,6 +159,23 @@ public class ConcertServiceImpl implements ConcertService {
         return concertRepository.findTop5ByIsActivatedIsTrueOrderByEndedAtDesc().stream()
                 .map(ConcertGetImagesResponse::of)
                 .toList();
+    }
+
+    @Override
+    public AccompanyPostsAndConcertsResponse getAccompanyPostsAndConcertsByKeyword(
+            Long accompanyPostCursorId, Long concertCursorId, int size, String keyword, Long currentMemberId) {
+        Slice<AccompanyPost> accompanyPostSlice = accompanyPostRepository.findAllByKeyword(accompanyPostCursorId, size, keyword);
+        Slice<Concert> concertSlice = concertRepository.findAllByKeyword(concertCursorId, size, keyword);
+
+        List<AccompanyPostInfo> accompanyPostInfos = accompanyPostSlice.stream()
+                .map(accompanyPost -> {
+                    long commentCount = accompanyCommentRepository.countByAccompanyPostIdAndIsActivatedIsTrue(
+                            accompanyPost.getId());
+                    return AccompanyPostInfo.of(accompanyPost, commentCount);
+                }).toList();
+        List<ConcertGetShortResponse> concertInfoResponses = concertSlice.stream().map(ConcertGetShortResponse::of).toList();
+
+        return new AccompanyPostsAndConcertsResponse(accompanyPostSlice.hasNext(), concertSlice.hasNext(), accompanyPostInfos, concertInfoResponses);
     }
 
     @Scheduled(cron = "0 30 15 * * *", zone = "Asia/Seoul")

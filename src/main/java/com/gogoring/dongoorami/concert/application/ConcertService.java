@@ -2,12 +2,14 @@ package com.gogoring.dongoorami.concert.application;
 
 import com.gogoring.dongoorami.accompany.dto.response.ReviewResponse;
 import com.gogoring.dongoorami.concert.dto.request.ConcertReviewRequest;
+import com.gogoring.dongoorami.concert.dto.response.AccompanyPostsAndConcertsResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetImagesResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertReviewsGetResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertsGetShortResponse;
 import com.gogoring.dongoorami.concert.dto.response.ConcertInfoResponse;
 import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 public interface ConcertService {
 
@@ -32,4 +34,6 @@ public interface ConcertService {
     List<ReviewResponse> getConcertAndAccompanyReview(Long memberId);
 
     List<ConcertGetImagesResponse> getConcertImages();
+
+    AccompanyPostsAndConcertsResponse getAccompanyPostsAndConcertsByKeyword(Long accompanyPostCursorId, Long concertCursorId, int size, String keyword, Long currentMemberId);
 }
