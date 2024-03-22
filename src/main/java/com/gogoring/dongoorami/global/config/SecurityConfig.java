@@ -63,6 +63,9 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers(HttpMethod.GET,
                                         "/api/v1/accompanies/posts/regions").permitAll()
+                                .requestMatchers(HttpMethod.GET,
+                                        "/api/v1/accompanies/posts/concerts/{concertId}")
+                                .permitAll()
                                 // 공연 API
                                 .requestMatchers(HttpMethod.GET,
                                         "/api/v1/concerts/reviews/{concertId}").permitAll()

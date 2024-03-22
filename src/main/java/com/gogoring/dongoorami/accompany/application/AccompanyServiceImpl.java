@@ -12,8 +12,10 @@ import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentShortRespo
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse.AccompanyCommentInfo;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsShortResponse;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostConcertResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostShortResponse;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsConcertResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse.AccompanyPostInfo;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsShortResponse;
@@ -346,6 +348,23 @@ public class AccompanyServiceImpl implements AccompanyService {
                 accompanyCommentShortResponses);
     }
 
+    @Override
+    public AccompanyPostsConcertResponse getAccompanyPostsByConcert(Long cursorId, int size,
+            Long concertId) {
+        Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(concertId).orElseThrow(
+                () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
+
+        Slice<AccompanyPost> accompanyPosts = accompanyPostRepository.findAllByConcert(cursorId,
+                size, concert);
+        List<AccompanyPostConcertResponse> accompanyPostConcertResponses = accompanyPosts.stream()
+                .map(accompanyPost -> AccompanyPostConcertResponse.of(accompanyPost,
+                        accompanyCommentRepository.countByAccompanyPostIdAndIsActivatedIsTrue(
+                                accompanyPost.getId()))).toList();
+
+        return AccompanyPostsConcertResponse.of(accompanyPosts.hasNext(),
+                accompanyPostConcertResponses);
+    }
+
     private List<Member> getAccompanyConfirmedMembers(AccompanyPost accompanyPost,
             Member newCompanion) {
         List<Member> companions = new ArrayList<>();
@@ -440,6 +459,4 @@ public class AccompanyServiceImpl implements AccompanyService {
                     AccompanyErrorCode.ALREADY_APPLY_CONFIRMED_ACCOMPANY_COMMENT);
         }
     }
-
-
 }
