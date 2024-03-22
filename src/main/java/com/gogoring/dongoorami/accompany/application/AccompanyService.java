@@ -7,6 +7,7 @@ import com.gogoring.dongoorami.accompany.dto.request.AccompanyReviewRequest;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyCommentsShortResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostResponse;
+import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsConcertResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsResponse;
 import com.gogoring.dongoorami.accompany.dto.response.AccompanyPostsShortResponse;
 import com.gogoring.dongoorami.accompany.dto.response.MemberProfile;
@@ -63,4 +64,7 @@ public interface AccompanyService {
 
     AccompanyCommentsShortResponse getAccompanyCommentsByMember(Long cursorId, int size,
             Long currentMemberId);
+
+    AccompanyPostsConcertResponse getAccompanyPostsByConcert(Long cursorId, int size,
+            Long concertId);
 }

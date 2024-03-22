@@ -13,4 +13,6 @@ public interface AccompanyPostCustomRepository {
     Slice<AccompanyPost> findAllByMember(Long cursorId, int size, Member member);
 
     Slice<AccompanyPost> findAllByKeyword(Long cursorId, int size, String keyword);
+
+    Slice<AccompanyPost> findAllByConcert(Long cursorId, int size, Concert concert);
 }

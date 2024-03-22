@@ -5,6 +5,7 @@ import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyPurposeTy
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost.AccompanyRegionType;
 import com.gogoring.dongoorami.accompany.domain.QAccompanyPost;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
+import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.member.domain.Member;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -58,7 +59,26 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
         boolean hasNext = false;
         if (!accompanyPosts.isEmpty()) {
             Long lastIdInResult = accompanyPosts.get(accompanyPosts.size() - 1).getId();
-            hasNext = isExistByIdLessThan(lastIdInResult, member);
+            hasNext = isExistByIdLessThanOfMember(lastIdInResult, member);
+        }
+
+        return new SliceImpl<>(accompanyPosts, Pageable.ofSize(size), hasNext);
+    }
+
+    @Override
+    public Slice<AccompanyPost> findAllByConcert(Long cursorId, int size, Concert concert) {
+        List<AccompanyPost> accompanyPosts = jpaQueryFactory
+                .selectFrom(accompanyPost)
+                .where(
+                        accompanyPost.concert.eq(concert),
+                        accompanyPost.isActivated.isTrue(),
+                        lessThanCursorId(cursorId)
+                ).orderBy(accompanyPost.id.desc()).limit(size).fetch();
+
+        boolean hasNext = false;
+        if (!accompanyPosts.isEmpty()) {
+            Long lastIdInResult = accompanyPosts.get(accompanyPosts.size() - 1).getId();
+            hasNext = isExistByIdLessThanOfConcert(lastIdInResult, concert);
         }
 
         return new SliceImpl<>(accompanyPosts, Pageable.ofSize(size), hasNext);
@@ -126,7 +146,7 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
                 .fetchFirst() != null;
     }
 
-    private boolean isExistByIdLessThan(Long id, Member member) {
+    private boolean isExistByIdLessThanOfMember(Long id, Member member) {
         return jpaQueryFactory.selectFrom(accompanyPost)
                 .where(
                         accompanyPost.writer.eq(member),
@@ -157,6 +177,15 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
                         accompanyPostContains(keyword),
                         accompanyPost.id.lt(id),
                         accompanyPost.isActivated.eq(true)
+                ).fetchFirst() != null;
+    }
+
+    private boolean isExistByIdLessThanOfConcert(Long id, Concert concert) {
+        return jpaQueryFactory.selectFrom(accompanyPost)
+                .where(
+                        accompanyPost.concert.eq(concert),
+                        accompanyPost.id.lt(id),
+                        accompanyPost.isActivated.isTrue()
                 ).fetchFirst() != null;
     }
 }
