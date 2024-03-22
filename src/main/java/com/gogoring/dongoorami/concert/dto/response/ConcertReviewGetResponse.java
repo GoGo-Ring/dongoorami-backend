@@ -2,7 +2,6 @@ package com.gogoring.dongoorami.concert.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gogoring.dongoorami.concert.domain.ConcertReview;
-import com.gogoring.dongoorami.member.domain.Member;
 import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;

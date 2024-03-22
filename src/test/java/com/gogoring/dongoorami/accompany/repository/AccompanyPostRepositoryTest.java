@@ -317,6 +317,31 @@ class AccompanyPostRepositoryTest {
                 .toList()).doesNotContain(maxId);
     }
 
+    @Test
+    @DisplayName("키워드 기반 동행 구인글 목록을 조회할 수 있다.")
+    void success_findAllByKeyword() {
+        // given
+        Member member = MemberDataFactory.createMember();
+        memberRepository.save(member);
+
+        int size = 3;
+        List<Concert> concerts = concertRepository.saveAll(
+                ConcertDataFactory.createConcerts(size * 3));
+        List<AccompanyPost> accompanyPosts = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, size * 3, concerts.get(0)));
+        Long accompanyPostCursorId = accompanyPosts.get(accompanyPosts.size() - 1).getId() + 1;
+        String keyword = accompanyPosts.get(0).getTitle()
+                .substring(0, accompanyPosts.get(0).getTitle().length() / 2);
+
+        // when
+        Slice<AccompanyPost> accompanyPostsContainingKeyword = accompanyPostRepository.findAllByKeyword(
+                accompanyPostCursorId, size, keyword);
+
+        // then
+        Assertions.assertThat(accompanyPostsContainingKeyword.hasNext()).isEqualTo(true);
+        Assertions.assertThat(accompanyPostsContainingKeyword.getContent().size()).isEqualTo(size);
+    }
+
     private boolean isAccompanyPostEqualsAccompanyPostFilterRequest(AccompanyPost accompanyPost,
             AccompanyPostFilterRequest accompanyPostFilterRequest) {
         return ((accompanyPostFilterRequest.getGender() == null || accompanyPost.getGender()

@@ -660,7 +660,7 @@ public class ConcertControllerTest {
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/v1/concerts/accompanies/reviews").header(
-                                "Authorization", accessToken)
+                        "Authorization", accessToken)
         );
 
         // then
@@ -711,6 +711,199 @@ public class ConcertControllerTest {
                                         .description("공연 아이디"),
                                 fieldWithPath("[].imageUrl").type(STRING)
                                         .description("공연 포스터 url")
+                        ))
+                );
+    }
+
+    @Test
+    @DisplayName("키워드로 동행 구인글과 공연 목록을 조회할 수 있다. - 최초 요청")
+    void success_getAccompanyPostsAndConcertsByKeywordFirst() throws Exception {
+        // given
+        Member member = MemberDataFactory.createMember();
+        memberRepository.save(member);
+
+        int size = 3;
+        List<Concert> concerts = concertRepository.saveAll(ConcertDataFactory.createConcerts(size));
+        accompanyPostRepository.saveAll(createAccompanyPosts(member, size, concerts.get(0)));
+        String keyword = concerts.get(0).getName()
+                .substring(0, concerts.get(0).getName().length() / 2);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompanies-concerts")
+                        .param("size", String.valueOf(size))
+                        .param("keyword", keyword)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getAccompanyPostsAndConcertsByKeywordFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("size").description(
+                                        "조회할 동행구인글/공연 각각의 개수, 값 넣지 않으면 기본 10개").optional(),
+                                parameterWithName("keyword").description(
+                                        "검색 키워드").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNextAccompanyPost").type(BOOLEAN)
+                                        .description("다음 동행 구인글 존재 여부"),
+                                fieldWithPath("hasNextConcert").type(BOOLEAN)
+                                        .description("다음 공연 존재 여부"),
+                                fieldWithPath("concertGetShortResponses").type(ARRAY)
+                                        .description("공연 목록"),
+                                fieldWithPath("concertGetShortResponses[].id").type(NUMBER)
+                                        .description("공연 아이디"),
+                                fieldWithPath("concertGetShortResponses[].name").type(STRING)
+                                        .description("공연명"),
+                                fieldWithPath("concertGetShortResponses[].place").type(STRING)
+                                        .description("공연장소"),
+                                fieldWithPath("concertGetShortResponses[].genre").type(STRING)
+                                        .description("장르"),
+                                fieldWithPath("concertGetShortResponses[].startedAt").type(STRING)
+                                        .description("공연 시작 일자"),
+                                fieldWithPath("concertGetShortResponses[].endedAt").type(STRING)
+                                        .description("공연 종료 일자"),
+                                fieldWithPath("concertGetShortResponses[].poster").type(STRING)
+                                        .description("포스터 이미지 url"),
+                                fieldWithPath("concertGetShortResponses[].status").type(STRING)
+                                        .description("공연 상태"),
+                                fieldWithPath("accompanyPostInfos").type(ARRAY)
+                                        .description("동행 구인글 목록"),
+                                fieldWithPath("accompanyPostInfos[].id").type(NUMBER)
+                                        .description("동행 구인글 id"),
+                                fieldWithPath("accompanyPostInfos[].title").type(
+                                                STRING)
+                                        .description("제목"),
+                                fieldWithPath("accompanyPostInfos[].writer").type(
+                                                STRING)
+                                        .description("작성자"),
+                                fieldWithPath("accompanyPostInfos[].createdAt").type(
+                                                STRING)
+                                        .description("생성 날짜"),
+                                fieldWithPath("accompanyPostInfos[].updatedAt").type(
+                                                STRING)
+                                        .description("수정 날짜"),
+                                fieldWithPath("accompanyPostInfos[].status").type(
+                                                STRING)
+                                        .description("구인 상태"),
+                                fieldWithPath("accompanyPostInfos[].concertName").type(
+                                                STRING)
+                                        .description("공연명"),
+                                fieldWithPath("accompanyPostInfos[].viewCount").type(
+                                                NUMBER)
+                                        .description("조회수"),
+                                fieldWithPath("accompanyPostInfos[].commentCount").type(
+                                                NUMBER)
+                                        .description("댓글수"),
+                                fieldWithPath("accompanyPostInfos[].gender").type(
+                                                STRING)
+                                        .description("성별"),
+                                fieldWithPath("accompanyPostInfos[].totalPeople").type(
+                                                NUMBER)
+                                        .description("모집 인원 수")
+                        ))
+                );
+    }
+
+    @Test
+    @DisplayName("키워드로 동행 구인글과 공연 목록을 조회할 수 있다. - 이후 요청")
+    void success_getAccompanyPostsAndConcertsByKeywordAfterFirst() throws Exception {
+        // given
+        Member member = MemberDataFactory.createMember();
+        memberRepository.save(member);
+
+        int size = 3;
+        List<Concert> concerts = concertRepository.saveAll(ConcertDataFactory.createConcerts(size));
+        Long concertCursorId = concerts.get(concerts.size() - 1).getId() + 1;
+        List<AccompanyPost> accompanyPosts = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, size, concerts.get(0)));
+        Long accompanyPostCursorId = accompanyPosts.get(accompanyPosts.size() - 1).getId() + 1;
+        String keyword = concerts.get(0).getName()
+                .substring(0, concerts.get(0).getName().length() / 2);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/v1/accompanies-concerts")
+                        .param("accompanyPostCursorId", String.valueOf(accompanyPostCursorId))
+                        .param("concertCursorId", String.valueOf(concertCursorId))
+                        .param("size", String.valueOf(size))
+                        .param("keyword", keyword)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andDo(document("{ClassName}/getAccompanyPostsAndConcertsByKeywordAfterFirst",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("accompanyPostCursorId").description(
+                                        "마지막으로 받은 동행 구인글 id").optional(),
+                                parameterWithName("concertCursorId").description(
+                                        "마지막으로 받은 공연 id").optional(),
+                                parameterWithName("size").description(
+                                        "조회할 동행구인글/공연 각각의 개수, 값 넣지 않으면 기본 10개").optional(),
+                                parameterWithName("keyword").description(
+                                        "검색 키워드").optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("hasNextAccompanyPost").type(BOOLEAN)
+                                        .description("다음 동행 구인글 존재 여부"),
+                                fieldWithPath("hasNextConcert").type(BOOLEAN)
+                                        .description("다음 공연 존재 여부"),
+                                fieldWithPath("concertGetShortResponses").type(ARRAY)
+                                        .description("공연 목록"),
+                                fieldWithPath("concertGetShortResponses[].id").type(NUMBER)
+                                        .description("공연 아이디"),
+                                fieldWithPath("concertGetShortResponses[].name").type(STRING)
+                                        .description("공연명"),
+                                fieldWithPath("concertGetShortResponses[].place").type(STRING)
+                                        .description("공연장소"),
+                                fieldWithPath("concertGetShortResponses[].genre").type(STRING)
+                                        .description("장르"),
+                                fieldWithPath("concertGetShortResponses[].startedAt").type(STRING)
+                                        .description("공연 시작 일자"),
+                                fieldWithPath("concertGetShortResponses[].endedAt").type(STRING)
+                                        .description("공연 종료 일자"),
+                                fieldWithPath("concertGetShortResponses[].poster").type(STRING)
+                                        .description("포스터 이미지 url"),
+                                fieldWithPath("concertGetShortResponses[].status").type(STRING)
+                                        .description("공연 상태"),
+                                fieldWithPath("accompanyPostInfos").type(ARRAY)
+                                        .description("동행 구인글 목록"),
+                                fieldWithPath("accompanyPostInfos[].id").type(NUMBER)
+                                        .description("동행 구인글 id"),
+                                fieldWithPath("accompanyPostInfos[].title").type(
+                                                STRING)
+                                        .description("제목"),
+                                fieldWithPath("accompanyPostInfos[].writer").type(
+                                                STRING)
+                                        .description("작성자"),
+                                fieldWithPath("accompanyPostInfos[].createdAt").type(
+                                                STRING)
+                                        .description("생성 날짜"),
+                                fieldWithPath("accompanyPostInfos[].updatedAt").type(
+                                                STRING)
+                                        .description("수정 날짜"),
+                                fieldWithPath("accompanyPostInfos[].status").type(
+                                                STRING)
+                                        .description("구인 상태"),
+                                fieldWithPath("accompanyPostInfos[].concertName").type(
+                                                STRING)
+                                        .description("공연명"),
+                                fieldWithPath("accompanyPostInfos[].viewCount").type(
+                                                NUMBER)
+                                        .description("조회수"),
+                                fieldWithPath("accompanyPostInfos[].commentCount").type(
+                                                NUMBER)
+                                        .description("댓글수"),
+                                fieldWithPath("accompanyPostInfos[].gender").type(
+                                                STRING)
+                                        .description("성별"),
+                                fieldWithPath("accompanyPostInfos[].totalPeople").type(
+                                                NUMBER)
+                                        .description("모집 인원 수")
                         ))
                 );
     }

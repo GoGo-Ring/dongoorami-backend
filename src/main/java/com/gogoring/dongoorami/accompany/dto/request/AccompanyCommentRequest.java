@@ -22,7 +22,8 @@ public class AccompanyCommentRequest {
         return new AccompanyCommentRequest("동행 신청합니다!");
     }
 
-    public AccompanyComment toEntity(AccompanyPost accompanyPost, Member member, Boolean isAccompanyApplyComment) {
+    public AccompanyComment toEntity(AccompanyPost accompanyPost, Member member,
+            Boolean isAccompanyApplyComment) {
         return AccompanyComment.builder()
                 .accompanyPost(accompanyPost)
                 .member(member)

@@ -83,7 +83,8 @@ public class Member extends BaseEntity {
         return this;
     }
 
-    public void updateNicknameAndGenderAndBirthDate(String nickname, String gender, LocalDate birthDate) {
+    public void updateNicknameAndGenderAndBirthDate(String nickname, String gender,
+            LocalDate birthDate) {
         checkIsNull();
         this.nickname = nickname;
         this.gender = gender;

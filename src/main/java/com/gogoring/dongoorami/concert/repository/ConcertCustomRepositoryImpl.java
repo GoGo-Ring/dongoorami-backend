@@ -38,6 +38,25 @@ public class ConcertCustomRepositoryImpl implements ConcertCustomRepository {
         return new SliceImpl<>(concerts, Pageable.ofSize(size), hasNext);
     }
 
+    @Override
+    public Slice<Concert> findAllByKeyword(Long cursorId, int size, String keyword) {
+        List<Concert> concerts = jpaQueryFactory
+                .selectFrom(concert)
+                .where(
+                        concertContains(keyword),
+                        lessThanCursorId(cursorId),
+                        concert.isActivated.eq(true)
+                ).orderBy(concert.id.desc()).limit(size).fetch();
+
+        boolean hasNext = false;
+        if (!concerts.isEmpty()) {
+            Long lastIdInResult = concerts.get(concerts.size() - 1).getId();
+            hasNext = isExistByIdLessThan(lastIdInResult, keyword);
+        }
+
+        return new SliceImpl<>(concerts, Pageable.ofSize(size), hasNext);
+    }
+
     private BooleanExpression nameLikes(String keyword) {
         return keyword != null ? concert.name.like("%" + keyword + "%") : null;
     }
@@ -64,6 +83,30 @@ public class ConcertCustomRepositoryImpl implements ConcertCustomRepository {
                         nameLikes(keyword),
                         genresEquals(genres),
                         statusesEquals(statuses),
+                        concert.id.lt(id),
+                        concert.isActivated.eq(true)
+                )
+                .fetchFirst() != null;
+    }
+
+    private BooleanExpression concertContains(String keyword) {
+        return keyword != null ?
+                concert.name.like("%" + keyword + "%")
+                        .or(concert.place.like("%" + keyword + "%"))
+                        .or(concert.actor.like("%" + keyword + "%"))
+                        .or(concert.crew.like("%" + keyword + "%"))
+                        .or(concert.producer.like("%" + keyword + "%"))
+                        .or(concert.agency.like("%" + keyword + "%"))
+                        .or(concert.host.like("%" + keyword + "%"))
+                        .or(concert.management.like("%" + keyword + "%"))
+                        .or(concert.summary.like("%" + keyword + "%"))
+                        .or(concert.genre.like("%" + keyword + "%")) : null;
+    }
+
+    private boolean isExistByIdLessThan(Long id, String keyword) {
+        return jpaQueryFactory.selectFrom(concert)
+                .where(
+                        concertContains(keyword),
                         concert.id.lt(id),
                         concert.isActivated.eq(true)
                 )

@@ -40,7 +40,8 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
         boolean hasNext = false;
         if (!accompanyPosts.isEmpty()) {
             Long lastIdInResult = accompanyPosts.get(accompanyPosts.size() - 1).getId();
-            hasNext = isExistByIdLessThan(lastIdInResult);
+            hasNext = isExistByIdLessThanOfAccompanyPostFilterRequest(lastIdInResult,
+                    accompanyPostFilterRequest);
         }
 
         return new SliceImpl<>(accompanyPosts, Pageable.ofSize(size), hasNext);
@@ -84,6 +85,25 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
         return new SliceImpl<>(accompanyPosts, Pageable.ofSize(size), hasNext);
     }
 
+    @Override
+    public Slice<AccompanyPost> findAllByKeyword(Long cursorId, int size, String keyword) {
+        List<AccompanyPost> accompanyPosts = jpaQueryFactory
+                .selectFrom(accompanyPost)
+                .where(
+                        accompanyPostContains(keyword),
+                        lessThanCursorId(cursorId),
+                        accompanyPost.isActivated.eq(true)
+                ).orderBy(accompanyPost.id.desc()).limit(size).fetch();
+
+        boolean hasNext = false;
+        if (!accompanyPosts.isEmpty()) {
+            Long lastIdInResult = accompanyPosts.get(accompanyPosts.size() - 1).getId();
+            hasNext = isExistByIdLessThanOfKeyword(lastIdInResult, keyword);
+        }
+
+        return new SliceImpl<>(accompanyPosts, Pageable.ofSize(size), hasNext);
+    }
+
     private BooleanExpression genderEquals(String gender) {
         return gender != null ? accompanyPost.gender.eq(gender) : null;
     }
@@ -120,9 +140,34 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
         return cursorId != null ? accompanyPost.id.lt(cursorId) : null;
     }
 
-    private boolean isExistByIdLessThan(Long id) {
+    private BooleanExpression accompanyPostContains(String keyword) {
+        return keyword != null ?
+                accompanyPost.concert.name.like("%" + keyword + "%")
+                        .or(accompanyPost.concert.place.like("%" + keyword + "%"))
+                        .or(accompanyPost.concert.actor.like("%" + keyword + "%"))
+                        .or(accompanyPost.concert.crew.like("%" + keyword + "%"))
+                        .or(accompanyPost.concert.producer.like("%" + keyword + "%"))
+                        .or(accompanyPost.concert.agency.like("%" + keyword + "%"))
+                        .or(accompanyPost.concert.host.like("%" + keyword + "%"))
+                        .or(accompanyPost.concert.management.like("%" + keyword + "%"))
+                        .or(accompanyPost.concert.summary.like("%" + keyword + "%"))
+                        .or(accompanyPost.concert.genre.like("%" + keyword + "%"))
+                        .or(accompanyPost.title.like("%" + keyword + "%"))
+                        .or(accompanyPost.content.like("%" + keyword + "%")) : null;
+    }
+
+    private boolean isExistByIdLessThanOfAccompanyPostFilterRequest(Long id,
+            AccompanyPostFilterRequest accompanyPostFilterRequest) {
         return jpaQueryFactory.selectFrom(accompanyPost)
-                .where(accompanyPost.id.lt(id),
+                .where(
+                        genderEquals(accompanyPostFilterRequest.getGender()),
+                        regionEquals(accompanyPostFilterRequest.getRegion()),
+                        ageOverlap(accompanyPostFilterRequest.getStartAge(),
+                                accompanyPostFilterRequest.getEndAge()),
+                        totalPeopleEquals(accompanyPostFilterRequest.getTotalPeople()),
+                        concertPlaceEquals(accompanyPostFilterRequest.getConcertPlace()),
+                        purposesEquals(accompanyPostFilterRequest.getPurposes()),
+                        accompanyPost.id.lt(id),
                         accompanyPost.isActivated.eq(true))
                 .fetchFirst() != null;
     }
@@ -131,6 +176,15 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
         return jpaQueryFactory.selectFrom(accompanyPost)
                 .where(
                         accompanyPost.writer.eq(member),
+                        accompanyPost.id.lt(id),
+                        accompanyPost.isActivated.eq(true)
+                ).fetchFirst() != null;
+    }
+
+    private boolean isExistByIdLessThanOfKeyword(Long id, String keyword) {
+        return jpaQueryFactory.selectFrom(accompanyPost)
+                .where(
+                        accompanyPostContains(keyword),
                         accompanyPost.id.lt(id),
                         accompanyPost.isActivated.eq(true)
                 ).fetchFirst() != null;

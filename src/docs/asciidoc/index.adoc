@@ -515,6 +515,28 @@ include::{snippets}/ConcertControllerTest/getConcertImages/http-request.adoc[]
 include::{snippets}/ConcertControllerTest/getConcertImages/http-response.adoc[]
 include::{snippets}/ConcertControllerTest/getConcertImages/response-fields.adoc[]
 
+=== 동행 구인글/공연 통합 검색(최초 요청)
+
+.Request
+include::{snippets}/ConcertControllerTest/getAccompanyPostsAndConcertsByKeywordFirst/http-request.adoc[]
+include::{snippets}/ConcertControllerTest/getAccompanyPostsAndConcertsByKeywordFirst/query-parameters.adoc[]
+
+.Response
+include::{snippets}/ConcertControllerTest/getAccompanyPostsAndConcertsByKeywordFirst/http-response.adoc[]
+include::{snippets}/ConcertControllerTest/getAccompanyPostsAndConcertsByKeywordFirst/response-fields.adoc[]
+
+=== 동행 구인글/공연 통합 검색(이후 요청)
+
+최초 요청 api와는 cursorId 유무의 차이가 있습니다
+
+.Request
+include::{snippets}/ConcertControllerTest/getAccompanyPostsAndConcertsByKeywordAfterFirst/http-request.adoc[]
+include::{snippets}/ConcertControllerTest/getAccompanyPostsAndConcertsByKeywordAfterFirst/query-parameters.adoc[]
+
+.Response
+include::{snippets}/ConcertControllerTest/getAccompanyPostsAndConcertsByKeywordAfterFirst/http-response.adoc[]
+include::{snippets}/ConcertControllerTest/getAccompanyPostsAndConcertsByKeywordAfterFirst/response-fields.adoc[]
+
 == 찜 API
 === 찜 정보 저장
 

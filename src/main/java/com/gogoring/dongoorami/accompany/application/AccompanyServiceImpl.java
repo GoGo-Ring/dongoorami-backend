@@ -136,7 +136,7 @@ public class AccompanyServiceImpl implements AccompanyService {
                 .orElseThrow(() -> new AccompanyPostNotFoundException(
                         AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
         List<AccompanyCommentInfo> accompanyCommentInfos = accompanyCommentRepository.findAllByAccompanyPostIdAndIsActivatedIsTrue(
-                        accompanyPostId)
+                        accompanyPost.getId())
                 .stream()
                 .filter(AccompanyComment::isActivated)
                 .map((AccompanyComment accompanyComment) -> AccompanyCommentInfo.of(

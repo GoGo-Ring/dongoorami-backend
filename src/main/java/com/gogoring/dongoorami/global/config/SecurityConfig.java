@@ -74,6 +74,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/api/v1/concerts").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/concerts/images")
                                 .permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/accompanies-concerts")
+                                .permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandlingConfigurer -> exceptionHandlingConfigurer
