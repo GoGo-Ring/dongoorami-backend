@@ -1,6 +1,5 @@
 package com.gogoring.dongoorami.member.application;
 
-import com.gogoring.dongoorami.accompany.repository.AccompanyReviewRepository;
 import com.gogoring.dongoorami.global.jwt.TokenProvider;
 import com.gogoring.dongoorami.global.util.ImageType;
 import com.gogoring.dongoorami.global.util.S3ImageUtil;

@@ -40,7 +40,8 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
         boolean hasNext = false;
         if (!accompanyPosts.isEmpty()) {
             Long lastIdInResult = accompanyPosts.get(accompanyPosts.size() - 1).getId();
-            hasNext = isExistByIdLessThan(lastIdInResult);
+            hasNext = isExistByIdLessThanOfAccompanyPostFilterRequest(lastIdInResult,
+                    accompanyPostFilterRequest);
         }
 
         return new SliceImpl<>(accompanyPosts, Pageable.ofSize(size), hasNext);
@@ -97,7 +98,7 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
         boolean hasNext = false;
         if (!accompanyPosts.isEmpty()) {
             Long lastIdInResult = accompanyPosts.get(accompanyPosts.size() - 1).getId();
-            hasNext = isExistByIdLessThan(lastIdInResult, keyword);
+            hasNext = isExistByIdLessThanOfKeyword(lastIdInResult, keyword);
         }
 
         return new SliceImpl<>(accompanyPosts, Pageable.ofSize(size), hasNext);
@@ -139,22 +140,6 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
         return cursorId != null ? accompanyPost.id.lt(cursorId) : null;
     }
 
-    private boolean isExistByIdLessThan(Long id) {
-        return jpaQueryFactory.selectFrom(accompanyPost)
-                .where(accompanyPost.id.lt(id),
-                        accompanyPost.isActivated.eq(true))
-                .fetchFirst() != null;
-    }
-
-    private boolean isExistByIdLessThanOfMember(Long id, Member member) {
-        return jpaQueryFactory.selectFrom(accompanyPost)
-                .where(
-                        accompanyPost.writer.eq(member),
-                        accompanyPost.id.lt(id),
-                        accompanyPost.isActivated.eq(true)
-                ).fetchFirst() != null;
-    }
-
     private BooleanExpression accompanyPostContains(String keyword) {
         return keyword != null ?
                 accompanyPost.concert.name.like("%" + keyword + "%")
@@ -171,7 +156,32 @@ public class AccompanyPostCustomRepositoryImpl implements AccompanyPostCustomRep
                         .or(accompanyPost.content.like("%" + keyword + "%")) : null;
     }
 
-    private boolean isExistByIdLessThan(Long id, String keyword) {
+    private boolean isExistByIdLessThanOfAccompanyPostFilterRequest(Long id,
+            AccompanyPostFilterRequest accompanyPostFilterRequest) {
+        return jpaQueryFactory.selectFrom(accompanyPost)
+                .where(
+                        genderEquals(accompanyPostFilterRequest.getGender()),
+                        regionEquals(accompanyPostFilterRequest.getRegion()),
+                        ageOverlap(accompanyPostFilterRequest.getStartAge(),
+                                accompanyPostFilterRequest.getEndAge()),
+                        totalPeopleEquals(accompanyPostFilterRequest.getTotalPeople()),
+                        concertPlaceEquals(accompanyPostFilterRequest.getConcertPlace()),
+                        purposesEquals(accompanyPostFilterRequest.getPurposes()),
+                        accompanyPost.id.lt(id),
+                        accompanyPost.isActivated.eq(true))
+                .fetchFirst() != null;
+    }
+
+    private boolean isExistByIdLessThanOfMember(Long id, Member member) {
+        return jpaQueryFactory.selectFrom(accompanyPost)
+                .where(
+                        accompanyPost.writer.eq(member),
+                        accompanyPost.id.lt(id),
+                        accompanyPost.isActivated.eq(true)
+                ).fetchFirst() != null;
+    }
+
+    private boolean isExistByIdLessThanOfKeyword(Long id, String keyword) {
         return jpaQueryFactory.selectFrom(accompanyPost)
                 .where(
                         accompanyPostContains(keyword),

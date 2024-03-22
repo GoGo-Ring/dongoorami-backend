@@ -33,7 +33,8 @@ public class AccompanyComment extends BaseEntity {
     private Boolean isAccompanyConfirmedComment = false;
 
     @Builder
-    public AccompanyComment(AccompanyPost accompanyPost, Member member, String content, Boolean isAccompanyApplyComment) {
+    public AccompanyComment(AccompanyPost accompanyPost, Member member, String content,
+            Boolean isAccompanyApplyComment) {
         this.accompanyPost = accompanyPost;
         this.member = member;
         this.content = content;

@@ -2,6 +2,7 @@ package com.gogoring.dongoorami.accompany.repository;
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.dto.request.AccompanyPostFilterRequest;
+import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.member.domain.Member;
 import org.springframework.data.domain.Slice;
 
