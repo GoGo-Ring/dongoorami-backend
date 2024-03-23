@@ -43,7 +43,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         queryParams.add("isFirstLogin", isFirstLogin.toString());
 
         return UriComponentsBuilder
-                .fromHttpUrl("http://localhost:3000/oauth")
+                .fromHttpUrl("https://dongoorami.netlify.app/oauth")
                 .queryParams(queryParams)
                 .build()
                 .toUri().toString();
