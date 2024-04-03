@@ -111,6 +111,22 @@ public class AccompanyServiceImpl implements AccompanyService {
                 MemberProfile.of(accompanyPost.getWriter(), currentMemberId));
     }
 
+    @Transactional
+    @Override
+    public AccompanyPostResponse getAccompanyPostWithViewCountUpdateQuery(Long currentMemberId,
+            Long accompanyPostId) {
+        AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyPostId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
+        accompanyPostRepository.updateViewCount(accompanyPostId);
+        Long waitingCount = accompanyCommentRepository.countByAccompanyPostIdAndIsActivatedIsTrueAndIsAccompanyApplyCommentTrue(
+                accompanyPostId);
+
+        return AccompanyPostResponse.of(accompanyPost, waitingCount,
+                MemberProfile.of(accompanyPost.getWriter(), currentMemberId));
+    }
+
     @Override
     public Long createAccompanyComment(Long accompanyPostId,
             AccompanyCommentRequest accompanyCommentRequest, Long currentMemberId,
