@@ -70,7 +70,7 @@ public class AccompanyController {
             @PathVariable Long accompanyPostId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.ok(
-                accompanyService.getAccompanyPost(
+                accompanyService.getAccompanyPostWithViewCountUpdateQuery(
                         customUserDetails != null ? customUserDetails.getId() : -1,
                         accompanyPostId));
     }
