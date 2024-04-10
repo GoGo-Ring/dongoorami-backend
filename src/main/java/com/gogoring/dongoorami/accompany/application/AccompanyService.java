@@ -25,6 +25,12 @@ public interface AccompanyService {
 
     AccompanyPostResponse getAccompanyPost(Long currentMemberId, Long accompanyPostId);
 
+    AccompanyPostResponse getAccompanyPostWithViewCountUpdateQuery(Long currentMemberId,
+            Long accompanyPostId);
+
+    AccompanyPostResponse getAccompanyPostWithPessimisticLock(Long currentMemberId,
+            Long accompanyPostId);
+
     Long createAccompanyComment(Long accompanyPostId,
             AccompanyCommentRequest accompanyCommentRequest, Long currentMemberId,
             Boolean isAccompanyApplyComment);
