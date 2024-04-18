@@ -106,6 +106,10 @@ public class AccompanyPost extends BaseEntity {
         this.status = RecruitmentStatusType.COMPLETED;
     }
 
+    public void updateViewCount(Long viewCount) {
+        this.viewCount = viewCount;
+    }
+
     private void checkIsWriter(Long memberId) {
         if (!this.writer.getId().equals(memberId)) {
             throw new OnlyWriterCanModifyException(AccompanyErrorCode.ONLY_WRITER_CAN_MODIFY);

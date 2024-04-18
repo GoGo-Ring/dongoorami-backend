@@ -33,6 +33,7 @@ import com.gogoring.dongoorami.accompany.exception.OnlyWriterCanConfirmApplyExce
 import com.gogoring.dongoorami.accompany.repository.AccompanyCommentRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
 import com.gogoring.dongoorami.accompany.repository.AccompanyReviewRepository;
+import com.gogoring.dongoorami.accompany.repository.ViewCountRepository;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.exception.ConcertErrorCode;
 import com.gogoring.dongoorami.concert.exception.ConcertNotFoundException;
@@ -61,6 +62,7 @@ public class AccompanyServiceImpl implements AccompanyService {
     private final MemberRepository memberRepository;
     private final ConcertRepository concertRepository;
     private final S3ImageUtil s3ImageUtil;
+    private final ViewCountRepository viewCountRepository;
 
     @Transactional
     @Override
@@ -74,10 +76,12 @@ public class AccompanyServiceImpl implements AccompanyService {
         Concert concert = concertRepository.findByIdAndIsActivatedIsTrue(
                 accompanyPostRequest.getConcertId()).orElseThrow(
                 () -> new ConcertNotFoundException(ConcertErrorCode.CONCERT_NOT_FOUND));
-
-        return accompanyPostRepository.save(
+        Long accompanyPostId = accompanyPostRepository.save(
                         accompanyPostRequest.toEntity(concert, member, imageUrls))
                 .getId();
+        viewCountRepository.save(accompanyPostId + "_view_count", "0");
+
+        return accompanyPostId;
     }
 
     @Override
@@ -138,6 +142,27 @@ public class AccompanyServiceImpl implements AccompanyService {
         accompanyPost.increaseViewCount();
         Long waitingCount = accompanyCommentRepository.countByAccompanyPostIdAndIsActivatedIsTrueAndIsAccompanyApplyCommentTrue(
                 accompanyPostId);
+
+        return AccompanyPostResponse.of(accompanyPost, waitingCount,
+                MemberProfile.of(accompanyPost.getWriter(), currentMemberId));
+    }
+
+    @Transactional
+    @Override
+    public AccompanyPostResponse getAccompanyPostWithRedisViewCount(Long currentMemberId,
+            Long accompanyPostId) {
+        AccompanyPost accompanyPost = accompanyPostRepository.findByIdAndIsActivatedIsTrue(
+                        accompanyPostId)
+                .orElseThrow(() -> new AccompanyPostNotFoundException(
+                        AccompanyErrorCode.ACCOMPANY_POST_NOT_FOUND));
+        if (viewCountRepository.findByKey(accompanyPostId + "_view_count") == null) {
+            viewCountRepository.save(accompanyPostId + "_view_count",
+                    String.valueOf(accompanyPost.getViewCount()));
+        }
+        String viewCount = viewCountRepository.increaseViewCount(accompanyPostId + "_view_count");
+        Long waitingCount = accompanyCommentRepository.countByAccompanyPostIdAndIsActivatedIsTrueAndIsAccompanyApplyCommentTrue(
+                accompanyPostId);
+        accompanyPost.updateViewCount(Long.valueOf(viewCount));
 
         return AccompanyPostResponse.of(accompanyPost, waitingCount,
                 MemberProfile.of(accompanyPost.getWriter(), currentMemberId));

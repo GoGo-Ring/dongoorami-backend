@@ -31,6 +31,9 @@ public interface AccompanyService {
     AccompanyPostResponse getAccompanyPostWithPessimisticLock(Long currentMemberId,
             Long accompanyPostId);
 
+    AccompanyPostResponse getAccompanyPostWithRedisViewCount(Long currentMemberId,
+            Long accompanyPostId);
+
     Long createAccompanyComment(Long accompanyPostId,
             AccompanyCommentRequest accompanyCommentRequest, Long currentMemberId,
             Boolean isAccompanyApplyComment);
