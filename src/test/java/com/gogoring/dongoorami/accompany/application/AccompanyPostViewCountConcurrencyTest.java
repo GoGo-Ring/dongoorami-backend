@@ -4,6 +4,7 @@ import static com.gogoring.dongoorami.accompany.AccompanyDataFactory.createAccom
 
 import com.gogoring.dongoorami.accompany.domain.AccompanyPost;
 import com.gogoring.dongoorami.accompany.repository.AccompanyPostRepository;
+import com.gogoring.dongoorami.accompany.repository.ViewCountRepository;
 import com.gogoring.dongoorami.concert.ConcertDataFactory;
 import com.gogoring.dongoorami.concert.domain.Concert;
 import com.gogoring.dongoorami.concert.repository.ConcertRepository;
@@ -36,6 +37,9 @@ class AccompanyPostViewCountConcurrencyTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private ViewCountRepository viewCountRepository;
+
     @BeforeEach
     void setUp() {
         accompanyPostRepository.deleteAll();
@@ -57,13 +61,13 @@ class AccompanyPostViewCountConcurrencyTest {
         Member member = MemberDataFactory.createMember();
         memberRepository.save(member);
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
-        int size = 1, requestCnt = 100;
+        int size = 1, requestCnt = 300;
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, size, concert)).get(0);
         Long viewCountBeforeRequests = accompanyPost.getViewCount(), viewCountAfterRequests;
 
         // when
-        List<CompletableFuture<Void>> getAccompanyPostRequestFutures = IntStream.range(0, 100)
+        List<CompletableFuture<Void>> getAccompanyPostRequestFutures = IntStream.range(0, 300)
                 .mapToObj(i -> CompletableFuture.runAsync(() ->
                         accompanyService.getAccompanyPost(member.getId(), accompanyPost.getId())
                 ))
@@ -89,14 +93,14 @@ class AccompanyPostViewCountConcurrencyTest {
         Member member = MemberDataFactory.createMember();
         memberRepository.save(member);
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
-        int size = 1, requestCnt = 100;
+        int size = 1, requestCnt = 300;
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, size, concert)).get(0);
         Long viewCountBeforeRequests = accompanyPost.getViewCount(), viewCountAfterRequests;
 
         // when
         long beforeTime = System.currentTimeMillis();
-        List<CompletableFuture<Void>> getAccompanyPostRequestFutures = IntStream.range(0, 100)
+        List<CompletableFuture<Void>> getAccompanyPostRequestFutures = IntStream.range(0, 300)
                 .mapToObj(i -> CompletableFuture.runAsync(() ->
                         accompanyService.getAccompanyPostWithViewCountUpdateQuery(member.getId(),
                                 accompanyPost.getId())
@@ -111,7 +115,7 @@ class AccompanyPostViewCountConcurrencyTest {
         long afterTime = System.currentTimeMillis();
 
         // then
-        System.out.println("소요시간(ms): " + (afterTime - beforeTime));
+        System.out.println("Update Lock 소요시간(ms): " + (afterTime - beforeTime));
         Assertions.assertThat(viewCountAfterRequests - viewCountBeforeRequests)
                 .isEqualTo(requestCnt);
     }
@@ -123,14 +127,14 @@ class AccompanyPostViewCountConcurrencyTest {
         Member member = MemberDataFactory.createMember();
         memberRepository.save(member);
         Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
-        int size = 1, requestCnt = 100;
+        int size = 1, requestCnt = 300;
         AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
                 createAccompanyPosts(member, size, concert)).get(0);
         Long viewCountBeforeRequests = accompanyPost.getViewCount(), viewCountAfterRequests;
 
         // when
         long beforeTime = System.currentTimeMillis();
-        List<CompletableFuture<Void>> getAccompanyPostRequestFutures = IntStream.range(0, 100)
+        List<CompletableFuture<Void>> getAccompanyPostRequestFutures = IntStream.range(0, 300)
                 .mapToObj(i -> CompletableFuture.runAsync(() ->
                         accompanyService.getAccompanyPostWithPessimisticLock(member.getId(),
                                 accompanyPost.getId())
@@ -145,7 +149,43 @@ class AccompanyPostViewCountConcurrencyTest {
         long afterTime = System.currentTimeMillis();
 
         // then
-        System.out.println("소요시간(ms): " + (afterTime - beforeTime));
+        System.out.println("Exclusive Lock 소요시간(ms): " + (afterTime - beforeTime));
+        Assertions.assertThat(viewCountAfterRequests - viewCountBeforeRequests)
+                .isEqualTo(requestCnt);
+    }
+
+    @Test
+    @DisplayName("동시에 여러 조회가 이루어지는 경우, 모든 조회수가 정상적으로 반영된다. - 레디스 사용")
+    void success_updateViewCount_given_redis() {
+        // given
+        Member member = MemberDataFactory.createMember();
+        memberRepository.save(member);
+        Concert concert = concertRepository.save(ConcertDataFactory.createConcert());
+        int size = 1, requestCnt = 300;
+        AccompanyPost accompanyPost = accompanyPostRepository.saveAll(
+                createAccompanyPosts(member, size, concert)).get(0);
+        viewCountRepository.save(accompanyPost.getId() + "_view_count", "0");
+        Long viewCountBeforeRequests = Long.parseLong(viewCountRepository.findByKey(
+                accompanyPost.getId() + "_view_count")), viewCountAfterRequests;
+
+        // when
+        long beforeTime = System.currentTimeMillis();
+        List<CompletableFuture<Void>> getAccompanyPostRequestFutures = IntStream.range(0, 300)
+                .mapToObj(i -> CompletableFuture.runAsync(() ->
+                        accompanyService.getAccompanyPostWithRedisViewCount(member.getId(),
+                                accompanyPost.getId())
+                ))
+                .toList();
+        CompletableFuture.allOf(
+                getAccompanyPostRequestFutures.toArray(
+                        new CompletableFuture[getAccompanyPostRequestFutures.size()])
+        ).join();
+        viewCountAfterRequests = Long.parseLong(
+                viewCountRepository.findByKey(accompanyPost.getId() + "_view_count"));
+        long afterTime = System.currentTimeMillis();
+
+        // then
+        System.out.println("Redisson 소요시간(ms): " + (afterTime - beforeTime));
         Assertions.assertThat(viewCountAfterRequests - viewCountBeforeRequests)
                 .isEqualTo(requestCnt);
     }
