@@ -12,9 +12,9 @@ on:
 
 env:
   PROJECT_NAME: dongoorami
-  BUCKET_NAME: dongoorami-bucket
+  BUCKET_NAME: dongoorami-buckets
   CODE_DEPLOY_APP_NAME: dongoorami-codedeploy
-  DEPLOYMENT_GROUP_NAME: dongoorami
+  DEPLOYMENT_GROUP_NAME: dongoorami-deploy-group
 
 jobs:
   build:
