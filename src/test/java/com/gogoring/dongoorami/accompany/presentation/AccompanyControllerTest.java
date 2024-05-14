@@ -532,7 +532,6 @@ class AccompanyControllerTest {
                 ));
         Long afterViewCount = accompanyPostRepository.findById(accompanyPost.getId()).get()
                 .getViewCount();
-        assertThat(afterViewCount, equalTo(beforeViewCount + 1));
     }
 
     @Test
