@@ -60,11 +60,11 @@ public class KopisService {
                 String result;
                 try {
                     result = kopisHttpInterface.findAll(serviceKey, LocalDate.now().format(
-                            DateTimeFormatter.ofPattern("yyyyMMdd")), "20241231", page, 5000, "Y");
+                            DateTimeFormatter.ofPattern("yyyyMMdd")), "20240501", page, 5000, "Y");
                 } catch (HttpClientErrorException e) {
                     log.warn(e.getMessage() + " page: " + page, e);
                     result = kopisHttpInterface.findAll(serviceKey, LocalDate.now().format(
-                            DateTimeFormatter.ofPattern("yyyyMMdd")), "20241231", page, 5000, "Y");
+                            DateTimeFormatter.ofPattern("yyyyMMdd")), "20240501", page, 5000, "Y");
                 }
 
                 if (result != null) {
