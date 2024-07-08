@@ -43,7 +43,7 @@
 - 커서 기반 무한 스크롤
 - 필터링 QueryDsl 적극 활용
 - 동시성 처리
-- Open API를 활용한 공연 정보 업데이트
+- Open API를 활용한 공연 정보 업데이트 (출처: [공연예술 통합전산망 KOPIS](https://www.kopis.or.kr/por/cs/openapi/openApiInfo.do?menuId=MNU_00074))
 - Spring Acutator를 통한 로그 확인
 - 테스트 코드 작성
 
