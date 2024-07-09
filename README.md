@@ -55,7 +55,7 @@
 |  Role   |                          AWS 책임자, 동행/쪽지 API                           |                       팀장, 공연/회원/찜 API                        |  
 
 ## 🦀 서버 구성
-![cicdaws서버](https://github.com/GoGo-Ring/dongoorami-backend/assets/77786996/a5b02db3-2664-4d7e-80da-c52c5a34c635)
+![cicdaws서버](https://github.com/GoGo-Ring/dongoorami-backend/assets/77786996/f62126ce-2d88-4404-8cf0-76a0941e3d6d)
 
 ## 🛠 기술 스택
 
@@ -97,7 +97,7 @@
 </p>
 
 ## 🗺️ ERD
-![gogoring_erd](https://github.com/GoGo-Ring/dongoorami-backend/assets/77786996/cb2ab04d-2420-4ec2-9c4b-33aa736f08bd)
+![gogoring_erd](https://github.com/GoGo-Ring/dongoorami-backend/assets/77786996/bfb78beb-1af3-42cd-991d-47130a4fec95)
 
 ## 🤙 Convention
 
