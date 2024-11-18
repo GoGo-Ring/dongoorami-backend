@@ -49,7 +49,7 @@
 
 ## 💪 백엔드 팀원
 
-|  Name   |             [최정은](https://github.com/JeongeunChoi)              |             [이유정](https://github.com/letskuku)       | 
+|  Name   |             [-](https://github.com/JeongeunChoi)              |             [이유정](https://github.com/letskuku)       | 
 |:-------:|:---------------------------------------------------------------:|:----------------------------------------------------------:|
 | Profile | <img width="100px" src="https://github.com/JeongeunChoi.png" /> | <img width="100px" src="https://github.com/letskuku.png" /> |
 |  Role   |                          AWS 책임자, 동행/쪽지 API                           |                       팀장, 공연/회원/찜 API                        |  
